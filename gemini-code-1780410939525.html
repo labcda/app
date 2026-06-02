@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Primeiro PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Olá, Mundo!</h1>
+        <p>Este é um Progressive Web App hospedado no GitHub.</p>
+        <button onclick="avisar()">Clique Aqui</button>
+    </div>
+
+    <script>
+        // Registra o Service Worker para permitir funcionamento offline
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+            .then(() => console.log('Service Worker registrado com sucesso!'))
+            .catch(err => console.error('Erro ao registrar Service Worker:', err));
+        }
+
+        function avisar() {
+            alert('Funciona mesmo offline!');
+        }
+    </script>
+</body>
+</html>
