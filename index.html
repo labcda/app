@@ -6,7 +6,7 @@
     <title>Laboratório CDA - Diagnóstico de Confiança</title>
     
     <!-- Meta tags para PWA -->
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#49BCBE">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Lab CDA">
@@ -15,7 +15,7 @@
     <!-- Google Fonts & Tailwind CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -25,15 +25,21 @@
                 extend: {
                     colors: {
                         cda: {
-                            dark: 'var(--cda-dark, #0f172a)',       // Grafite Escuro (Letras CDA)
-                            primary: 'var(--cda-primary, #10b981)', // Verde Vibrante (Microscópio/DNA)
-                            light: 'var(--cda-light, #f0fdf4)',     // Fundo Suave Verde Claro
-                            gray: '#4b5563',
-                            lightGray: '#f3f4f6'
+                            primary: '#49BCBE',
+                            'primary-dark': '#37A7AA',
+                            'primary-light': '#E8F8F8',
+                            text: '#3F3F3F',
+                            'text-light': '#6B7280',
+                            white: '#FFFFFF',
+                            background: '#F8FAFB',
+                            dark: '#3F3F3F',
+                            light: '#E8F8F8',
+                            gray: '#6B7280',
+                            lightGray: '#F8FAFB'
                         }
                     },
                     fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        sans: ['"DM Sans"', 'sans-serif'],
                     }
                 }
             }
@@ -41,45 +47,133 @@
     </script>
 
     <style>
-        /* Definição de Temas de Cores com Variáveis CSS */
+        /* Nova Paleta Oficial CDA */
         :root {
-            /* Tema Padrão: Grafite & Verde Bio (Inspirado na Logo Real) */
-            --cda-dark: #1e293b;
-            --cda-primary: #10b981;
-            --cda-light: #f0fdf4;
+            --cda-primary: #49BCBE;
+            --cda-primary-dark: #37A7AA;
+            --cda-primary-light: #E8F8F8;
+            --cda-text: #3F3F3F;
+            --cda-text-light: #6B7280;
+            --cda-white: #FFFFFF;
+            --cda-background: #F8FAFB;
+            /* legado para compatibilidade */
+            --cda-dark: #3F3F3F;
         }
 
-        /* Ocultar barra de rolagem estética */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--cda-primary);
-            border-radius: 10px;
-        }
+        body { background: var(--cda-background); color: var(--cda-text); }
+
+        /* Scrollbar refinada */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--cda-primary); border-radius: 10px; }
         
-        /* Animações e Transições de Páginas */
-        .page {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        .page.active {
-            display: block;
-            opacity: 1;
-        }
+        /* Transições de página */
+        .page { display: none; opacity: 0; transition: opacity 0.35s ease-in-out; }
+        .page.active { display: block; opacity: 1; }
         
-        /* Efeito de carregamento Pulsante do Splash */
+        /* Splash Screen – branco, logo centralizada */
+        #splashScreen {
+            background: #ffffff;
+        }
+
+        /* Barra de progresso no splash */
+        @keyframes progressBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .splash-progress-bar {
+            animation: progressBar 1.6s ease-in-out forwards;
+            background: linear-gradient(90deg, var(--cda-primary), var(--cda-primary-dark));
+        }
+
         @keyframes customPulse {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.95; }
+            50% { transform: scale(1.04); opacity: 0.92; }
         }
-        .splash-pulse {
-            animation: customPulse 2s infinite ease-in-out;
+        .splash-pulse { animation: customPulse 2.2s infinite ease-in-out; }
+
+        /* Cards premium CDA */
+        .card-cda {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(73,188,190,.10);
+            transition: transform .28s ease, box-shadow .28s ease;
+            border: 1px solid rgba(73,188,190,.10);
+        }
+        .card-cda:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(73,188,190,.18);
+        }
+
+        /* Botões CDA */
+        .btn-cda-primary {
+            background: #49BCBE;
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 600;
+            transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+            box-shadow: 0 4px 14px rgba(73,188,190,.30);
+        }
+        .btn-cda-primary:hover {
+            background: #37A7AA;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(73,188,190,.40);
+        }
+        .btn-cda-secondary {
+            background: #fff;
+            border-radius: 999px;
+            color: #49BCBE;
+            font-weight: 600;
+            border: 2px solid #49BCBE;
+            transition: all .2s ease;
+        }
+        .btn-cda-secondary:hover {
+            background: #E8F8F8;
+        }
+
+        /* Hero – fundo verde água CDA */
+        .hero-cda {
+            background: linear-gradient(135deg, #49BCBE 0%, #37A7AA 60%, #2d9496 100%);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-cda::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='28'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        /* Ícone CDA – badge */
+        .icon-cda {
+            background: var(--cda-primary-light);
+            color: var(--cda-primary);
+        }
+
+        /* Rodapé branco */
+        footer.footer-cda {
+            background: #fff;
+            border-top: 3px solid var(--cda-primary);
+            color: var(--cda-text);
+        }
+
+        /* Header clean */
+        header { background: #fff !important; }
+
+        /* Inputs focus */
+        input:focus, select:focus, textarea:focus {
+            border-color: #49BCBE !important;
+            ring-color: #49BCBE !important;
+        }
+
+        /* Nav mobile ativo */
+        .nav-item.active-nav { color: #49BCBE !important; }
+
+        /* Laudo premium */
+        #laudoContentState {
+            background: #fff;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -88,20 +182,22 @@
     <!-- SPLASH SCREEN DE CARREGAMENTO -->
     <div id="splashScreen" class="fixed inset-0 z-50 bg-white flex flex-col justify-between items-center p-8 transition-all duration-700">
         <div class="flex-grow flex flex-col justify-center items-center">
-            <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="w-72 h-auto splash-pulse">
-            <div class="mt-8 flex items-center space-x-2 text-cda-primary">
-                <i class="fa-solid fa-circle-notch animate-spin text-2xl"></i>
-                <span class="font-medium tracking-wide">Iniciando aplicativo seguro...</span>
+            <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="w-64 h-auto splash-pulse">
+            <div class="mt-10 w-64">
+                <div class="bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="splash-progress-bar h-1.5 rounded-full"></div>
+                </div>
+                <p class="text-center text-xs text-gray-400 mt-3 font-medium tracking-wide">Carregando portal seguro...</p>
             </div>
         </div>
-        <div class="text-center text-xs text-slate-400">
+        <div class="text-center text-xs text-gray-300">
             <p>Laboratório CDA LTDA &copy; 2026</p>
             <p>Diagnósticos com Rigor Científico e Humanização</p>
         </div>
     </div>
 
     <!-- BANNER DE INSTALAÇÃO PWA -->
-    <div id="installBanner" class="hidden bg-cda-dark text-white px-4 py-3 flex justify-between items-center text-sm z-40 sticky top-0">
+    <div id="installBanner" class="hidden text-white px-4 py-3 flex justify-between items-center text-sm z-40 sticky top-0" style="background:#49BCBE">
         <div class="flex items-center space-x-3">
             <img src="logo CDA Transparente.png" alt="CDA" class="w-10 bg-white rounded p-1">
             <div>
@@ -110,25 +206,24 @@
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="dismissInstall()" class="text-slate-300 px-2 py-1 text-xs hover:text-white">Agora não</button>
-            <button onclick="triggerInstall()" class="bg-cda-primary hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded text-xs transition shadow-sm">Instalar</button>
+            <button onclick="dismissInstall()" class="text-white/80 px-2 py-1 text-xs hover:text-white">Agora não</button>
+            <button onclick="triggerInstall()" class="bg-white text-cda-primary hover:bg-gray-50 font-bold px-3 py-1.5 rounded-full text-xs transition shadow-sm">Instalar</button>
         </div>
     </div>
 
     <!-- HEADER DO APLICATIVO -->
-    <header class="bg-white shadow-sm sticky top-0 z-30 px-4 py-3 md:py-4 flex justify-between items-center border-b border-slate-100">
+    <header class="bg-white shadow-sm sticky top-0 z-30 px-4 py-3 md:py-4 flex justify-between items-center border-b border-gray-100">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="navigateTo('home')">
             <img src="logo CDA Transparente.png" alt="Laboratório CDA Logo" class="h-10 md:h-12 w-auto">
         </div>
         <div class="flex items-center space-x-3">
-            <!-- Botão do Seletor de Cores / Tema -->
-            <button onclick="toggleThemePanel()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2.5 flex items-center justify-center transition" title="Mudar cores do design">
-                <i class="fa-solid fa-palette text-lg"></i>
+            <button onclick="toggleThemePanel()" class="bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-full p-2.5 flex items-center justify-center transition border border-gray-200" title="Mudar cores do design">
+                <i class="fa-solid fa-palette text-lg" style="color:#49BCBE"></i>
             </button>
-            <a href="https://wa.me/5527998980658" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full p-2.5 flex items-center justify-center transition shadow-md" title="Falar no WhatsApp">
+            <a href="https://wa.me/5527998980658" target="_blank" class="text-white rounded-full p-2.5 flex items-center justify-center transition shadow-md btn-cda-primary" title="Falar no WhatsApp">
                 <i class="fa-brands fa-whatsapp text-lg"></i>
             </a>
-            <button onclick="navigateTo('contato')" class="hidden md:inline-flex bg-cda-light text-cda-dark hover:bg-emerald-100 px-4 py-2 rounded-full font-medium text-sm transition">
+            <button onclick="navigateTo('contato')" class="hidden md:inline-flex px-5 py-2 rounded-full font-semibold text-sm transition btn-cda-primary">
                 Fale Conosco
             </button>
         </div>
@@ -171,24 +266,24 @@
         
         <!-- PÁGINA 1: HOME/DASHBOARD -->
         <section id="page-home" class="page active space-y-6">
-            <!-- Banner de Boas-vindas -->
-            <div class="bg-gradient-to-br from-cda-dark to-slate-800 text-white rounded-2xl p-6 md:p-8 shadow-lg relative overflow-hidden transition-all duration-300">
-                <div class="absolute right-0 bottom-0 opacity-10 translate-y-6 translate-x-6">
-                    <i class="fa-solid fa-microscope text-9xl"></i>
+            <!-- Banner de Boas-vindas - Hero CDA -->
+            <div class="hero-cda text-white p-6 md:p-10 shadow-lg relative">
+                <div class="absolute right-6 bottom-0 opacity-10 translate-y-2">
+                    <i class="fa-solid fa-dna text-9xl"></i>
                 </div>
-                <div class="max-w-xl">
-                    <span class="bg-white/10 text-white text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
+                <div class="max-w-xl relative z-10">
+                    <span class="bg-white/20 text-white text-xs uppercase tracking-wider font-bold px-4 py-1.5 rounded-full backdrop-blur-sm border border-white/30 inline-block">
                         Tecnologia & Cuidado de Ponta
                     </span>
-                    <h2 class="text-2xl md:text-3xl font-bold mt-4 mb-2">Cuidar de você é a nossa missão</h2>
-                    <p class="text-sm md:text-base text-slate-300 leading-relaxed">
+                    <h2 class="text-2xl md:text-3xl font-bold mt-5 mb-3">Cuidar de você é a nossa missão</h2>
+                    <p class="text-sm md:text-base text-white/85 leading-relaxed">
                         Estamos prontos para atender você e sua família com acolhimento, precisão e responsabilidade em Afonso Cláudio.
                     </p>
-                    <div class="mt-6 flex flex-wrap gap-3">
-                        <button onclick="navigateTo('resultados')" class="bg-white text-slate-900 hover:bg-slate-100 font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-md">
-                            <i class="fa-solid fa-file-medical mr-2 text-cda-primary"></i>Ver Resultados
+                    <div class="mt-7 flex flex-wrap gap-3">
+                        <button onclick="navigateTo('resultados')" class="bg-white font-semibold px-6 py-2.5 rounded-full text-sm transition shadow-md hover:bg-gray-50" style="color:#49BCBE">
+                            <i class="fa-solid fa-file-medical mr-2"></i>Ver Resultados
                         </button>
-                        <button onclick="navigateTo('agendar')" class="bg-cda-primary hover:bg-opacity-90 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-md">
+                        <button onclick="navigateTo('agendar')" class="bg-white/15 hover:bg-white/25 text-white font-semibold px-6 py-2.5 rounded-full text-sm transition border border-white/30">
                             <i class="fa-solid fa-calendar-check mr-2"></i>Agendar Coleta
                         </button>
                     </div>
@@ -197,51 +292,51 @@
 
             <!-- Grid de Ações Rápidas -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div onclick="navigateTo('resultados')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
+                <div onclick="navigateTo('resultados')" class="card-cda cursor-pointer p-5 flex flex-col justify-between h-40">
+                    <div class="icon-cda w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-key"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Laudo Online</h3>
-                        <p class="text-xs text-slate-500 mt-1">Acesse com seu código de protocolo</p>
+                        <h3 class="font-bold text-sm md:text-base" style="color:#3F3F3F">Laudo Online</h3>
+                        <p class="text-xs mt-1" style="color:#6B7280">Acesse com seu código de protocolo</p>
                     </div>
                 </div>
 
-                <div onclick="navigateTo('agendar')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
+                <div onclick="navigateTo('agendar')" class="card-cda cursor-pointer p-5 flex flex-col justify-between h-40">
+                    <div class="icon-cda w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-vial"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Coleta Domiciliar</h3>
-                        <p class="text-xs text-slate-500 mt-1">Agende e faremos onde você preferir</p>
+                        <h3 class="font-bold text-sm md:text-base" style="color:#3F3F3F">Coleta Domiciliar</h3>
+                        <p class="text-xs mt-1" style="color:#6B7280">Agende e faremos onde você preferir</p>
                     </div>
                 </div>
 
-                <div onclick="navigateTo('preparo')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
+                <div onclick="navigateTo('preparo')" class="card-cda cursor-pointer p-5 flex flex-col justify-between h-40">
+                    <div class="icon-cda w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-book-medical"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Guia de Preparo</h3>
-                        <p class="text-xs text-slate-500 mt-1">Como se preparar para cada exame</p>
+                        <h3 class="font-bold text-sm md:text-base" style="color:#3F3F3F">Guia de Preparo</h3>
+                        <p class="text-xs mt-1" style="color:#6B7280">Como se preparar para cada exame</p>
                     </div>
                 </div>
 
-                <div onclick="navigateTo('unidades')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
+                <div onclick="navigateTo('unidades')" class="card-cda cursor-pointer p-5 flex flex-col justify-between h-40">
+                    <div class="icon-cda w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Nossas Unidades</h3>
-                        <p class="text-xs text-slate-500 mt-1">Matriz e filial em Afonso Cláudio</p>
+                        <h3 class="font-bold text-sm md:text-base" style="color:#3F3F3F">Nossas Unidades</h3>
+                        <p class="text-xs mt-1" style="color:#6B7280">Matriz e filial em Afonso Cláudio</p>
                     </div>
                 </div>
             </div>
 
             <!-- Informações das Unidades & Horários Rápidos -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                <h3 class="text-lg font-bold text-cda-dark mb-4 flex items-center">
-                    <i class="fa-regular fa-clock mr-2 text-cda-primary"></i> Horários e Unidades de Coleta
+            <div class="card-cda p-6">
+                <h3 class="text-lg font-bold mb-4 flex items-center" style="color:#3F3F3F">
+                    <i class="fa-regular fa-clock mr-2" style="color:#49BCBE"></i> Horários e Unidades de Coleta
                 </h3>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="border-l-4 border-cda-primary pl-4 py-1">
@@ -262,7 +357,7 @@
             </div>
 
             <!-- Convênios Principais -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
+            <div class="card-cda p-6 text-center">
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Trabalhamos com os principais planos</p>
                 <div class="flex flex-wrap justify-center items-center gap-6 opacity-80">
                     <span class="font-bold text-lg text-blue-800">UNIMED</span>
@@ -706,28 +801,28 @@
     </main>
 
     <!-- FOOTER DESKTOP -->
-    <footer class="hidden md:block bg-cda-dark text-white py-10 mt-12 border-t border-slate-800">
+    <footer class="hidden md:block footer-cda py-10 mt-12">
         <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="space-y-3">
-                <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="h-12 bg-white rounded-lg p-1.5 mb-2 shadow-sm">
-                <p class="text-sm text-slate-300">Precisão diagnóstica, excelência analítica e atendimento caloroso e humanizado para Afonso Cláudio.</p>
+                <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="h-12 w-auto mb-2">
+                <p class="text-sm" style="color:#6B7280">Precisão diagnóstica, excelência analítica e atendimento caloroso e humanizado para Afonso Cláudio.</p>
             </div>
             <div>
-                <h4 class="font-bold text-lg mb-4 text-white">Links Rápidos</h4>
-                <ul class="space-y-2 text-sm text-slate-300">
-                    <li><a href="#" onclick="navigateTo('home')" class="hover:text-white transition">Início</a></li>
-                    <li><a href="#" onclick="navigateTo('resultados')" class="hover:text-white transition">Resultados Online</a></li>
-                    <li><a href="#" onclick="navigateTo('agendar')" class="hover:text-white transition">Agendar Coleta</a></li>
-                    <li><a href="#" onclick="navigateTo('preparo')" class="hover:text-white transition">Guia de Preparo</a></li>
+                <h4 class="font-bold text-lg mb-4" style="color:#3F3F3F">Links Rápidos</h4>
+                <ul class="space-y-2 text-sm" style="color:#6B7280">
+                    <li><a href="#" onclick="navigateTo('home')" class="hover:underline transition" style="color:#49BCBE">Início</a></li>
+                    <li><a href="#" onclick="navigateTo('resultados')" class="hover:underline transition" style="color:#49BCBE">Resultados Online</a></li>
+                    <li><a href="#" onclick="navigateTo('agendar')" class="hover:underline transition" style="color:#49BCBE">Agendar Coleta</a></li>
+                    <li><a href="#" onclick="navigateTo('preparo')" class="hover:underline transition" style="color:#49BCBE">Guia de Preparo</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="font-bold text-lg mb-4 text-white">Atendimento ao Cliente</h4>
-                <p class="text-sm text-slate-300">Matriz: Rua José Giestas, nº 46, Centro, Afonso Cláudio - ES</p>
-                <p class="text-sm text-slate-300 mt-2">Dúvidas? <a href="tel:27998980658" class="underline hover:text-white">(27) 99898-0658</a></p>
+                <h4 class="font-bold text-lg mb-4" style="color:#3F3F3F">Atendimento ao Cliente</h4>
+                <p class="text-sm" style="color:#6B7280">Matriz: Rua José Giestas, nº 46, Centro, Afonso Cláudio - ES</p>
+                <p class="text-sm mt-2" style="color:#6B7280">Dúvidas? <a href="tel:27998980658" class="font-semibold" style="color:#49BCBE">(27) 99898-0658</a></p>
             </div>
         </div>
-        <div class="border-t border-slate-800 mt-8 pt-4 text-center text-xs text-slate-400">
+        <div class="mt-8 pt-4 text-center text-xs border-t" style="border-color:#E8F8F8; color:#6B7280">
             Laboratório CDA LTDA &copy; 2026. Todos os direitos reservados.
         </div>
     </footer>
