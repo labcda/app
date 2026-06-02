@@ -6,7 +6,7 @@
     <title>Laboratório CDA - Diagnóstico de Confiança</title>
     
     <!-- Meta tags para PWA -->
-    <meta name="theme-color" content="#1e4634">
+    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Lab CDA">
@@ -19,17 +19,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Configuração do Tailwind com a paleta oficial da logo -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         cda: {
-                            dark: '#1e4634',       // Verde Escuro Institucional
-                            primary: '#2d7a57',    // Verde Principal do DNA
-                            light: '#e8f3ee',      // Fundo suave esverdeado
-                            gray: '#4a4a4a',       // Cinza do texto da marca
+                            dark: 'var(--cda-dark, #0f172a)',       // Grafite Escuro (Letras CDA)
+                            primary: 'var(--cda-primary, #10b981)', // Verde Vibrante (Microscópio/DNA)
+                            light: 'var(--cda-light, #f0fdf4)',     // Fundo Suave Verde Claro
+                            gray: '#4b5563',
                             lightGray: '#f3f4f6'
                         }
                     },
@@ -42,6 +41,14 @@
     </script>
 
     <style>
+        /* Definição de Temas de Cores com Variáveis CSS */
+        :root {
+            /* Tema Padrão: Grafite & Verde Bio (Inspirado na Logo Real) */
+            --cda-dark: #1e293b;
+            --cda-primary: #10b981;
+            --cda-light: #f0fdf4;
+        }
+
         /* Ocultar barra de rolagem estética */
         ::-webkit-scrollbar {
             width: 6px;
@@ -51,11 +58,11 @@
             background: #f1f1f1;
         }
         ::-webkit-scrollbar-thumb {
-            background: #2d7a57;
+            background: var(--cda-primary);
             border-radius: 10px;
         }
         
-        /* Animações e Transições */
+        /* Animações e Transições de Páginas */
         .page {
             display: none;
             opacity: 0;
@@ -76,7 +83,7 @@
         }
     </style>
 </head>
-<body class="bg-[#f7faf8] font-sans antialiased text-gray-800 min-h-screen flex flex-col pb-20 md:pb-0">
+<body class="bg-[#f8fafc] font-sans antialiased text-slate-800 min-h-screen flex flex-col pb-20 md:pb-0">
 
     <!-- SPLASH SCREEN DE CARREGAMENTO -->
     <div id="splashScreen" class="fixed inset-0 z-50 bg-white flex flex-col justify-between items-center p-8 transition-all duration-700">
@@ -87,34 +94,38 @@
                 <span class="font-medium tracking-wide">Iniciando aplicativo seguro...</span>
             </div>
         </div>
-        <div class="text-center text-xs text-gray-400">
+        <div class="text-center text-xs text-slate-400">
             <p>Laboratório CDA LTDA &copy; 2026</p>
             <p>Diagnósticos com Rigor Científico e Humanização</p>
         </div>
     </div>
 
-    <!-- BANNER DE INSTALAÇÃO PWA (Aparece no topo se elegível) -->
+    <!-- BANNER DE INSTALAÇÃO PWA -->
     <div id="installBanner" class="hidden bg-cda-dark text-white px-4 py-3 flex justify-between items-center text-sm z-40 sticky top-0">
         <div class="flex items-center space-x-3">
             <img src="logo CDA Transparente.png" alt="CDA" class="w-10 bg-white rounded p-1">
             <div>
-                <p class="font-bold">Instale o app do CDA</p>
-                <p class="text-xs text-gray-300">Acesso super rápido e funciona offline!</p>
+                <p class="font-bold text-white">Instale o app do CDA</p>
+                <p class="text-xs text-slate-300">Acesso super rápido e funciona offline!</p>
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="dismissInstall()" class="text-gray-300 px-2 py-1 text-xs">Agora não</button>
-            <button onclick="triggerInstall()" class="bg-[#2d7a57] hover:bg-cda-primary text-white font-bold px-3 py-1.5 rounded text-xs transition">Instalar</button>
+            <button onclick="dismissInstall()" class="text-slate-300 px-2 py-1 text-xs hover:text-white">Agora não</button>
+            <button onclick="triggerInstall()" class="bg-cda-primary hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded text-xs transition shadow-sm">Instalar</button>
         </div>
     </div>
 
     <!-- HEADER DO APLICATIVO -->
-    <header class="bg-white shadow-sm sticky top-0 z-30 px-4 py-3 md:py-4 flex justify-between items-center">
+    <header class="bg-white shadow-sm sticky top-0 z-30 px-4 py-3 md:py-4 flex justify-between items-center border-b border-slate-100">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="navigateTo('home')">
             <img src="logo CDA Transparente.png" alt="Laboratório CDA Logo" class="h-10 md:h-12 w-auto">
         </div>
         <div class="flex items-center space-x-3">
-            <a href="https://wa.me/5527998980658" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full p-2.5 flex items-center justify-center transition shadow-sm" title="Falar no WhatsApp">
+            <!-- Botão do Seletor de Cores / Tema -->
+            <button onclick="toggleThemePanel()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2.5 flex items-center justify-center transition" title="Mudar cores do design">
+                <i class="fa-solid fa-palette text-lg"></i>
+            </button>
+            <a href="https://wa.me/5527998980658" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full p-2.5 flex items-center justify-center transition shadow-md" title="Falar no WhatsApp">
                 <i class="fa-brands fa-whatsapp text-lg"></i>
             </a>
             <button onclick="navigateTo('contato')" class="hidden md:inline-flex bg-cda-light text-cda-dark hover:bg-emerald-100 px-4 py-2 rounded-full font-medium text-sm transition">
@@ -123,27 +134,61 @@
         </div>
     </header>
 
+    <!-- PAINEL INTERATIVO DE AJUSTE DE CORES -->
+    <div id="themePanel" class="hidden bg-white border-b border-slate-200 px-4 py-4 transition-all duration-300">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h4 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-wand-magic-sparkles text-cda-primary mr-2"></i>Personalize as Cores do App</h4>
+                <p class="text-xs text-slate-500">Escolha a combinação de cores que melhor combina com a marca:</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="setTheme('#1e293b', '#10b981', '#f0fdf4', 'logo-grafite')" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition">
+                    <span class="w-3.5 h-3.5 rounded-full bg-slate-800 inline-block"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block -ml-2"></span>
+                    <span>Grafite & Bio-Verde (Logo)</span>
+                </button>
+                <button onclick="setTheme('#1e4634', '#2d7a57', '#e8f3ee', 'classico')" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#1e4634] inline-block"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#2d7a57] inline-block -ml-2"></span>
+                    <span>Verde Clássico</span>
+                </button>
+                <button onclick="setTheme('#0f172a', '#0284c7', '#f0f9ff', 'azul')" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition">
+                    <span class="w-3.5 h-3.5 rounded-full bg-slate-900 inline-block"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-sky-600 inline-block -ml-2"></span>
+                    <span>Azul Clínico</span>
+                </button>
+                <button onclick="setTheme('#115e59', '#0d9488', '#f0fdfa', 'teal')" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition">
+                    <span class="w-3.5 h-3.5 rounded-full bg-teal-800 inline-block"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-teal-600 inline-block -ml-2"></span>
+                    <span>Teal Moderno</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- CONTAINER DAS PÁGINAS -->
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
         
         <!-- PÁGINA 1: HOME/DASHBOARD -->
         <section id="page-home" class="page active space-y-6">
             <!-- Banner de Boas-vindas -->
-            <div class="bg-gradient-to-br from-cda-dark to-cda-primary text-white rounded-2xl p-6 md:p-8 shadow-md relative overflow-hidden">
+            <div class="bg-gradient-to-br from-cda-dark to-slate-800 text-white rounded-2xl p-6 md:p-8 shadow-lg relative overflow-hidden transition-all duration-300">
                 <div class="absolute right-0 bottom-0 opacity-10 translate-y-6 translate-x-6">
                     <i class="fa-solid fa-microscope text-9xl"></i>
                 </div>
                 <div class="max-w-xl">
-                    <span class="bg-emerald-800/50 text-emerald-200 text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full">Tecnologia & Cuidado</span>
-                    <h2 class="text-2xl md:text-3xl font-bold mt-3 mb-2">Cuidar de você é a nossa missão</h2>
-                    <p class="text-sm md:text-base text-gray-200 leading-relaxed">
+                    <span class="bg-white/10 text-white text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
+                        Tecnologia & Cuidado de Ponta
+                    </span>
+                    <h2 class="text-2xl md:text-3xl font-bold mt-4 mb-2">Cuidar de você é a nossa missão</h2>
+                    <p class="text-sm md:text-base text-slate-300 leading-relaxed">
                         Estamos prontos para atender você e sua família com acolhimento, precisão e responsabilidade em Afonso Cláudio.
                     </p>
-                    <div class="mt-5 flex flex-wrap gap-3">
-                        <button onclick="navigateTo('resultados')" class="bg-white text-cda-dark hover:bg-gray-100 font-semibold px-5 py-2.5 rounded-lg text-sm transition shadow-sm">
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <button onclick="navigateTo('resultados')" class="bg-white text-slate-900 hover:bg-slate-100 font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-md">
                             <i class="fa-solid fa-file-medical mr-2 text-cda-primary"></i>Ver Resultados
                         </button>
-                        <button onclick="navigateTo('agendar')" class="bg-[#10b981] hover:bg-emerald-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition shadow-sm">
+                        <button onclick="navigateTo('agendar')" class="bg-cda-primary hover:bg-opacity-90 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-md">
                             <i class="fa-solid fa-calendar-check mr-2"></i>Agendar Coleta
                         </button>
                     </div>
@@ -152,64 +197,64 @@
 
             <!-- Grid de Ações Rápidas -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div onclick="navigateTo('resultados')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-xl shadow-sm border border-transparent transition flex flex-col justify-between h-36">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-lg flex items-center justify-center text-xl">
+                <div onclick="navigateTo('resultados')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
+                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-key"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm md:text-base">Laudo Online</h3>
-                        <p class="text-xs text-gray-500 mt-1">Acesse com seu código de protocolo</p>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Laudo Online</h3>
+                        <p class="text-xs text-slate-500 mt-1">Acesse com seu código de protocolo</p>
                     </div>
                 </div>
 
-                <div onclick="navigateTo('agendar')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-xl shadow-sm border border-transparent transition flex flex-col justify-between h-36">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-lg flex items-center justify-center text-xl">
+                <div onclick="navigateTo('agendar')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
+                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-vial"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm md:text-base">Coleta Domiciliar</h3>
-                        <p class="text-xs text-gray-500 mt-1">Agende e faremos onde você preferir</p>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Coleta Domiciliar</h3>
+                        <p class="text-xs text-slate-500 mt-1">Agende e faremos onde você preferir</p>
                     </div>
                 </div>
 
-                <div onclick="navigateTo('preparo')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-xl shadow-sm border border-transparent transition flex flex-col justify-between h-36">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-lg flex items-center justify-center text-xl">
+                <div onclick="navigateTo('preparo')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
+                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-book-medical"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm md:text-base">Guia de Preparo</h3>
-                        <p class="text-xs text-gray-500 mt-1">Como se preparar para cada exame</p>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Guia de Preparo</h3>
+                        <p class="text-xs text-slate-500 mt-1">Como se preparar para cada exame</p>
                     </div>
                 </div>
 
-                <div onclick="navigateTo('unidades')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-xl shadow-sm border border-transparent transition flex flex-col justify-between h-36">
-                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-lg flex items-center justify-center text-xl">
+                <div onclick="navigateTo('unidades')" class="bg-white hover:border-cda-primary cursor-pointer p-5 rounded-2xl shadow-sm border border-slate-100 transition flex flex-col justify-between h-40">
+                    <div class="bg-cda-light text-cda-primary w-12 h-12 rounded-xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm md:text-base">Nossas Unidades</h3>
-                        <p class="text-xs text-gray-500 mt-1">Matriz e filial em Afonso Cláudio</p>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Nossas Unidades</h3>
+                        <p class="text-xs text-slate-500 mt-1">Matriz e filial em Afonso Cláudio</p>
                     </div>
                 </div>
             </div>
 
             <!-- Informações das Unidades & Horários Rápidos -->
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                 <h3 class="text-lg font-bold text-cda-dark mb-4 flex items-center">
                     <i class="fa-regular fa-clock mr-2 text-cda-primary"></i> Horários e Unidades de Coleta
                 </h3>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="border-l-4 border-cda-primary pl-4 py-1">
-                        <span class="font-bold text-gray-800">Matriz (Centro)</span>
-                        <p class="text-sm text-gray-600 mt-1">Rua José Giestas, nº 46, Centro (Próximo à Caixa Econômica)</p>
-                        <p class="text-xs text-emerald-700 font-medium mt-2">
-                            <i class="fa-solid fa-check-double"></i> Seg. a Sex. das 07:00 às 17:00h
+                        <span class="font-bold text-slate-800">Matriz (Centro)</span>
+                        <p class="text-sm text-slate-500 mt-1">Rua José Giestas, nº 46, Centro (Próximo à Caixa Econômica)</p>
+                        <p class="text-xs font-semibold mt-2 text-cda-primary">
+                            <i class="fa-solid fa-circle-check"></i> Seg. a Sex. das 07:00 às 17:00h
                         </p>
                     </div>
                     <div class="border-l-4 border-amber-500 pl-4 py-1">
-                        <span class="font-bold text-gray-800">Mata Fria (Filial)</span>
-                        <p class="text-sm text-gray-600 mt-1">Córrego Francisco Correia, Zona Rural - Mata Fria</p>
-                        <p class="text-xs text-amber-700 font-medium mt-2">
+                        <span class="font-bold text-slate-800">Mata Fria (Filial)</span>
+                        <p class="text-sm text-slate-500 mt-1">Córrego Francisco Correia, Zona Rural - Mata Fria</p>
+                        <p class="text-xs text-amber-600 font-semibold mt-2">
                             <i class="fa-solid fa-calendar-days"></i> Segunda, Quarta e Sexta das 06:00 às 09:00h
                         </p>
                     </div>
@@ -217,14 +262,14 @@
             </div>
 
             <!-- Convênios Principais -->
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">Trabalhamos com os principais planos</p>
-                <div class="flex flex-wrap justify-center items-center gap-6 opacity-75">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Trabalhamos com os principais planos</p>
+                <div class="flex flex-wrap justify-center items-center gap-6 opacity-80">
                     <span class="font-bold text-lg text-blue-800">UNIMED</span>
                     <span class="font-bold text-lg text-teal-600">SAMP</span>
                     <span class="font-bold text-lg text-sky-600">MEDSERVIC</span>
                     <span class="font-bold text-lg text-red-700">BANESTES SAÚDE</span>
-                    <span class="font-bold text-lg text-gray-700">PARTICULAR</span>
+                    <span class="font-bold text-lg text-slate-500">PARTICULAR</span>
                 </div>
             </div>
         </section>
@@ -232,59 +277,59 @@
         <!-- PÁGINA 2: EXAMES / PREPARO -->
         <section id="page-preparo" class="page space-y-6">
             <h2 class="text-2xl font-bold text-cda-dark">Guia de Preparo de Exames</h2>
-            <p class="text-gray-600 -mt-4 text-sm">Siga rigorosamente as orientações para garantir a precisão máxima dos seus resultados analíticos.</p>
+            <p class="text-slate-500 -mt-4 text-sm">Siga rigorosamente as orientações para garantir a precisão máxima dos seus resultados analíticos.</p>
             
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
                 <!-- Barra de pesquisa rápida -->
-                <div class="p-4 bg-gray-50 border-b border-gray-100">
+                <div class="p-4 bg-slate-50 border-b border-slate-100">
                     <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-gray-400"></i>
-                        <input type="text" id="preparoSearch" onkeyup="filterPreparo()" placeholder="Buscar instrução (Ex: Urina, Hemograma, Glicose...)" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-cda-primary text-sm">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-400"></i>
+                        <input type="text" id="preparoSearch" onkeyup="filterPreparo()" placeholder="Buscar instrução (Ex: Urina, Hemograma, Glicose...)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cda-primary text-sm">
                     </div>
                 </div>
 
-                <div class="divide-y divide-gray-100" id="preparoList">
+                <div class="divide-y divide-slate-100" id="preparoList">
                     <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="hemograma sangue completo">
                         <div>
-                            <span class="font-bold text-gray-800 block text-base">Hemograma Completo</span>
-                            <span class="text-xs text-gray-500">Exame de Sangue</span>
+                            <span class="font-bold text-slate-800 block text-base">Hemograma Completo</span>
+                            <span class="text-xs text-slate-500">Exame de Sangue</span>
                         </div>
                         <div class="flex flex-wrap gap-2 text-xs">
                             <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Recomendado jejum de 3 horas</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full">Sem álcool por 24h</span>
+                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Sem álcool por 24h</span>
                         </div>
                     </div>
 
                     <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="glicemia em jejum glicose sangue">
                         <div>
-                            <span class="font-bold text-gray-800 block text-base">Glicemia de Jejum</span>
-                            <span class="text-xs text-gray-500">Dosagem de Glicose</span>
+                            <span class="font-bold text-slate-800 block text-base">Glicemia de Jejum</span>
+                            <span class="text-xs text-slate-500">Dosagem de Glicose</span>
                         </div>
                         <div class="flex flex-wrap gap-2 text-xs">
                             <span class="bg-red-50 text-red-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum obrigatório de 8 a 12 horas</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full">Água pura é permitida</span>
+                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Água pura é permitida</span>
                         </div>
                     </div>
 
                     <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="urina tipo 1 eas urocultura rotina">
                         <div>
-                            <span class="font-bold text-gray-800 block text-base">Urina Rotina (EAS ou Tipo 1)</span>
-                            <span class="text-xs text-gray-500">Coleta Urinária</span>
+                            <span class="font-bold text-slate-800 block text-base">Urina Rotina (EAS ou Tipo 1)</span>
+                            <span class="text-xs text-slate-500">Coleta Urinária</span>
                         </div>
                         <div class="flex flex-wrap gap-2 text-xs">
                             <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full"><i class="fa-solid fa-droplet mr-1"></i> Preferencialmente a 1ª urina da manhã</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full">Desprezar o primeiro jato</span>
+                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Desprezar o primeiro jato</span>
                         </div>
                     </div>
 
                     <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="fezes parasitologico coprocultura">
                         <div>
-                            <span class="font-bold text-gray-800 block text-base">Exame de Fezes (Parasitológico)</span>
-                            <span class="text-xs text-gray-500">Coleta de Amostra</span>
+                            <span class="font-bold text-slate-800 block text-base">Exame de Fezes (Parasitológico)</span>
+                            <span class="text-xs text-slate-500">Coleta de Amostra</span>
                         </div>
                         <div class="flex flex-wrap gap-2 text-xs">
                             <span class="bg-amber-50 text-amber-700 px-3 py-1 rounded-full"><i class="fa-solid fa-box mr-1"></i> Coletar em frasco estéril</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full">Evitar laxantes</span>
+                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Evitar laxantes</span>
                         </div>
                     </div>
                 </div>
@@ -294,25 +339,25 @@
         <!-- PÁGINA 3: AGENDAMENTO ONLINE -->
         <section id="page-agendar" class="page space-y-6">
             <h2 class="text-2xl font-bold text-cda-dark">Solicitar Pré-Agendamento</h2>
-            <p class="text-gray-600 -mt-4 text-sm">Preencha os dados e entraremos em contato via WhatsApp para confirmar a data e o horário.</p>
+            <p class="text-slate-500 -mt-4 text-sm">Preencha os dados e entraremos em contato via WhatsApp para confirmar a data e o horário.</p>
 
-            <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 space-y-4">
+            <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 space-y-4">
                 <!-- Unidade de Coleta -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Selecione a Unidade:</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Selecione a Unidade:</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="border-2 border-gray-200 rounded-lg p-3 flex items-center space-x-3 cursor-pointer hover:border-cda-primary checked:border-cda-primary transition">
+                        <label class="border-2 border-slate-200 rounded-xl p-3 flex items-center space-x-3 cursor-pointer hover:border-cda-primary transition">
                             <input type="radio" name="unidade" value="Matriz" required checked class="text-cda-primary focus:ring-cda-primary">
                             <div>
                                 <span class="font-bold text-sm block">Matriz</span>
-                                <span class="text-xs text-gray-500">Afonso Cláudio (Centro)</span>
+                                <span class="text-xs text-slate-500">Afonso Cláudio (Centro)</span>
                             </div>
                         </label>
-                        <label class="border-2 border-gray-200 rounded-lg p-3 flex items-center space-x-3 cursor-pointer hover:border-cda-primary checked:border-cda-primary transition">
+                        <label class="border-2 border-slate-200 rounded-xl p-3 flex items-center space-x-3 cursor-pointer hover:border-cda-primary transition">
                             <input type="radio" name="unidade" value="Mata Fria" class="text-cda-primary focus:ring-cda-primary">
                             <div>
                                 <span class="font-bold text-sm block">Mata Fria</span>
-                                <span class="text-xs text-gray-500">Zona Rural (Filial)</span>
+                                <span class="text-xs text-slate-500">Zona Rural (Filial)</span>
                             </div>
                         </label>
                     </div>
@@ -320,8 +365,8 @@
 
                 <!-- Tipo de Coleta -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Local da Coleta:</label>
-                    <select name="tipoColeta" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" required>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Local da Coleta:</label>
+                    <select name="tipoColeta" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" required>
                         <option value="Laboratorio">Presencial no Laboratório</option>
                         <option value="Domiciliar">Domiciliar (Cuidado e Conforto no seu Lar)</option>
                     </select>
@@ -330,23 +375,23 @@
                 <!-- Informações do Paciente -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nome Completo:</label>
-                        <input type="text" name="nome" placeholder="Seu nome completo" required class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nome Completo:</label>
+                        <input type="text" name="nome" placeholder="Seu nome completo" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp de Contato:</label>
-                        <input type="tel" name="whatsapp" placeholder="(27) 99999-9999" required class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">WhatsApp de Contato:</label>
+                        <input type="tel" name="whatsapp" placeholder="(27) 99999-9999" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Previsão de Data:</label>
-                        <input type="date" name="dataPretendida" required class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Previsão de Data:</label>
+                        <input type="date" name="dataPretendida" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Convênio:</label>
-                        <select name="convenio" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" required>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Convênio:</label>
+                        <select name="convenio" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" required>
                             <option value="Particular">Particular</option>
                             <option value="Unimed">Unimed</option>
                             <option value="Samp">Samp</option>
@@ -356,11 +401,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Quais exames deseja agendar? (Se houver):</label>
-                    <textarea name="exames" rows="2" placeholder="Ex: Hemograma, Urina, Glicemia..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Quais exames deseja agendar? (Se houver):</label>
+                    <textarea name="exames" rows="2" placeholder="Ex: Hemograma, Urina, Glicemia..." class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
                 </div>
 
-                <button type="submit" class="w-full bg-cda-primary hover:bg-cda-dark text-white font-bold py-3 px-4 rounded-lg text-sm transition shadow-sm">
+                <button type="submit" class="w-full bg-cda-primary hover:bg-opacity-95 text-white font-bold py-3 px-4 rounded-xl text-sm transition shadow-md flex justify-center items-center">
                     <i class="fa-regular fa-paper-plane mr-2"></i>Enviar Solicitação por WhatsApp
                 </button>
             </form>
@@ -369,49 +414,49 @@
         <!-- PÁGINA 4: RESULTADO ONLINE -->
         <section id="page-resultados" class="page space-y-6">
             <h2 class="text-2xl font-bold text-cda-dark">Acesso a Resultados Online</h2>
-            <p class="text-gray-600 -mt-4 text-sm font-medium">Insira os dados do protocolo entregue na coleta para obter o laudo técnico digital.</p>
+            <p class="text-slate-500 -mt-4 text-sm font-medium">Insira os dados do protocolo entregue na coleta para obter o laudo técnico digital.</p>
 
             <div class="grid md:grid-cols-3 gap-6">
                 <!-- Formulário de Login de Laudo -->
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 md:col-span-1 space-y-4 h-fit">
-                    <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 md:col-span-1 space-y-4 h-fit">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center">
                         <i class="fa-solid fa-lock text-cda-primary mr-2"></i> Área Segura
                     </h3>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Código de Protocolo:</label>
-                        <input type="text" id="resultProtocol" placeholder="Ex: CDA-2026" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none font-mono uppercase">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Código de Protocolo:</label>
+                        <input type="text" id="resultProtocol" placeholder="Ex: CDA-2026" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none font-mono uppercase">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Senha de Acesso:</label>
-                        <input type="password" id="resultPass" placeholder="••••" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Senha de Acesso:</label>
+                        <input type="password" id="resultPass" placeholder="••••" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                     </div>
                     
-                    <button onclick="buscarExames()" class="w-full bg-[#2d7a57] hover:bg-cda-dark text-white font-semibold py-2.5 rounded-lg text-sm transition">
+                    <button onclick="buscarExames()" class="w-full bg-cda-primary hover:bg-opacity-95 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-sm">
                         <i class="fa-solid fa-circle-check mr-2"></i>Visualizar Laudo
                     </button>
 
-                    <div class="bg-gray-50 p-3 rounded-lg border border-dashed border-gray-200 text-xs text-gray-500">
-                        <span class="font-bold block text-cda-dark"><i class="fa-solid fa-circle-info text-cda-primary"></i> Código de teste:</span>
-                        Utilize <span class="font-bold font-mono bg-white px-1.5 py-0.5 border border-gray-300 rounded text-cda-primary">CDA-2026</span> com qualquer senha para simular e inspecionar a interface do laudo médico.
+                    <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-200 text-xs text-slate-500">
+                        <span class="font-bold block text-cda-dark mb-1"><i class="fa-solid fa-circle-info text-cda-primary"></i> Código de teste:</span>
+                        Utilize <span class="font-bold font-mono bg-white px-1.5 py-0.5 border border-slate-300 rounded text-cda-primary">CDA-2026</span> com qualquer senha para simular e inspecionar a interface do laudo médico.
                     </div>
                 </div>
 
                 <!-- Visualizador do Laudo Laboratorial -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 md:col-span-2 min-h-[400px] flex items-center justify-center p-6 relative" id="laudoDisplayContainer">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 md:col-span-2 min-h-[400px] flex items-center justify-center p-6 relative" id="laudoDisplayContainer">
                     
                     <!-- Estado Inicial (Sem buscas) -->
                     <div id="laudoEmptyState" class="text-center max-w-sm">
-                        <div class="text-6xl text-gray-300 mb-4">
+                        <div class="text-6xl text-slate-300 mb-4">
                             <i class="fa-solid fa-file-invoice"></i>
                         </div>
-                        <h4 class="font-bold text-gray-700 text-base">Aguardando Credenciais</h4>
-                        <p class="text-sm text-gray-400 mt-2">Os laudos emitidos possuem assinatura digital e validade jurídica para apresentação médica.</p>
+                        <h4 class="font-bold text-slate-700 text-base">Aguardando Credenciais</h4>
+                        <p class="text-sm text-slate-400 mt-2">Os laudos emitidos possuem assinatura digital e validade jurídica para apresentação médica.</p>
                     </div>
 
                     <!-- Estado Carregando -->
                     <div id="laudoLoaderState" class="hidden text-center">
                         <i class="fa-solid fa-spinner animate-spin text-4xl text-cda-primary"></i>
-                        <p class="text-sm text-gray-500 mt-3 font-semibold">Buscando banco de dados...</p>
+                        <p class="text-sm text-slate-500 mt-3 font-semibold">Buscando banco de dados...</p>
                     </div>
 
                     <!-- Laudo Renderizado Realista -->
@@ -420,31 +465,31 @@
                         <div class="flex justify-between items-start border-b pb-4">
                             <div>
                                 <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="h-10 w-auto mb-2">
-                                <span class="text-[10px] text-gray-400 block">LABORATÓRIO CDA LTDA | CNPJ: 12.525.717/0001-36</span>
+                                <span class="text-[10px] text-slate-400 block">LABORATÓRIO CDA LTDA | CNPJ: 12.525.717/0001-36</span>
                             </div>
                             <div class="text-right">
                                 <span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded text-[10px] uppercase">Laudo Assinado Digitalmente</span>
-                                <span class="text-gray-400 block mt-1 text-[10px]">Autenticação: #928374-CDA</span>
+                                <span class="text-slate-400 block mt-1 text-[10px]">Autenticação: #928374-CDA</span>
                             </div>
                         </div>
 
                         <!-- Dados do Paciente -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-lg font-medium text-[11px]">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl font-medium text-[11px]">
                             <div>
-                                <span class="text-gray-400 block text-[9px] uppercase">Paciente:</span>
-                                <span class="text-gray-800 font-bold">José Afonso de Souza</span>
+                                <span class="text-slate-400 block text-[9px] uppercase">Paciente:</span>
+                                <span class="text-slate-800 font-bold">José Afonso de Souza</span>
                             </div>
                             <div>
-                                <span class="text-gray-400 block text-[9px] uppercase">Data de Nascimento:</span>
-                                <span class="text-gray-800">14/08/1979 (46 anos)</span>
+                                <span class="text-slate-400 block text-[9px] uppercase">Data de Nascimento:</span>
+                                <span class="text-slate-800">14/08/1979 (46 anos)</span>
                             </div>
                             <div>
-                                <span class="text-gray-400 block text-[9px] uppercase">Coleta:</span>
-                                <span class="text-gray-800">02/06/2026 07:15h</span>
+                                <span class="text-slate-400 block text-[9px] uppercase">Coleta:</span>
+                                <span class="text-slate-800">02/06/2026 07:15h</span>
                             </div>
                             <div>
-                                <span class="text-gray-400 block text-[9px] uppercase">Solicitante:</span>
-                                <span class="text-gray-800">Dr. Marcos Viana CRM-ES</span>
+                                <span class="text-slate-400 block text-[9px] uppercase">Solicitante:</span>
+                                <span class="text-slate-800">Dr. Marcos Viana CRM-ES</span>
                             </div>
                         </div>
 
@@ -454,27 +499,27 @@
                             
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="border-b text-gray-400 uppercase text-[9px] tracking-wider">
+                                    <tr class="border-b text-slate-400 uppercase text-[9px] tracking-wider">
                                         <th class="pb-2">Parâmetro Analisado</th>
                                         <th class="pb-2">Resultado Encontrado</th>
                                         <th class="pb-2">Unidade</th>
                                         <th class="pb-2 text-right">Valores de Referência</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y text-[11px] text-gray-700">
-                                    <tr class="hover:bg-gray-50">
+                                <tbody class="divide-y text-[11px] text-slate-700">
+                                    <tr class="hover:bg-slate-50">
                                         <td class="py-2.5 font-semibold">Glicose em Jejum</td>
                                         <td class="py-2.5 font-bold text-emerald-700">88,00</td>
                                         <td class="py-2.5">mg/dL</td>
                                         <td class="py-2.5 text-right">70,00 a 99,00 mg/dL</td>
                                     </tr>
-                                    <tr class="hover:bg-gray-50">
+                                    <tr class="hover:bg-slate-50">
                                         <td class="py-2.5 font-semibold">Hemoglobina</td>
                                         <td class="py-2.5 font-bold text-emerald-700">14,2</td>
                                         <td class="py-2.5">g/dL</td>
                                         <td class="py-2.5 text-right">13,5 a 17,5 g/dL</td>
                                     </tr>
-                                    <tr class="hover:bg-gray-50">
+                                    <tr class="hover:bg-slate-50">
                                         <td class="py-2.5 font-semibold">Colesterol Total</td>
                                         <td class="py-2.5 font-bold text-amber-600">198,00</td>
                                         <td class="py-2.5">mg/dL</td>
@@ -486,25 +531,25 @@
 
                         <!-- Notas e Responsabilidade Técnica -->
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-t pt-4 gap-4">
-                            <div class="text-[9px] text-gray-400 max-w-sm">
-                                <p class="font-bold text-gray-500">Nota Científica:</p>
+                            <div class="text-[9px] text-slate-400 max-w-sm">
+                                <p class="font-bold text-slate-500">Nota Científica:</p>
                                 <p>Os exames laboratoriais correlacionam-se com as condições clínicas no momento da coleta. Resultados isolados devem ser correlacionados com o histórico clínico pelo seu médico de confiança.</p>
                             </div>
                             <div class="text-right w-full md:w-auto">
-                                <div class="border-b border-gray-300 w-44 inline-block text-center mb-1">
-                                    <span class="font-bold text-gray-800 text-[10px] block">Dra. Clara Silveira</span>
-                                    <span class="text-gray-400 text-[9px] block">CRBM-ES 4482-P</span>
+                                <div class="border-b border-slate-300 w-44 inline-block text-center mb-1">
+                                    <span class="font-bold text-slate-800 text-[10px] block">Dra. Clara Silveira</span>
+                                    <span class="text-slate-400 text-[9px] block">CRBM-ES 4482-P</span>
                                 </div>
-                                <p class="text-[9px] text-gray-400">Farmacêutica-Bioquímica Responsável</p>
+                                <p class="text-[9px] text-slate-400">Farmacêutica-Bioquímica Responsável</p>
                             </div>
                         </div>
 
                         <!-- Botão de Ação do Laudo -->
                         <div class="flex justify-end space-x-2 pt-2">
-                            <button onclick="window.print()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded text-[10px] transition">
+                            <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-lg text-[10px] transition">
                                 <i class="fa-solid fa-print mr-1"></i> Imprimir Laudo
                             </button>
-                            <button onclick="alert('Laudo baixado com validade jurídica.')" class="bg-cda-primary hover:bg-cda-dark text-white font-bold px-4 py-2 rounded text-[10px] transition">
+                            <button onclick="baixarLaudoSimulado()" class="bg-cda-primary hover:bg-opacity-90 text-white font-bold px-4 py-2 rounded-lg text-[10px] transition shadow-sm">
                                 <i class="fa-solid fa-file-pdf mr-1"></i> Baixar PDF
                             </button>
                         </div>
@@ -517,20 +562,20 @@
         <!-- PÁGINA 5: UNIDADES / CONTATO -->
         <section id="page-unidades" class="page space-y-6">
             <h2 class="text-2xl font-bold text-cda-dark">Nossas Unidades</h2>
-            <p class="text-gray-600 -mt-4 text-sm">Dispomos de infraestrutura confortável e higienizada, projetada com todo o carinho e cuidado.</p>
+            <p class="text-slate-500 -mt-4 text-sm">Dispomos de infraestrutura confortável e higienizada, projetada com todo o carinho e cuidado.</p>
 
             <div class="grid md:grid-cols-2 gap-6">
                 <!-- Unidade Matriz -->
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 flex flex-col justify-between">
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100 flex flex-col justify-between">
                     <div class="p-6">
                         <div class="flex justify-between items-start">
-                            <span class="bg-emerald-100 text-[#1e4634] font-bold text-xs uppercase px-2.5 py-1 rounded">Matriz</span>
+                            <span class="bg-emerald-100 text-cda-dark font-bold text-xs uppercase px-2.5 py-1 rounded-full">Matriz</span>
                             <a href="tel:27998980658" class="text-cda-primary hover:underline font-bold text-xs"><i class="fa-solid fa-phone mr-1"></i> (27) 99898-0658</a>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mt-4">Unidade Centro</h3>
-                        <p class="text-sm text-gray-500 mt-2">Rua José Giestas, nº 46, Centro - Afonso Cláudio / ES (Ponto de fácil acesso com estacionamento rápido no entorno)</p>
+                        <h3 class="text-xl font-bold text-slate-800 mt-4">Unidade Centro</h3>
+                        <p class="text-sm text-slate-500 mt-2">Rua José Giestas, nº 46, Centro - Afonso Cláudio / ES (Ponto de fácil acesso com estacionamento rápido no entorno)</p>
                         
-                        <div class="mt-6 space-y-2 text-sm text-gray-600">
+                        <div class="mt-6 space-y-2 text-sm text-slate-600">
                             <div class="flex items-center">
                                 <i class="fa-regular fa-clock w-6 text-cda-primary"></i>
                                 <span>Coleta: Segunda a Sexta, das 07:00 às 11:00h</span>
@@ -541,8 +586,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 bg-gray-50 border-t flex justify-end space-x-2">
-                        <a href="https://maps.google.com/?q=Rua+Jose+Giestas,+46,+Centro,+Afonso+Claudio+ES" target="_blank" class="bg-white hover:bg-gray-100 border text-gray-700 font-semibold px-4 py-2 rounded-lg text-xs transition">
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
+                        <a href="https://maps.google.com/?q=Rua+Jose+Giestas,+46,+Centro,+Afonso+Claudio+ES" target="_blank" class="bg-white hover:bg-slate-100 border text-slate-700 font-semibold px-4 py-2 rounded-lg text-xs transition">
                             <i class="fa-solid fa-route mr-1 text-emerald-600"></i> Como Chegar
                         </a>
                         <a href="https://wa.me/5527998980658" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">
@@ -552,16 +597,16 @@
                 </div>
 
                 <!-- Unidade Mata Fria -->
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 flex flex-col justify-between">
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100 flex flex-col justify-between">
                     <div class="p-6">
                         <div class="flex justify-between items-start">
-                            <span class="bg-amber-100 text-amber-800 font-bold text-xs uppercase px-2.5 py-1 rounded">Filial</span>
+                            <span class="bg-amber-100 text-amber-800 font-bold text-xs uppercase px-2.5 py-1 rounded-full">Filial</span>
                             <a href="tel:27996508220" class="text-amber-700 hover:underline font-bold text-xs"><i class="fa-solid fa-phone mr-1"></i> (27) 99650-8220</a>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mt-4">Unidade Mata Fria</h3>
-                        <p class="text-sm text-gray-500 mt-2">Córrego Francisco Correia, Zona Rural - Mata Fria, Afonso Cláudio / ES</p>
+                        <h3 class="text-xl font-bold text-slate-800 mt-4">Unidade Mata Fria</h3>
+                        <p class="text-sm text-slate-500 mt-2">Córrego Francisco Correia, Zona Rural - Mata Fria, Afonso Cláudio / ES</p>
                         
-                        <div class="mt-6 space-y-2 text-sm text-gray-600">
+                        <div class="mt-6 space-y-2 text-sm text-slate-600">
                             <div class="flex items-center">
                                 <i class="fa-regular fa-clock w-6 text-amber-600"></i>
                                 <span>Coleta: Segunda, Quarta e Sexta das 06:00 às 09:00h</span>
@@ -572,8 +617,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 bg-gray-50 border-t flex justify-end space-x-2">
-                        <a href="https://maps.google.com/?q=Mata+Fria,+Afonso+Claudio+ES" target="_blank" class="bg-white hover:bg-gray-100 border text-gray-700 font-semibold px-4 py-2 rounded-lg text-xs transition">
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
+                        <a href="https://maps.google.com/?q=Mata+Fria,+Afonso+Claudio+ES" target="_blank" class="bg-white hover:bg-slate-100 border text-slate-700 font-semibold px-4 py-2 rounded-lg text-xs transition">
                             <i class="fa-solid fa-route mr-1 text-emerald-600"></i> Como Chegar
                         </a>
                         <a href="https://wa.me/5527996508220" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">
@@ -587,58 +632,58 @@
         <!-- PÁGINA 6: CONTATO / FALE CONOSCO -->
         <section id="page-contato" class="page space-y-6">
             <h2 class="text-2xl font-bold text-cda-dark">Fale Conosco</h2>
-            <p class="text-gray-600 -mt-4 text-sm">Tem dúvidas, sugestões ou elogios? Entre em contato por nossos canais digitais ou pelo formulário abaixo.</p>
+            <p class="text-slate-500 -mt-4 text-sm">Tem dúvidas, sugestões ou elogios? Entre em contato por nossos canais digitais ou pelo formulário abaixo.</p>
 
             <div class="grid md:grid-cols-3 gap-6">
                 <!-- Informações de contato -->
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 md:col-span-1 space-y-6">
-                    <h3 class="font-bold text-gray-800 text-lg">Canais Diretos</h3>
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 md:col-span-1 space-y-6">
+                    <h3 class="font-bold text-slate-800 text-lg">Canais Diretos</h3>
                     
                     <div class="space-y-4">
                         <div class="flex items-start space-x-3">
                             <div class="text-cda-primary text-lg mt-1"><i class="fa-solid fa-phone"></i></div>
                             <div>
-                                <span class="font-semibold block text-sm">Telefone Matriz</span>
-                                <a href="tel:27998980658" class="text-gray-600 hover:underline text-sm">(27) 99898-0658</a>
+                                <span class="font-semibold block text-sm text-slate-800">Telefone Matriz</span>
+                                <a href="tel:27998980658" class="text-slate-600 hover:underline text-sm">(27) 99898-0658</a>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-3">
                             <div class="text-emerald-500 text-lg mt-1"><i class="fa-brands fa-whatsapp"></i></div>
                             <div>
-                                <span class="font-semibold block text-sm">WhatsApp</span>
-                                <a href="https://wa.me/5527998980658" target="_blank" class="text-gray-600 hover:underline text-sm">Clique para conversar</a>
+                                <span class="font-semibold block text-sm text-slate-800">WhatsApp</span>
+                                <a href="https://wa.me/5527998980658" target="_blank" class="text-slate-600 hover:underline text-sm">Clique para conversar</a>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-3">
                             <div class="text-cda-primary text-lg mt-1"><i class="fa-solid fa-envelope"></i></div>
                             <div>
-                                <span class="font-semibold block text-sm">E-mail</span>
-                                <span class="text-gray-600 text-sm">laboratoriocda.recepcao@gmail.com</span>
+                                <span class="font-semibold block text-sm text-slate-800">E-mail</span>
+                                <span class="text-slate-600 text-sm">laboratoriocda.recepcao@gmail.com</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Formulário de mensagem direta -->
-                <form onsubmit="submitFormContato(event)" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 md:col-span-2 space-y-4">
-                    <h3 class="font-bold text-gray-800 text-lg">Envie uma Mensagem</h3>
+                <form onsubmit="submitFormContato(event)" class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 md:col-span-2 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-lg">Envie uma Mensagem</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Seu Nome:</label>
-                            <input type="text" name="contatoNome" required placeholder="Digite seu nome completo" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Seu Nome:</label>
+                            <input type="text" name="contatoNome" required placeholder="Digite seu nome completo" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Seu E-mail ou Telefone:</label>
-                            <input type="text" name="contatoInfo" required placeholder="(27) 99999-9999 ou e-mail" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Seu E-mail ou Telefone:</label>
+                            <input type="text" name="contatoInfo" required placeholder="(27) 99999-9999 ou e-mail" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Assunto:</label>
-                        <select name="contatoAssunto" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Assunto:</label>
+                        <select name="contatoAssunto" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                             <option value="Duvidas">Dúvidas sobre Exames / Preparos</option>
                             <option value="Orcamentos">Orçamentos de Exames</option>
                             <option value="Reclamacoes">Elogios, Reclamações ou Sugestões</option>
@@ -646,11 +691,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Mensagem:</label>
-                        <textarea name="contatoMensagem" rows="4" required placeholder="Como podemos ajudar você hoje?" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Mensagem:</label>
+                        <textarea name="contatoMensagem" rows="4" required placeholder="Como podemos ajudar você hoje?" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
                     </div>
 
-                    <button type="submit" class="bg-cda-primary hover:bg-cda-dark text-white font-bold py-3 px-6 rounded-lg text-sm transition shadow-sm flex items-center justify-center space-x-2">
+                    <button type="submit" class="bg-cda-primary hover:bg-opacity-95 text-white font-bold py-3 px-6 rounded-xl text-sm transition shadow-md flex items-center justify-center space-x-2">
                         <i class="fa-regular fa-paper-plane"></i>
                         <span>Enviar Mensagem</span>
                     </button>
@@ -661,15 +706,15 @@
     </main>
 
     <!-- FOOTER DESKTOP -->
-    <footer class="hidden md:block bg-cda-dark text-white py-10 mt-12">
+    <footer class="hidden md:block bg-cda-dark text-white py-10 mt-12 border-t border-slate-800">
         <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="space-y-3">
-                <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="h-12 bg-white rounded p-1 mb-2">
-                <p class="text-sm text-gray-300">Precisão diagnóstica, excelência analítica e atendimento caloroso e humanizado para Afonso Cláudio.</p>
+                <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="h-12 bg-white rounded-lg p-1.5 mb-2 shadow-sm">
+                <p class="text-sm text-slate-300">Precisão diagnóstica, excelência analítica e atendimento caloroso e humanizado para Afonso Cláudio.</p>
             </div>
             <div>
-                <h4 class="font-bold text-lg mb-4 text-emerald-400">Links Rápidos</h4>
-                <ul class="space-y-2 text-sm text-gray-300">
+                <h4 class="font-bold text-lg mb-4 text-white">Links Rápidos</h4>
+                <ul class="space-y-2 text-sm text-slate-300">
                     <li><a href="#" onclick="navigateTo('home')" class="hover:text-white transition">Início</a></li>
                     <li><a href="#" onclick="navigateTo('resultados')" class="hover:text-white transition">Resultados Online</a></li>
                     <li><a href="#" onclick="navigateTo('agendar')" class="hover:text-white transition">Agendar Coleta</a></li>
@@ -677,35 +722,35 @@
                 </ul>
             </div>
             <div>
-                <h4 class="font-bold text-lg mb-4 text-emerald-400">Atendimento ao Cliente</h4>
-                <p class="text-sm text-gray-300">Matriz: Rua José Giestas, nº 46, Centro, Afonso Cláudio - ES</p>
-                <p class="text-sm text-gray-300 mt-2">Dúvidas? <a href="tel:27998980658" class="underline hover:text-white">(27) 99898-0658</a></p>
+                <h4 class="font-bold text-lg mb-4 text-white">Atendimento ao Cliente</h4>
+                <p class="text-sm text-slate-300">Matriz: Rua José Giestas, nº 46, Centro, Afonso Cláudio - ES</p>
+                <p class="text-sm text-slate-300 mt-2">Dúvidas? <a href="tel:27998980658" class="underline hover:text-white">(27) 99898-0658</a></p>
             </div>
         </div>
-        <div class="border-t border-emerald-800/50 mt-8 pt-4 text-center text-xs text-emerald-300">
+        <div class="border-t border-slate-800 mt-8 pt-4 text-center text-xs text-slate-400">
             Laboratório CDA LTDA &copy; 2026. Todos os direitos reservados.
         </div>
     </footer>
 
-    <!-- BARRA DE NAVEGAÇÃO MOBILE (Ficada na base) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 flex justify-around items-center h-16 shadow-lg">
+    <!-- BARRA DE NAVEGAÇÃO MOBILE (Fixada na base) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 z-30 flex justify-around items-center h-16 shadow-lg">
         <button onclick="navigateTo('home')" class="nav-item flex flex-col items-center justify-center text-cda-primary w-12" id="nav-home">
             <i class="fa-solid fa-house text-lg"></i>
             <span class="text-[10px] font-semibold mt-0.5">Início</span>
         </button>
-        <button onclick="navigateTo('preparo')" class="nav-item flex flex-col items-center justify-center text-gray-400 w-12" id="nav-preparo">
+        <button onclick="navigateTo('preparo')" class="nav-item flex flex-col items-center justify-center text-slate-400 w-12" id="nav-preparo">
             <i class="fa-solid fa-list-check text-lg"></i>
             <span class="text-[10px] font-semibold mt-0.5">Preparo</span>
         </button>
-        <button onclick="navigateTo('agendar')" class="nav-item flex flex-col items-center justify-center text-gray-400 w-12" id="nav-agendar">
+        <button onclick="navigateTo('agendar')" class="nav-item flex flex-col items-center justify-center text-slate-400 w-12" id="nav-agendar">
             <i class="fa-solid fa-calendar-plus text-lg"></i>
             <span class="text-[10px] font-semibold mt-0.5">Agendar</span>
         </button>
-        <button onclick="navigateTo('resultados')" class="nav-item flex flex-col items-center justify-center text-gray-400 w-12" id="nav-resultados">
+        <button onclick="navigateTo('resultados')" class="nav-item flex flex-col items-center justify-center text-slate-400 w-12" id="nav-resultados">
             <i class="fa-solid fa-id-card text-lg"></i>
             <span class="text-[10px] font-semibold mt-0.5">Laudos</span>
         </button>
-        <button onclick="navigateTo('unidades')" class="nav-item flex flex-col items-center justify-center text-gray-400 w-12" id="nav-unidades">
+        <button onclick="navigateTo('unidades')" class="nav-item flex flex-col items-center justify-center text-slate-400 w-12" id="nav-unidades">
             <i class="fa-solid fa-map-location-dot text-lg"></i>
             <span class="text-[10px] font-semibold mt-0.5">Lojas</span>
         </button>
@@ -715,6 +760,14 @@
     <script>
         // 1. Simular Splash Screen sumindo após carregar assets básicos
         window.addEventListener('load', () => {
+            // Aplicar tema salvo no localStorage, se houver
+            const savedDark = localStorage.getItem('cda-theme-dark');
+            const savedPrimary = localStorage.getItem('cda-theme-primary');
+            const savedLight = localStorage.getItem('cda-theme-light');
+            if (savedDark && savedPrimary && savedLight) {
+                setTheme(savedDark, savedPrimary, savedLight, 'stored');
+            }
+
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
                 splash.classList.add('opacity-0', 'pointer-events-none');
@@ -724,7 +777,29 @@
             }, 1800);
         });
 
-        // 2. Sistema de Roteamento SPA Simples
+        // 2. Sistema de Personalização Dinâmica de Cores (CSS Variables)
+        function toggleThemePanel() {
+            const panel = document.getElementById('themePanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function setTheme(dark, primary, light, themeName) {
+            document.documentElement.style.setProperty('--cda-dark', dark);
+            document.documentElement.style.setProperty('--cda-primary', primary);
+            document.documentElement.style.setProperty('--cda-light', light);
+            
+            // Atualizar cor da meta tag theme-color de forma dinâmica
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', dark);
+
+            // Salvar escolha do usuário para as próximas visitas
+            if (themeName !== 'stored') {
+                localStorage.setItem('cda-theme-dark', dark);
+                localStorage.setItem('cda-theme-primary', primary);
+                localStorage.setItem('cda-theme-light', light);
+            }
+        }
+
+        // 3. Sistema de Roteamento SPA Simples
         function navigateTo(pageId) {
             // Ocultar todas as páginas
             document.querySelectorAll('.page').forEach(page => {
@@ -741,16 +816,16 @@
             // Atualizar estilos dos botões de navegação no Mobile
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('text-cda-primary');
-                item.classList.add('text-gray-400');
+                item.classList.add('text-slate-400');
             });
             const activeNav = document.getElementById(`nav-${pageId}`);
             if (activeNav) {
-                activeNav.classList.remove('text-gray-400');
+                activeNav.classList.remove('text-slate-400');
                 activeNav.classList.add('text-cda-primary');
             }
         }
 
-        // 3. Sistema de Busca de Laudo Médico de Teste
+        // 4. Sistema de Busca de Laudo Médico de Teste
         function buscarExames() {
             const protocol = document.getElementById('resultProtocol').value.trim().toUpperCase();
             const pass = document.getElementById('resultPass').value.trim();
@@ -783,7 +858,22 @@
             }, 1200);
         }
 
-        // 4. Filtrar lista de preparo de exames
+        // Ação de download simulado (substituição para evitar alert() conforme as regras do sistema)
+        function baixarLaudoSimulado() {
+            const tempBox = document.createElement('div');
+            tempBox.className = "fixed bottom-5 right-5 left-5 md:left-auto md:w-96 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center justify-between z-50 text-xs";
+            tempBox.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+                    <span>Laudo PDF baixado com autenticação digital válida!</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white font-bold ml-2">X</button>
+            `;
+            document.body.appendChild(tempBox);
+            setTimeout(() => tempBox.remove(), 4000);
+        }
+
+        // 5. Filtrar lista de preparo de exames
         function filterPreparo() {
             const query = document.getElementById('preparoSearch').value.toLowerCase();
             const items = document.querySelectorAll('.preparo-item');
@@ -798,7 +888,7 @@
             });
         }
 
-        // 5. Envio de Agendamento por Whatsapp
+        // 6. Envio de Agendamento por Whatsapp
         function submitAgendamento(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
@@ -830,7 +920,7 @@
             window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
         }
 
-        // 6. Enviar formulário de Fale Conosco
+        // 7. Enviar formulário de Fale Conosco
         function submitFormContato(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
@@ -851,7 +941,7 @@
             event.target.reset();
         }
 
-        // 7. Simular Instalação do PWA
+        // 8. Simular Instalação do PWA
         let deferredPrompt;
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -886,8 +976,15 @@
                     dismissInstall();
                 });
             } else {
-                // Instrução de compatibilidade caso o prompt direto não seja disparado
-                alert('No iOS (iPhone), clique no botão de Compartilhar do seu Safari e selecione "Adicionar à Tela de Início". No Android, utilize o menu de 3 pontos do Chrome.');
+                // Mensagem de ajuda caso o prompt direto não seja disparado
+                const infoBox = document.createElement('div');
+                infoBox.className = "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-200 z-50 text-xs w-80 text-center";
+                infoBox.innerHTML = `
+                    <h5 class="font-bold text-sm mb-2 text-slate-900"><i class="fa-solid fa-mobile-screen text-cda-primary mr-1"></i>Instruções de Instalação</h5>
+                    <p class="text-slate-600 mb-4">No **iOS (iPhone)**, toque em <i class="fa-solid fa-share-nodes text-slate-500"></i> Compartilhar no Safari e selecione **"Adicionar à Tela de Início"**.<br><br>No **Android (Chrome)**, toque nos 3 pontinhos e selecione **"Instalar Aplicativo"**.</p>
+                    <button onclick="this.parentElement.remove()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-lg">Entendi</button>
+                `;
+                document.body.appendChild(infoBox);
                 dismissInstall();
             }
         }
