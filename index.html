@@ -1125,7 +1125,7 @@
             });
         }
 
-        async function submitOrcamento() {
+                async function submitOrcamento() {
             const nome = document.getElementById('orcNome').value.trim();
             const whatsapp = document.getElementById('orcWhatsapp').value.trim();
             const convenio = document.getElementById('orcConvenio').value;
@@ -1135,56 +1135,58 @@
             const arquivos = fotosInput ? Array.from(fotosInput.files) : [];
             const temFotos = arquivos.length > 0;
 
-            if (!nome) { mostrarAlerta('Por favor, informe seu nome completo.', 'erro'); return; }
+            if (!nome || !whatsapp) { mostrarAlerta('Por favor, preencha nome e WhatsApp.', 'erro'); return; }
+            if (!exames && !temFotos) { mostrarAlerta('Descreva os exames ou anexe uma foto.', 'erro'); return; }
+
+            const msg = `Olá, Laboratório CDA! Orçamento de exames:
+
+*Nome:* ${nome}
+*WhatsApp:* ${whatsapp}
+*Convênio:* ${convenio}
+${exames ? '*Exames:* '+exames : '*(Exames via foto)*'}
+*Obs:* ${obs}${temFotos ? '
+
+📎 Enviarei '+arquivos.length+' foto(s) em seguida.' : ''}`;
+            const phone = "5527998980658";
+
+            if (temFotos && navigator.canShare && navigator.canShare({ files: arquivos })) {
+                try {
+                    await navigator.share({ title: 'Orçamento CDA', text: msg, files: arquivos });
+                    limparFormOrc(fotosInput); return;
+                } catch (e) {}
+            }
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+            limparFormOrc(fotosInput);
+            mostrarAlerta('✅ Mensagem enviada! Se houver fotos, anexe-as agora no WhatsApp.', 'sucesso');
+        }
+        function limparFormOrc(f) { 
+            document.getElementById('orcNome').value = ''; document.getElementById('orcWhatsapp').value = ''; 
+            document.getElementById('orcExames').value = ''; document.getElementById('orcObs').value = '';
+            if(f) f.value = ''; document.getElementById('fotosPreview').classList.add('hidden');
+        }
+
             if (!whatsapp) { mostrarAlerta('Por favor, informe seu WhatsApp para retorno.', 'erro'); return; }
             if (!exames && !temFotos) { mostrarAlerta('Por favor, descreva os exames ou adicione uma foto do pedido.', 'erro'); return; }
 
-            const fotosInfoTexto = temFotos ? `\n\n📎 Fotos/arquivos anexados: ${arquivos.length} arquivo(s) selecionado(s).` : '';
-            const examesInfoTexto = exames ? `\nExames descritos: ${exames}` : '\n(Exames via foto/arquivo em anexo)';
-            const mensagem = `Olá, Laboratório CDA! Gostaria de solicitar um orçamento de exames.\n\n` +
-                `Nome: ${nome}\n` +
-                `WhatsApp p/ retorno: ${whatsapp}\n` +
-                `Convênio/Plano: ${convenio}` +
-                examesInfoTexto +
-                `\nObservações: ${obs}` +
-                fotosInfoTexto +
-                `\n\nPor favor, enviar o orçamento no WhatsApp informado acima. Obrigado!`;
+            const fotosInfo = temFotos ? `%0A%0A📎 *Fotos do pedido:* ${fotosInput.files.length} imagem(ns) anexada(s) — enviarei em seguida` : '';
+            const examesInfo = exames ? `%0A*Exames descritos:* ${exames}` : '%0A*(Exames via foto em anexo)*';
+
+            const text = `Olá, Laboratório CDA! Gostaria de solicitar um *orçamento de exames* 🧪%0A%0A` +
+                `*Nome:* ${nome}%0A` +
+                `*WhatsApp p/ retorno:* ${whatsapp}%0A` +
+                `*Convênio/Plano:* ${convenio}` +
+                examesInfo +
+                `%0A*Observações:* ${obs}` +
+                fotosInfo +
+                `%0A%0A_Por favor, enviar o orçamento no WhatsApp informado acima. Obrigado!_`;
 
             const phone = "5527998980658";
-            const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(mensagem)}`;
+            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
 
-            if (temFotos) {
-                const shareData = {
-                    title: 'Pedido de orçamento - Laboratório CDA',
-                    text: mensagem,
-                    files: arquivos
-                };
-
-                if (navigator.canShare && navigator.canShare({ files: arquivos }) && navigator.share) {
-                    try {
-                        await navigator.share(shareData);
-                        mostrarAlerta('✅ Orçamento compartilhado com os anexos. Selecione o WhatsApp do Laboratório CDA para concluir o envio.', 'sucesso');
-                        limparFormularioOrcamento(fotosInput);
-                        return;
-                    } catch (e) {
-                        if (e && e.name === 'AbortError') {
-                            mostrarAlerta('Envio cancelado. Os anexos continuam selecionados para tentar novamente.', 'erro');
-                            return;
-                        }
-                    }
-                }
-
-                window.open(whatsappUrl, '_blank');
-                mostrarAlerta('O WhatsApp Web não permite anexar arquivos automaticamente por link. A mensagem foi aberta; anexe manualmente as fotos já selecionadas no aparelho.', 'erro');
-                return;
-            }
-
-            window.open(whatsappUrl, '_blank');
+            // Toast de confirmação
             setTimeout(() => mostrarAlerta('✅ Mensagem enviada! Nossa equipe retornará no seu WhatsApp em breve.', 'sucesso'), 600);
-            limparFormularioOrcamento(fotosInput);
-        }
 
-        function limparFormularioOrcamento(fotosInput) {
+            // Limpar formulário
             document.getElementById('orcNome').value = '';
             document.getElementById('orcWhatsapp').value = '';
             document.getElementById('orcExames').value = '';
@@ -1238,76 +1240,80 @@
 
         function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-        // IA Groq (Llama 3): cole sua chave abaixo ou salve no navegador com:
-        // localStorage.setItem('CDA_GROQ_API_KEY', 'gsk_SUA_CHAVE_AQUI')
-        const GROQ_API_KEY = localStorage.getItem('CDA_GROQ_API_KEY') || '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'; // Cole sua chave aqui (ex: 'gsk_...')
-
+        // Para ativar IA gratuita: obtenha chave grátis em aistudio.google.com e coloque abaixo
+        
+        const GROQ_API_KEY = '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';
         async function responderPreparo(pergunta) {
             const typing = document.getElementById('chatTyping');
             typing.classList.remove('hidden');
-            document.getElementById('chatMessages').scrollTop = 99999;
-
-            const GROQ_KEY = GROQ_API_KEY;
-            const systemPrompt = `Você é o assistente virtual do Laboratório CDA (Afonso Cláudio - ES), especialista em preparo de exames.
-DIRETRIZES DE RESPOSTA:
-1. Baseie suas instruções estritamente nos manuais de preparo do "Alvaro Apoio" ou "Hermes Pardini".
-2. Use linguagem extremamente simples e acolhedora, como se estivesse explicando para uma pessoa leiga que nunca fez o exame.
-3. Se o usuário citar mais de um exame, faça um RESUMO unificado (ex: se um exame pede 8h de jejum e outro pede 12h, oriente o maior tempo, 12h, para cobrir ambos).
-4. FOCO: Jejum, medicamentos, atividade física e coleta de materiais (urina/fezes).
-5. Se a pergunta não for sobre preparo de exames, peça educadamente para focar no assunto ou ligar para (27) 99898-0658.
-6. Formate com negrito e tópicos para facilitar a leitura no celular. Responda em português brasileiro.`;
-
-            if (!GROQ_KEY) {
-                typing.classList.add('hidden');
-                adicionarMensagemChat(respostaPadrao(pergunta), 'bot');
-                return;
-            }
+            const systemPrompt = `Você é o assistente virtual cortês do Laboratório CDA.
+            REGRAS DE OURO (NUNCA ERRE O TIPO DE COLETA):
+            - SEXAGEM FETAL: Coleta de SANGUE venoso. Recomendado após 8ª semana.
+            - PAPANICOLAU / PREVENTIVO: Coleta CITOLÓGICA (material do colo do útero).
+            - HEMOGRAMA/GLICOSE/COLESTEROL: SANGUE.
+            - URINA: Frasco estéril (jato médio).
+            
+            INSTRUÇÕES:
+            1. Seja muito cortês e educado (ex: "Olá! Com prazer informo...").
+            2. Baseie-se em fontes confiáveis (Alvaro Apoio, Hermes Pardini, Fleury).
+            3. Dê respostas DIRETAS e resuma se houver vários exames.
+            4. Use linguagem simples para leigos.
+            5. Se não souber, peça para ligar no (27) 99898-0658.`;
 
             try {
                 const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_KEY}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
                     body: JSON.stringify({
                         model: "llama-3.1-8b-instant",
-                        messages: [
-                            { role: "system", content: systemPrompt },
-                            { role: "user", content: pergunta }
-                        ],
-                        temperature: 0.3,
-                        max_tokens: 800
+                        messages: [{role:"system", content:systemPrompt}, {role:"user", content:pergunta}],
+                        temperature: 0.2
                     })
                 });
-
                 const data = await res.json();
                 typing.classList.add('hidden');
-
-                if (!res.ok) {
-                    console.error('Erro Groq:', data);
-                    adicionarMensagemChat('A conexão com a IA Groq retornou erro. Confira se a chave gsk_ está correta. Enquanto isso, vou usar a base local.<br><br>' + respostaPadrao(pergunta), 'bot');
-                    return;
-                }
-
-                const resposta = data?.choices?.[0]?.message?.content;
-                if (resposta) {
-                    // Converter markdown simples para HTML
-                    const htmlResp = resposta
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                        .replace(/^[-•] (.+)$/gm, '<li class="ml-3 list-disc">$1</li>')
-                        .replace(/(<li.*<\/li>\n?)+/g, s => `<ul class="space-y-1 mt-1">${s}</ul>`)
-                        .replace(/\n/g, '<br>');
-                    adicionarMensagemChat(htmlResp, 'bot');
-                } else {
-                    adicionarMensagemChat('Desculpe, não consegui processar sua pergunta agora.', 'bot');
-                }
+                const resp = data.choices[0].message.content;
+                const htmlResp = resp.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/
+/g, '<br>');
+                adicionarMensagemChat(htmlResp, 'bot');
             } catch(e) {
                 typing.classList.add('hidden');
                 adicionarMensagemChat(respostaPadrao(pergunta), 'bot');
             }
         }
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        contents: [{ parts: [{ text: pergunta }] }]
+                    })
+                });
+                const data = await res.json();
+                typing.classList.add('hidden');
+                const resposta = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (resposta) {
+                    // Converter markdown simples para HTML
+                    const html = resposta
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/^[-•] (.+)$/gm, '<li class="ml-3 list-disc">$1</li>')
+                        .replace(/(<li.*<\/li>\n?)+/g, s => `<ul class="space-y-1 mt-1">${s}</ul>`)
+                        .replace(/\n/g, '<br>');
+                    adicionarMensagemChat(html, 'bot');
+                } else {
+                    adicionarMensagemChat('Desculpe, não consegui processar sua pergunta. Tente novamente ou ligue para a gente: <a href="tel:27998980658" class="text-cda-primary font-semibold underline">(27) 99898-0658</a>', 'bot');
+                }
+            } catch(e) {
+                typing.classList.add('hidden');
+                // Fallback: base de conhecimento local
+                const resp = respostaPadrao(pergunta);
+                adicionarMensagemChat(resp, 'bot');
+            }
+        }
+
 
         // Base de conhecimento local (fallback sem internet/chave)
         function respostaPadrao(q) {
