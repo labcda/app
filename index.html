@@ -3,72 +3,661 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laboratório CDA</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2F664F">
+    <title>Laboratório CDA - Diagnóstico de Confiança</title>
     
-    <!-- Ícone para iOS -->
-    <link rel="apple-touch-icon" href="logo.png">
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#35b5b0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lab CDA">
+    <link rel="apple-touch-icon" href="logo CDA Transparente.png">
     
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; background-color: #f4f4f9; color: #333; }
-        
-        /* Estilos do Splash Screen */
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: white; display: flex; justify-content: center;
-            align-items: center; z-index: 100; transition: opacity 0.5s ease-out;
+    <!-- Google Fonts & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Configuração do Tailwind com a paleta oficial extraída do site (image_4b0ae5.jpg) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cda: {
+                            primary: '#35b5b0',     // O turquesa vibrante oficial do site
+                            primaryDark: '#2ca19c', // Versão levemente escura para estados hover
+                            light: '#e6f7f6',       // Fundo suave turquesa
+                            dark: '#1e4634',        // Verde escuro complementar institucional
+                            grayText: '#595959',    // Cinza usado nos menus e descrições do site
+                            neutralBg: '#f4f9f8'    // Fundo da aplicação
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
         }
-        #splash-screen img { width: 150px; height: auto; }
-        #splash-screen.fade-out { opacity: 0; pointer-events: none; }
+    </script>
 
-        /* Estilos da Página Inicial */
-        header { background: white; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        header img { max-width: 200px; height: auto; }
-        .container { padding: 30px; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; max-width: 400px; }
-        h1 { color: #2F664F; }
-        button { background: #2F664F; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+    <style>
+        /* Ocultar barra de rolagem estética */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #35b5b0;
+            border-radius: 10px;
+        }
+        
+        /* Animações e Transições das Páginas SPA */
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Efeito de carregamento Pulsante do Splash */
+        @keyframes customPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.95; }
+        }
+        .splash-pulse {
+            animation: customPulse 2s infinite ease-in-out;
+        }
+
+        /* Recorte técnico para renderizar a imagem da família de image_4b0ae5.jpg */
+        .hero-family-crop {
+            background-image: url('image_4b0ae5.jpg');
+            background-repeat: no-repeat;
+            background-size: 195%;
+            background-position: right 20px bottom -40px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-family-crop {
+                background-size: 220%;
+                background-position: right -10px bottom -20px;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="bg-cda-neutralBg font-sans antialiased text-gray-800 min-h-screen flex flex-col pb-20 md:pb-0">
 
-    <!-- Splash Screen (Visível ao carregar) -->
-    <div id="splash-screen">
-        <img src="logo.png" alt="Logo Laboratório CDA">
-    </div>
-
-    <!-- Conteúdo da Página Inicial -->
-    <header>
-        <img src="logo.png" alt="Logo Laboratório CDA">
-    </header>
-
-    <div class="container">
-        <div class="card">
-            <h1>Bem-vindo!</h1>
-            <p>Seu PWA do Laboratório CDA está funcionando.</p>
-            <button onclick="avisar()">Consultar Resultados</button>
+    <!-- SPLASH SCREEN DE CARREGAMENTO -->
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-white flex flex-col justify-between items-center p-8 transition-all duration-700">
+        <div class="flex-grow flex flex-col justify-center items-center">
+            <!-- Usando a logo oficial informada -->
+            <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="w-80 h-auto splash-pulse">
+            <div class="mt-10 flex items-center space-x-3 text-cda-primary">
+                <i class="fa-solid fa-spinner animate-spin text-3xl"></i>
+                <span class="font-semibold tracking-wide text-gray-600">Carregando portal de diagnósticos...</span>
+            </div>
+        </div>
+        <div class="text-center text-xs text-gray-400">
+            <p>Laboratório CDA LTDA &copy; 2026</p>
+            <p>Rigor Científico, Humanização e Tecnologia</p>
         </div>
     </div>
 
-    <script>
-        // Registra o Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-            .then(() => console.log('Service Worker registrado!'))
-            .catch(err => console.error('Erro no Service Worker:', err));
-        }
+    <!-- BANNER DE INSTALAÇÃO PWA -->
+    <div id="installBanner" class="hidden bg-cda-primaryDark text-white px-4 py-3 flex justify-between items-center text-sm z-40 sticky top-0 shadow-md">
+        <div class="flex items-center space-x-3">
+            <img src="logo CDA Transparente.png" alt="CDA" class="w-10 bg-white rounded p-1 shadow-sm">
+            <div>
+                <p class="font-bold">App Laboratório CDA</p>
+                <p class="text-xs text-teal-100">Instale na tela de início para acesso rápido!</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="dismissInstall()" class="text-teal-100 hover:text-white px-2 py-1 text-xs font-medium">Agora não</button>
+            <button onclick="triggerInstall()" class="bg-white text-cda-primaryDark hover:bg-teal-50 font-bold px-3 py-1.5 rounded-lg text-xs transition shadow">Instalar</button>
+        </div>
+    </div>
 
-        // Script para esconder o Splash Screen após 1.5 segundos
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('splash-screen').classList.add('fade-out');
-            }, 1500); // Ajuste o tempo se necessário
-        });
+    <!-- HEADER DO APLICATIVO (Baseado na barra superior do site) -->
+    <header class="bg-white shadow-sm sticky top-0 z-30 px-4 py-3 md:py-4 border-b border-gray-100">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="navigateTo('home')">
+                <img src="logo CDA Transparente.png" alt="Laboratório CDA Logo" class="h-10 md:h-14 w-auto">
+            </div>
+            
+            <!-- Menu de Navegação Estilo Desktop -->
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold text-cda-grayText">
+                <button onclick="navigateTo('home')" class="hover:text-cda-primary transition">Início</button>
+                <button onclick="navigateTo('preparo')" class="hover:text-cda-primary transition">Primeiros Passos</button>
+                <button onclick="navigateTo('agendar')" class="hover:text-cda-primary transition">Agendar</button>
+                <button onclick="navigateTo('orcamento')" class="hover:text-cda-primary transition">Orçamento</button>
+                <button onclick="navigateTo('convenios')" class="hover:text-cda-primary transition">Convênios</button>
+                <button onclick="navigateTo('unidades')" class="hover:text-cda-primary transition">Unidades</button>
+                
+                <!-- Ícones sociais -->
+                <div class="flex items-center space-x-3 border-l pl-4 border-gray-200">
+                    <a href="https://instagram.com" target="_blank" class="text-cda-grayText hover:text-cda-primary transition"><i class="fa-brands fa-instagram text-lg"></i></a>
+                    <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-grayText hover:text-emerald-500 transition"><i class="fa-brands fa-whatsapp text-lg"></i></a>
+                </div>
+            </nav>
 
-        function avisar() {
-            alert('Funcionalidade de resultados em breve!');
-        }
-    </script>
-</body>
-</html>
+            <div class="flex items-center space-x-2">
+                <button onclick="navigateTo('resultados')" class="bg-cda-primary hover:bg-cda-primaryDark text-white font-bold px-5 py-2.5 rounded-full text-sm transition shadow-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>Resultados</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTAINER PRINCIPAL DAS PÁGINAS -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
+        
+        <!-- PÁGINA 1: HOME/DASHBOARD -->
+        <section id="page-home" class="page active space-y-6">
+            
+            <!-- Banner Principal Réplica Exata do Site (image_4b0ae5.jpg) -->
+            <div class="bg-cda-primary text-white rounded-3xl shadow-lg relative overflow-hidden min-h-[380px] md:min-h-[440px] flex flex-col justify-center">
+                <!-- Grid de divisão: texto na esquerda, família na direita -->
+                <div class="grid md:grid-cols-12 h-full">
+                    <div class="md:col-span-7 p-8 md:p-12 flex flex-col justify-center z-10">
+                        <!-- Badge laboratório cda -->
+                        <div class="inline-flex items-center space-x-2 border border-white/60 text-white rounded-lg px-4 py-1.5 w-fit text-xs font-bold uppercase tracking-wide mb-6">
+                            <i class="fa-solid fa-microscope"></i>
+                            <span>LABORATÓRIO CDA</span>
+                        </div>
+                        <h2 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight text-white">
+                            Cuidar de você é a nossa missão
+                        </h2>
+                        <p class="text-sm md:text-base text-teal-50/90 mt-4 leading-relaxed max-w-lg">
+                            Estamos ao seu lado para cuidar de você e de quem você ama, com acolhimento, atenção e o rigor científico que o seu diagnóstico precisa.
+                        </p>
+                        <div class="mt-8 flex flex-wrap gap-4">
+                            <button onclick="navigateTo('resultados')" class="bg-white text-cda-primary hover:bg-teal-50 font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-md flex items-center space-x-2">
+                                <i class="fa-solid fa-file-invoice"></i>
+                                <span>Ver Meus Resultados</span>
+                            </button>
+                            <a href="https://wa.me/5527998980658" target="_blank" class="bg-[#25D366] hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition shadow-md flex items-center space-x-2">
+                                <i class="fa-brands fa-whatsapp text-lg"></i>
+                                <span>Atendimento Rápido</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Lado direito: Imagem da Família extraída do layout do site -->
+                    <div class="hidden md:block md:col-span-5 relative hero-family-crop rounded-r-3xl">
+                        <!-- Gradiente para suavizar a transição com a cor sólida turquesa do fundo -->
+                        <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-cda-primary to-transparent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Os Quatro Pilares Clássicos de Ação do Site -->
+            <div>
+                <h3 class="text-lg font-bold text-gray-700 mb-4 px-1">Acesso Rápido</h3>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                    
+                    <!-- Card 1: Resultados -->
+                    <div onclick="navigateTo('resultados')" class="bg-white hover:shadow-md cursor-pointer p-6 rounded-2xl border-2 border-transparent hover:border-cda-primary transition flex flex-col items-center text-center justify-center space-y-4 h-44 shadow-sm group">
+                        <div class="bg-cda-light text-cda-primary w-14 h-14 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                        <span class="font-extrabold text-cda-primary tracking-wider text-xs md:text-sm uppercase">Resultados</span>
+                    </div>
+
+                    <!-- Card 2: Agendar Exames -->
+                    <div onclick="navigateTo('agendar')" class="bg-white hover:shadow-md cursor-pointer p-6 rounded-2xl border-2 border-transparent hover:border-cda-primary transition flex flex-col items-center text-center justify-center space-y-4 h-44 shadow-sm group">
+                        <div class="bg-cda-light text-cda-primary w-14 h-14 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+                        <span class="font-extrabold text-cda-primary tracking-wider text-xs md:text-sm uppercase">Agendar Exames</span>
+                    </div>
+
+                    <!-- Card 3: Orçamento -->
+                    <div onclick="navigateTo('orcamento')" class="bg-white hover:shadow-md cursor-pointer p-6 rounded-2xl border-2 border-transparent hover:border-cda-primary transition flex flex-col items-center text-center justify-center space-y-4 h-44 shadow-sm group">
+                        <div class="bg-cda-light text-cda-primary w-14 h-14 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span class="font-extrabold text-cda-primary tracking-wider text-xs md:text-sm uppercase">Orçamento</span>
+                    </div>
+
+                    <!-- Card 4: Convênios -->
+                    <div onclick="navigateTo('convenios')" class="bg-white hover:shadow-md cursor-pointer p-6 rounded-2xl border-2 border-transparent hover:border-cda-primary transition flex flex-col items-center text-center justify-center space-y-4 h-44 shadow-sm group">
+                        <div class="bg-cda-light text-cda-primary w-14 h-14 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <span class="font-extrabold text-cda-primary tracking-wider text-xs md:text-sm uppercase">Convênios</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Informações das Unidades & Horários Rápidos -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fa-regular fa-clock mr-2 text-cda-primary"></i> Horários de Coleta e Funcionamento
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="border-l-4 border-cda-primary pl-4 py-1">
+                        <span class="font-bold text-gray-800 text-base">Matriz (Afonso Cláudio - Centro)</span>
+                        <p class="text-sm text-gray-500 mt-1">Rua José Giestas, nº 46, Centro (Próximo à Caixa Econômica)</p>
+                        <p class="text-xs text-cda-primaryDark font-semibold mt-3">
+                            <i class="fa-solid fa-circle-check mr-1"></i> Seg. a Sex. das 07:00 às 17:00h
+                        </p>
+                    </div>
+                    <div class="border-l-4 border-amber-500 pl-4 py-1">
+                        <span class="font-bold text-gray-800 text-base">Mata Fria (Zona Rural)</span>
+                        <p class="text-sm text-gray-500 mt-1">Córrego Francisco Correia, Zona Rural - Mata Fria</p>
+                        <p class="text-xs text-amber-700 font-semibold mt-3">
+                            <i class="fa-solid fa-calendar-days mr-1"></i> Segunda, Quarta e Sexta das 06:00 às 09:00h
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Por que escolher o CDA? -->
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 grid md:grid-cols-3 gap-6">
+                <div class="text-center md:text-left space-y-2">
+                    <div class="text-cda-primary text-3xl"><i class="fa-solid fa-flask-vial"></i></div>
+                    <h4 class="font-bold text-gray-800 text-lg">Tecnologia Avançada</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">Equipamentos modernos com automação total e interface digital integrada para garantir segurança.</p>
+                </div>
+                <div class="text-center md:text-left space-y-2">
+                    <div class="text-cda-primary text-3xl"><i class="fa-solid fa-heart-pulse"></i></div>
+                    <h4 class="font-bold text-gray-800 text-lg">Acolhimento Humanizado</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">Profissionais prontos e treinados para o atendimento de crianças, idosos e coletas difíceis.</p>
+                </div>
+                <div class="text-center md:text-left space-y-2">
+                    <div class="text-cda-primary text-3xl"><i class="fa-solid fa-certificate"></i></div>
+                    <h4 class="font-bold text-gray-800 text-lg">Controle de Qualidade</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">Rigorosos testes de proficiência e controle interno diário para exatidão absoluta dos laudos.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 2: EXAMES / PREPARO -->
+        <section id="page-preparo" class="page space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Guia de Preparo de Exames</h2>
+                    <p class="text-gray-500 text-sm mt-1">Siga as instruções abaixo para garantir a precisão total do seu exame.</p>
+                </div>
+                <!-- Barra de pesquisa rápida integrada -->
+                <div class="relative w-full md:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-gray-400"></i>
+                    <input type="text" id="preparoSearch" onkeyup="filterPreparo()" placeholder="Buscar exame (Ex: Urina, Glicose...)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-cda-primary text-sm shadow-sm">
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                <div class="divide-y divide-gray-100" id="preparoList">
+                    
+                    <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="hemograma sangue completo plaquetas anemia">
+                        <div>
+                            <span class="font-bold text-gray-800 block text-base">Hemograma Completo</span>
+                            <span class="text-xs text-cda-primary font-medium">Exame de Sangue de Rotina</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="bg-cda-light text-cda-primaryDark font-semibold px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Recomendado jejum de 3 horas</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Evitar exercícios intensos nas 24h anteriores</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="glicemia em jejum glicose sangue diabetes curva">
+                        <div>
+                            <span class="font-bold text-gray-800 block text-base">Glicemia de Jejum</span>
+                            <span class="text-xs text-cda-primary font-medium">Dosagem de Glicose Sanguínea</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="bg-rose-50 text-rose-700 font-semibold px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum obrigatório de 8 a 12 horas</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Não ingerir bebidas alcoólicas por 72h</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="urina tipo 1 eas urocultura rotina infeccao">
+                        <div>
+                            <span class="font-bold text-gray-800 block text-base">Urina Rotina (EAS / Urocultura)</span>
+                            <span class="text-xs text-cda-primary font-medium">Análise e Cultura Urinária</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="bg-teal-50 text-teal-800 font-semibold px-3 py-1 rounded-full"><i class="fa-solid fa-droplet mr-1"></i> Primeira urina da manhã (preferencial)</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Desprezar o primeiro jato da coleta</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="fezes parasitologico coprocultura sangue oculto">
+                        <div>
+                            <span class="font-bold text-gray-800 block text-base">Exame de Fezes (Parasitológico / Sangue Oculto)</span>
+                            <span class="text-xs text-cda-primary font-medium">Coleta de Amostra Sólida</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="bg-amber-50 text-amber-800 font-semibold px-3 py-1 rounded-full"><i class="fa-solid fa-box mr-1"></i> Coletar em frasco estéril fornecido</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Evitar uso de laxantes</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="colesterol total hdl ldl triglicerideos perfil lipidico">
+                        <div>
+                            <span class="font-bold text-gray-800 block text-base">Perfil Lipídico (Colesterol e Triglicerídeos)</span>
+                            <span class="text-xs text-cda-primary font-medium">Avaliação Cardiovascular</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="bg-cda-light text-cda-primaryDark font-semibold px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum recomendado de 12 horas</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Manter dieta habitual</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 3: AGENDAMENTO ONLINE -->
+        <section id="page-agendar" class="page space-y-6">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-2xl font-bold text-gray-800">Solicitar Pré-Agendamento de Coleta</h2>
+                <p class="text-gray-500 text-sm">Agilize o seu atendimento preenchendo os dados abaixo. Nossa equipe entrará em contato via WhatsApp para confirmar o seu horário.</p>
+            </div>
+
+            <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 space-y-6 max-w-3xl mx-auto">
+                <!-- Escolha da Unidade -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Selecione a Unidade:</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="border-2 border-gray-200 rounded-xl p-4 flex items-center space-x-3 cursor-pointer hover:border-cda-primary transition relative" id="label-matriz">
+                            <input type="radio" name="unidade" value="Matriz" required checked class="text-cda-primary focus:ring-cda-primary h-4 w-4">
+                            <div>
+                                <span class="font-bold text-gray-800 text-sm block">Unidade Matriz</span>
+                                <span class="text-xs text-gray-400">Afonso Cláudio - Centro</span>
+                            </div>
+                        </label>
+                        <label class="border-2 border-gray-200 rounded-xl p-4 flex items-center space-x-3 cursor-pointer hover:border-cda-primary transition relative" id="label-matafria">
+                            <input type="radio" name="unidade" value="Mata Fria" class="text-cda-primary focus:ring-cda-primary h-4 w-4">
+                            <div>
+                                <span class="font-bold text-gray-800 text-sm block">Unidade Mata Fria</span>
+                                <span class="text-xs text-gray-400">Zona Rural (Filial)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Tipo de Coleta (Domiciliar ou Presencial) -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Local do Exame:</label>
+                    <select name="tipoColeta" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" required>
+                        <option value="Laboratorio">Presencial na Unidade Selecionada</option>
+                        <option value="Domiciliar">Atendimento em Casa / Coleta Domiciliar</option>
+                    </select>
+                </div>
+
+                <!-- Dados Pessoais -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nome Completo:</label>
+                        <input type="text" name="nome" placeholder="Digite seu nome completo" required class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">WhatsApp para Contato:</label>
+                        <input type="tel" name="whatsapp" placeholder="(27) 99999-9999" required class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Data de Preferência e Convênio -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Previsão de Data:</label>
+                        <input type="date" name="dataPretendida" required class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Forma de Atendimento:</label>
+                        <select name="convenio" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" required>
+                            <option value="Particular">Particular</option>
+                            <option value="Unimed">Unimed</option>
+                            <option value="Samp">Samp</option>
+                            <option value="Banestes Saúde">Banestes Saúde</option>
+                            <option value="Outro Convênio">Outros Convênios</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Exames Desejados -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Quais exames deseja agendar? (Opcional):</label>
+                    <textarea name="exames" rows="3" placeholder="Ex: Hemograma completo, Urocultura, Colesterol total..." class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-cda-primary hover:bg-cda-primaryDark text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-regular fa-paper-plane"></i>
+                    <span>Solicitar Confirmação no WhatsApp</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- PÁGINA 4: RESULTADO ONLINE -->
+        <section id="page-resultados" class="page space-y-6">
+            <div class="text-center max-w-2xl mx-auto">
+                <h2 class="text-2xl font-bold text-gray-800">Acesso a Laudos Online</h2>
+                <p class="text-gray-500 text-sm mt-1">Consulte seus exames com segurança inserindo as chaves do canhoto de coleta.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <!-- Chaves de Acesso -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 lg:col-span-1 space-y-4 h-fit">
+                    <h3 class="font-extrabold text-gray-800 text-base flex items-center">
+                        <i class="fa-solid fa-shield-halved text-cda-primary mr-2"></i> Área do Paciente
+                    </h3>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Código de Protocolo:</label>
+                        <input type="text" id="resultProtocol" placeholder="Ex: CDA-2026" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none font-mono uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Senha de Acesso:</label>
+                        <input type="password" id="resultPass" placeholder="••••" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                    </div>
+                    
+                    <button onclick="buscarExames()" class="w-full bg-cda-primary hover:bg-cda-primaryDark text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">
+                        <i class="fa-solid fa-fingerprint mr-1"></i> Visualizar Laudo
+                    </button>
+
+                    <div class="bg-cda-light p-4 rounded-xl border border-dashed border-cda-primary/30 text-xs text-gray-600">
+                        <span class="font-bold text-cda-primaryDark block mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Protocolo de Demonstração:</span>
+                        Insira o código <span class="font-mono bg-white font-bold px-1.5 py-0.5 border border-gray-300 rounded text-cda-primaryDark">CDA-2026</span> com qualquer senha para testar o visualizador.
+                    </div>
+                </div>
+
+                <!-- Quadro do Exame -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 lg:col-span-2 min-h-[420px] flex items-center justify-center p-6 relative" id="laudoDisplayContainer">
+                    
+                    <!-- Sem Buscas -->
+                    <div id="laudoEmptyState" class="text-center max-w-sm">
+                        <div class="text-6xl text-cda-primary/20 mb-4">
+                            <i class="fa-solid fa-file-medical"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-700 text-base">Nenhum laudo selecionado</h4>
+                        <p class="text-sm text-gray-400 mt-2">Digite suas credenciais ao lado para recuperar a análise médica e imprimir.</p>
+                    </div>
+
+                    <!-- Carregando -->
+                    <div id="laudoLoaderState" class="hidden text-center">
+                        <i class="fa-solid fa-spinner animate-spin text-4xl text-cda-primary"></i>
+                        <p class="text-sm text-gray-500 mt-3 font-semibold">Validando chaves de segurança...</p>
+                    </div>
+
+                    <!-- Exame Carregado Fielmente -->
+                    <div id="laudoContentState" class="hidden w-full space-y-6 text-xs text-left p-2">
+                        
+                        <!-- Cabeçalho Institucional do Laudo -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start gap-4 border-b pb-4">
+                            <div class="space-y-1">
+                                <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="h-10 w-auto">
+                                <span class="text-[9px] text-gray-400 block font-semibold">LABORATÓRIO CDA LTDA | CNPJ: 12.525.717/0001-36</span>
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <span class="bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded text-[10px] uppercase tracking-wide">Laudo Assinado Digitalmente</span>
+                                <span class="text-gray-400 block mt-1.5 text-[9px]">Autenticação: #928374-CDA</span>
+                            </div>
+                        </div>
+
+                        <!-- Dados Cadastrais -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-xl font-medium text-[11px] text-gray-700">
+                            <div>
+                                <span class="text-gray-400 block text-[9px] uppercase font-bold">Paciente:</span>
+                                <span class="text-gray-900 font-bold">José Afonso de Souza</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block text-[9px] uppercase font-bold">Data de Nascimento:</span>
+                                <span class="text-gray-800">14/08/1979 (46 anos)</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block text-[9px] uppercase font-bold">Data de Coleta:</span>
+                                <span class="text-gray-800">02/06/2026 07:15h</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block text-[9px] uppercase font-bold">Médico Solicitante:</span>
+                                <span class="text-gray-800">Dr. Marcos Viana CRM-ES</span>
+                            </div>
+                        </div>
+
+                        <!-- Resultados -->
+                        <div class="space-y-4">
+                            <h4 class="font-extrabold text-cda-primaryDark text-sm border-b pb-1">ANÁLISE DE GLICEMIA E COLESTEROL</h4>
+                            
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b text-gray-400 uppercase text-[9px] tracking-wider font-bold">
+                                        <th class="pb-2">Metodologia / Parâmetro</th>
+                                        <th class="pb-2">Resultado</th>
+                                        <th class="pb-2">Unidade</th>
+                                        <th class="pb-2 text-right">Valores de Referência</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y text-[11px] text-gray-700">
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="py-3 font-semibold">Glicose em Jejum (Soro)</td>
+                                        <td class="py-3 font-extrabold text-emerald-600">88,00</td>
+                                        <td class="py-3">mg/dL</td>
+                                        <td class="py-3 text-right">70,00 a 99,00 mg/dL</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="py-3 font-semibold">Hemoglobina Glicada (HBA1C)</td>
+                                        <td class="py-3 font-extrabold text-emerald-600">5,4</td>
+                                        <td class="py-3">%</td>
+                                        <td class="py-3 text-right">Menor que 5,7%</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="py-3 font-semibold">Colesterol Total (Soro)</td>
+                                        <td class="py-3 font-extrabold text-amber-600">198,00</td>
+                                        <td class="py-3">mg/dL</td>
+                                        <td class="py-3 text-right">Desejável menor que 200</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Rodapé do Laudo com Dra Clara -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-t pt-4 gap-4">
+                            <div class="text-[9px] text-gray-400 max-w-sm">
+                                <p class="font-bold text-gray-500">Nota:</p>
+                                <p>Resultados devem ser analisados em conjunto com o contexto clínico do paciente pelo médico responsável.</p>
+                            </div>
+                            <div class="text-right w-full sm:w-auto">
+                                <div class="border-b border-gray-300 w-48 inline-block text-center mb-1 pb-1">
+                                    <span class="font-bold text-gray-800 text-[10px] block">Dra. Clara Silveira</span>
+                                    <span class="text-gray-400 text-[9px] block">CRBM-ES 4482-P</span>
+                                </div>
+                                <p class="text-[9px] text-gray-400">Responsável Técnica</p>
+                            </div>
+                        </div>
+
+                        <!-- Botão de Ações -->
+                        <div class="flex justify-end space-x-2 pt-2">
+                            <button onclick="window.print()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-lg text-[10px] transition">
+                                <i class="fa-solid fa-print mr-1"></i> Imprimir Laudo
+                            </button>
+                            <button onclick="baixarLaudoPdf()" class="bg-cda-primary hover:bg-cda-primaryDark text-white font-bold px-4 py-2 rounded-lg text-[10px] transition">
+                                <i class="fa-solid fa-file-pdf mr-1"></i> Salvar PDF
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 5: SOLICITAR ORÇAMENTO (Card 3 do site) -->
+        <section id="page-orcamento" class="page space-y-6">
+            <div class="text-center max-w-2xl mx-auto">
+                <h2 class="text-2xl font-bold text-gray-800">Orçamento Sem Compromisso</h2>
+                <p class="text-gray-500 text-sm mt-1">Envie uma foto da sua guia médica ou digite a lista de exames e retornaremos com os valores e condições.</p>
+            </div>
+
+            <form id="orcamentoForm" onsubmit="submitOrcamento(event)" class="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 space-y-4 max-w-2xl mx-auto">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Seu Nome Completo:</label>
+                    <input type="text" name="orcamentoNome" required placeholder="Digite seu nome para o orçamento" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Seu WhatsApp de Contato:</label>
+                        <input type="tel" name="orcamentoTel" required placeholder="(27) 99999-9999" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Desejada:</label>
+                        <select name="orcamentoUnidade" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" required>
+                            <option value="Matriz">Centro (Afonso Cláudio)</option>
+                            <option value="Mata Fria">Mata Fria (Zona Rural)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Descreva os exames que deseja orçar:</label>
+                    <textarea name="orcamentoLista" rows="4" placeholder="Digite o nome de cada exame conforme prescrição do seu médico..." required class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-cda-primary hover:bg-cda-primaryDark text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Enviar e Solicitar Orçamento</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- PÁGINA 6: CONVÊNIOS PARCEIROS (Card 4 do site) -->
+        <section id="page-convenios" class="page space-y-6">
+            <div class="text-center max-w-2xl mx-auto">
+                <h2 class="text-2xl font-bold text-gray-800">Nossos Convênios</h2>
+                <p class="text-gray-500 text-sm mt-1">Trabalhamos com os melhores e mais solicitados planos de saúde do estado para facilitar o seu acesso aos exames.</p>
+            </div>
+
+            <!-- Grid de Convênios de alta qualidade visual -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 flex flex-col items-center justify-center space-y-3 shadow-sm">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-800 text-2xl font-black rounded-full flex items-center justify-center">
+                        U
+                    </div>
+                    <span class="font-extrabold text-gray-800 text-sm">UNIMED</span>
+                    <span class="text-xs text-gray-400">Nacional e Regional</span>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 flex flex-col items-center justify-center space-y-3 shadow-sm">
+                    <div class="w-14 h-14 bg-teal-50 text-teal-700 text-2xl font-black rounded-full flex items-center justify-center">
+                        S
+                    </div>
+                    <span class="font-extrabold text-gray-800 text-sm">SAMP</span>
+                    <span class="text-xs text-gray-400">Rede Credenciada</span>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 flex flex-col items-center justify-center space-y-3 shadow-sm">
+                    <div class="w-14 h-14 bg-sky-50 text-sky-700 text-2xl font-black rounded-full flex items-center justify-center">
+                        M
+                    </div>
+                    <span class="font-extrabold text-gray-800 text-sm">MEDSERVIC</span>
+                    <span class="text-xs text-gray-400">Atendimento Completo</span>
