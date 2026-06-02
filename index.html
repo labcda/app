@@ -1125,7 +1125,7 @@
             });
         }
 
-                async function submitOrcamento() {
+        async function submitOrcamento() {
             const nome = document.getElementById('orcNome').value.trim();
             const whatsapp = document.getElementById('orcWhatsapp').value.trim();
             const convenio = document.getElementById('orcConvenio').value;
@@ -1138,15 +1138,7 @@
             if (!nome || !whatsapp) { mostrarAlerta('Por favor, preencha nome e WhatsApp.', 'erro'); return; }
             if (!exames && !temFotos) { mostrarAlerta('Descreva os exames ou anexe uma foto.', 'erro'); return; }
 
-            const msg = `Olá, Laboratório CDA! Orçamento de exames:
-
-*Nome:* ${nome}
-*WhatsApp:* ${whatsapp}
-*Convênio:* ${convenio}
-${exames ? '*Exames:* '+exames : '*(Exames via foto)*'}
-*Obs:* ${obs}${temFotos ? '
-
-📎 Enviarei '+arquivos.length+' foto(s) em seguida.' : ''}`;
+            const msg = `Olá, Laboratório CDA! Orçamento de exames:\n\n*Nome:* ${nome}\n*WhatsApp:* ${whatsapp}\n*Convênio:* ${convenio}\n${exames ? '*Exames:* '+exames : '*(Exames via foto)*'}\n*Obs:* ${obs}${temFotos ? '\n\n📎 Enviarei '+arquivos.length+' foto(s) em seguida.' : ''}`;
             const phone = "5527998980658";
 
             if (temFotos && navigator.canShare && navigator.canShare({ files: arquivos })) {
@@ -1159,41 +1151,12 @@ ${exames ? '*Exames:* '+exames : '*(Exames via foto)*'}
             limparFormOrc(fotosInput);
             mostrarAlerta('✅ Mensagem enviada! Se houver fotos, anexe-as agora no WhatsApp.', 'sucesso');
         }
+
         function limparFormOrc(f) { 
             document.getElementById('orcNome').value = ''; document.getElementById('orcWhatsapp').value = ''; 
             document.getElementById('orcExames').value = ''; document.getElementById('orcObs').value = '';
             if(f) f.value = ''; document.getElementById('fotosPreview').classList.add('hidden');
-        }
-
-            if (!whatsapp) { mostrarAlerta('Por favor, informe seu WhatsApp para retorno.', 'erro'); return; }
-            if (!exames && !temFotos) { mostrarAlerta('Por favor, descreva os exames ou adicione uma foto do pedido.', 'erro'); return; }
-
-            const fotosInfo = temFotos ? `%0A%0A📎 *Fotos do pedido:* ${fotosInput.files.length} imagem(ns) anexada(s) — enviarei em seguida` : '';
-            const examesInfo = exames ? `%0A*Exames descritos:* ${exames}` : '%0A*(Exames via foto em anexo)*';
-
-            const text = `Olá, Laboratório CDA! Gostaria de solicitar um *orçamento de exames* 🧪%0A%0A` +
-                `*Nome:* ${nome}%0A` +
-                `*WhatsApp p/ retorno:* ${whatsapp}%0A` +
-                `*Convênio/Plano:* ${convenio}` +
-                examesInfo +
-                `%0A*Observações:* ${obs}` +
-                fotosInfo +
-                `%0A%0A_Por favor, enviar o orçamento no WhatsApp informado acima. Obrigado!_`;
-
-            const phone = "5527998980658";
-            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
-
-            // Toast de confirmação
-            setTimeout(() => mostrarAlerta('✅ Mensagem enviada! Nossa equipe retornará no seu WhatsApp em breve.', 'sucesso'), 600);
-
-            // Limpar formulário
-            document.getElementById('orcNome').value = '';
-            document.getElementById('orcWhatsapp').value = '';
-            document.getElementById('orcExames').value = '';
-            document.getElementById('orcObs').value = '';
-            if (fotosInput) fotosInput.value = '';
-            document.getElementById('fotosPreview').classList.add('hidden');
-            document.getElementById('fotosInfo').classList.add('hidden');
+            if(document.getElementById('fotosInfo')) document.getElementById('fotosInfo').classList.add('hidden');
         }
 
         function mostrarAlerta(msg, tipo) {
@@ -1246,6 +1209,7 @@ ${exames ? '*Exames:* '+exames : '*(Exames via foto)*'}
         async function responderPreparo(pergunta) {
             const typing = document.getElementById('chatTyping');
             typing.classList.remove('hidden');
+            const GROQ_API_KEY = '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';
             const systemPrompt = `Você é o assistente virtual cortês do Laboratório CDA.
             REGRAS DE OURO (NUNCA ERRE O TIPO DE COLETA):
             - SEXAGEM FETAL: Coleta de SANGUE venoso. Recomendado após 8ª semana.
@@ -1273,47 +1237,13 @@ ${exames ? '*Exames:* '+exames : '*(Exames via foto)*'}
                 const data = await res.json();
                 typing.classList.add('hidden');
                 const resp = data.choices[0].message.content;
-                const htmlResp = resp.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/
-/g, '<br>');
+                const htmlResp = resp.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
                 adicionarMensagemChat(htmlResp, 'bot');
             } catch(e) {
                 typing.classList.add('hidden');
                 adicionarMensagemChat(respostaPadrao(pergunta), 'bot');
             }
         }
-
-            try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        contents: [{ parts: [{ text: pergunta }] }]
-                    })
-                });
-                const data = await res.json();
-                typing.classList.add('hidden');
-                const resposta = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (resposta) {
-                    // Converter markdown simples para HTML
-                    const html = resposta
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                        .replace(/^[-•] (.+)$/gm, '<li class="ml-3 list-disc">$1</li>')
-                        .replace(/(<li.*<\/li>\n?)+/g, s => `<ul class="space-y-1 mt-1">${s}</ul>`)
-                        .replace(/\n/g, '<br>');
-                    adicionarMensagemChat(html, 'bot');
-                } else {
-                    adicionarMensagemChat('Desculpe, não consegui processar sua pergunta. Tente novamente ou ligue para a gente: <a href="tel:27998980658" class="text-cda-primary font-semibold underline">(27) 99898-0658</a>', 'bot');
-                }
-            } catch(e) {
-                typing.classList.add('hidden');
-                // Fallback: base de conhecimento local
-                const resp = respostaPadrao(pergunta);
-                adicionarMensagemChat(resp, 'bot');
-            }
-        }
-
 
         // Base de conhecimento local (fallback sem internet/chave)
         function respostaPadrao(q) {
