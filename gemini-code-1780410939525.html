@@ -3,32 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Primeiro PWA</title>
+    <title>Laboratório CDA</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#007bff">
+    <meta name="theme-color" content="#2F664F">
+    
+    <!-- Ícone para iOS -->
+    <link rel="apple-touch-icon" href="logo.png">
+    
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; background-color: #f4f4f9; color: #333; }
+        
+        /* Estilos do Splash Screen */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: white; display: flex; justify-content: center;
+            align-items: center; z-index: 100; transition: opacity 0.5s ease-out;
+        }
+        #splash-screen img { width: 150px; height: auto; }
+        #splash-screen.fade-out { opacity: 0; pointer-events: none; }
+
+        /* Estilos da Página Inicial */
+        header { background: white; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        header img { max-width: 200px; height: auto; }
+        .container { padding: 30px; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; max-width: 400px; }
+        h1 { color: #2F664F; }
+        button { background: #2F664F; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Olá, Mundo!</h1>
-        <p>Este é um Progressive Web App hospedado no GitHub.</p>
-        <button onclick="avisar()">Clique Aqui</button>
+
+    <!-- Splash Screen (Visível ao carregar) -->
+    <div id="splash-screen">
+        <img src="logo.png" alt="Logo Laboratório CDA">
+    </div>
+
+    <!-- Conteúdo da Página Inicial -->
+    <header>
+        <img src="logo.png" alt="Logo Laboratório CDA">
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h1>Bem-vindo!</h1>
+            <p>Seu PWA do Laboratório CDA está funcionando.</p>
+            <button onclick="avisar()">Consultar Resultados</button>
+        </div>
     </div>
 
     <script>
-        // Registra o Service Worker para permitir funcionamento offline
+        // Registra o Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
-            .then(() => console.log('Service Worker registrado com sucesso!'))
-            .catch(err => console.error('Erro ao registrar Service Worker:', err));
+            .then(() => console.log('Service Worker registrado!'))
+            .catch(err => console.error('Erro no Service Worker:', err));
         }
 
+        // Script para esconder o Splash Screen após 1.5 segundos
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('splash-screen').classList.add('fade-out');
+            }, 1500); // Ajuste o tempo se necessário
+        });
+
         function avisar() {
-            alert('Funciona mesmo offline!');
+            alert('Funcionalidade de resultados em breve!');
         }
     </script>
 </body>
