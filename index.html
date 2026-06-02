@@ -1238,66 +1238,76 @@
 
         function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-        // IA Google Gemini: cole sua chave abaixo ou salve no navegador com:
-        // localStorage.setItem('CDA_GEMINI_API_KEY', 'SUA_CHAVE_DO_GOOGLE_AI_STUDIO')
-        // Observação: em produção, o ideal é proteger a chave em um backend/proxy.
-        const GEMINI_API_KEY = localStorage.getItem('CDA_GEMINI_API_KEY') || 'AQ.Ab8RN6InaeDM39tGTa6fP30TDsSj9dAXo98VevcDuUshYX0I8A'; // Chave configurada pelo usuário
+        // IA Groq (Llama 3): cole sua chave abaixo ou salve no navegador com:
+        // localStorage.setItem('CDA_GROQ_API_KEY', 'gsk_SUA_CHAVE_AQUI')
+        const GROQ_API_KEY = localStorage.getItem('CDA_GROQ_API_KEY') || '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'; // Cole sua chave aqui (ex: 'gsk_...')
 
         async function responderPreparo(pergunta) {
             const typing = document.getElementById('chatTyping');
             typing.classList.remove('hidden');
             document.getElementById('chatMessages').scrollTop = 99999;
 
-            const GEMINI_KEY = GEMINI_API_KEY;
-            const systemPrompt = `Você é o assistente de preparo de exames do Laboratório CDA, localizado em Afonso Cláudio - ES. Responda APENAS perguntas sobre preparo de exames laboratoriais. Seja claro, objetivo e use linguagem simples. Formate com bullet points quando necessário. Se a pergunta não for sobre preparo de exames laboratoriais, diga educadamente que só pode ajudar com preparo de exames. Não invente informações; baseie-se em diretrizes laboratoriais padrão. Responda em português brasileiro. Máximo 200 palavras.`;
+            const GROQ_KEY = GROQ_API_KEY;
+            const systemPrompt = `Você é o assistente virtual do Laboratório CDA (Afonso Cláudio - ES), especialista em preparo de exames.
+DIRETRIZES DE RESPOSTA:
+1. Baseie suas instruções estritamente nos manuais de preparo do "Alvaro Apoio" ou "Hermes Pardini".
+2. Use linguagem extremamente simples e acolhedora, como se estivesse explicando para uma pessoa leiga que nunca fez o exame.
+3. Se o usuário citar mais de um exame, faça um RESUMO unificado (ex: se um exame pede 8h de jejum e outro pede 12h, oriente o maior tempo, 12h, para cobrir ambos).
+4. FOCO: Jejum, medicamentos, atividade física e coleta de materiais (urina/fezes).
+5. Se a pergunta não for sobre preparo de exames, peça educadamente para focar no assunto ou ligar para (27) 99898-0658.
+6. Formate com negrito e tópicos para facilitar a leitura no celular. Responda em português brasileiro.`;
 
-            if (!GEMINI_KEY) {
+            if (!GROQ_KEY) {
                 typing.classList.add('hidden');
                 adicionarMensagemChat(respostaPadrao(pergunta), 'bot');
                 return;
             }
+
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${GROQ_KEY}`
+                    },
                     body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        contents: [{ parts: [{ text: pergunta }] }],
-                        generationConfig: {
-                            temperature: 0.25,
-                            topP: 0.8,
-                            maxOutputTokens: 700
-                        }
+                        model: "llama-3.1-8b-instant",
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: pergunta }
+                        ],
+                        temperature: 0.3,
+                        max_tokens: 800
                     })
                 });
+
                 const data = await res.json();
                 typing.classList.add('hidden');
+
                 if (!res.ok) {
-                    console.error('Erro Gemini:', data);
-                    adicionarMensagemChat('A conexão com a IA do Google retornou erro. Confira se a chave do Google AI Studio está correta e ativa. Enquanto isso, vou usar a base local de preparo.<br><br>' + respostaPadrao(pergunta), 'bot');
+                    console.error('Erro Groq:', data);
+                    adicionarMensagemChat('A conexão com a IA Groq retornou erro. Confira se a chave gsk_ está correta. Enquanto isso, vou usar a base local.<br><br>' + respostaPadrao(pergunta), 'bot');
                     return;
                 }
-                const resposta = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                const resposta = data?.choices?.[0]?.message?.content;
                 if (resposta) {
                     // Converter markdown simples para HTML
-                    const html = resposta
+                    const htmlResp = resposta
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                         .replace(/\*(.*?)\*/g, '<em>$1</em>')
                         .replace(/^[-•] (.+)$/gm, '<li class="ml-3 list-disc">$1</li>')
                         .replace(/(<li.*<\/li>\n?)+/g, s => `<ul class="space-y-1 mt-1">${s}</ul>`)
                         .replace(/\n/g, '<br>');
-                    adicionarMensagemChat(html, 'bot');
+                    adicionarMensagemChat(htmlResp, 'bot');
                 } else {
-                    adicionarMensagemChat('Desculpe, não consegui processar sua pergunta. Tente novamente ou ligue para a gente: <a href="tel:27998980658" class="text-cda-primary font-semibold underline">(27) 99898-0658</a>', 'bot');
+                    adicionarMensagemChat('Desculpe, não consegui processar sua pergunta agora.', 'bot');
                 }
             } catch(e) {
                 typing.classList.add('hidden');
-                // Fallback: base de conhecimento local
-                const resp = respostaPadrao(pergunta);
-                adicionarMensagemChat(resp, 'bot');
+                adicionarMensagemChat(respostaPadrao(pergunta), 'bot');
             }
         }
-
 
         // Base de conhecimento local (fallback sem internet/chave)
         function respostaPadrao(q) {
