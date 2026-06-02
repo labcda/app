@@ -372,151 +372,79 @@
         </section>
 
         <!-- PÁGINA 2: EXAMES / PREPARO -->
-        <section id="page-preparo" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-cda-dark">Guia de Preparo de Exames</h2>
-            <p class="text-slate-500 -mt-4 text-sm">Siga rigorosamente as orientações para garantir a precisão máxima dos seus resultados analíticos.</p>
-            
-            <!-- Botão Álvaro Apoio -->
-            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div class="flex items-start space-x-3">
-                    <div class="bg-teal-100 text-teal-700 rounded-xl p-2.5 text-xl flex-shrink-0">
-                        <i class="fa-solid fa-flask-vial"></i>
+        <section id="page-preparo" class="page space-y-5">
+            <div>
+                <h2 class="text-2xl font-bold text-cda-dark">Guia de Preparo de Exames</h2>
+                <p class="text-slate-500 text-sm mt-1">Assistente inteligente — pergunte como se preparar para qualquer exame.</p>
+            </div>
+
+            <!-- Chat IA Preparo -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden" style="height: calc(100vh - 260px); min-height: 460px;">
+                <!-- Cabeçalho do chat -->
+                <div class="flex items-center gap-3 px-4 py-3 border-b border-slate-100" style="background:#f8fafb">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#E8F8F8">
+                        <i class="fa-solid fa-robot text-base" style="color:#49BCBE"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-slate-800 text-sm">Guia Completo de Preparo — Álvaro Apoio</h4>
-                        <p class="text-xs text-slate-500 mt-0.5">Consulte a tabela completa de preparos com todos os exames disponíveis, incluindo instruções detalhadas para cada procedimento.</p>
-                    </div>
-                </div>
-                <a href="https://www.alvaroapoio.com.br/preparo-de-exames/" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition shadow-sm flex items-center space-x-2">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    <span>Acessar Guia Completo</span>
-                </a>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
-                <!-- Barra de pesquisa rápida -->
-                <div class="p-4 bg-slate-50 border-b border-slate-100">
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-400"></i>
-                        <input type="text" id="preparoSearch" onkeyup="filterPreparo()" placeholder="Buscar instrução (Ex: Urina, Hemograma, Glicose...)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cda-primary text-sm">
+                        <p class="font-bold text-sm text-slate-800">Assistente de Preparo CDA</p>
+                        <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block"></span> Online agora
+                        </span>
                     </div>
                 </div>
 
-                <div class="divide-y divide-slate-100" id="preparoList">
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="hemograma sangue completo">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Hemograma Completo</span>
-                            <span class="text-xs text-slate-500">Exame de Sangue</span>
+                <!-- Área de mensagens -->
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth">
+                    <!-- Mensagem inicial do bot -->
+                    <div class="flex items-start gap-2">
+                        <div class="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#E8F8F8">
+                            <i class="fa-solid fa-robot text-xs" style="color:#49BCBE"></i>
                         </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Recomendado jejum de 3 horas</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Sem álcool por 24h</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="glicemia em jejum glicose sangue">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Glicemia de Jejum</span>
-                            <span class="text-xs text-slate-500">Dosagem de Glicose</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-red-50 text-red-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum obrigatório de 8 a 12 horas</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Água pura é permitida</span>
+                        <div class="bg-slate-50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs md:max-w-sm text-sm text-slate-700 shadow-sm border border-slate-100">
+                            <p>Olá! 👋 Sou o assistente de preparo do <strong>Laboratório CDA</strong>.</p>
+                            <p class="mt-2">Me diga qual exame você vai fazer e eu informo como se preparar corretamente!</p>
+                            <p class="text-xs text-slate-400 mt-2">Ex: <em>"Como me preparo para hemograma?"</em> ou <em>"Preciso fazer TSH, o que faço?"</em></p>
                         </div>
                     </div>
 
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="urina tipo 1 eas urocultura rotina">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Urina Rotina (EAS ou Tipo 1)</span>
-                            <span class="text-xs text-slate-500">Coleta Urinária</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full"><i class="fa-solid fa-droplet mr-1"></i> Preferencialmente a 1ª urina da manhã</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Desprezar o primeiro jato</span>
-                        </div>
+                    <!-- Sugestões rápidas -->
+                    <div class="flex flex-wrap gap-2 pl-9">
+                        <button onclick="enviarSugestao('Como me preparar para hemograma?')" class="text-xs px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:border-cda-primary hover:text-cda-primary transition text-slate-600 font-medium">Hemograma</button>
+                        <button onclick="enviarSugestao('Preparo para glicemia em jejum?')" class="text-xs px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:border-cda-primary hover:text-cda-primary transition text-slate-600 font-medium">Glicemia</button>
+                        <button onclick="enviarSugestao('Como coletar urina para exame?')" class="text-xs px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:border-cda-primary hover:text-cda-primary transition text-slate-600 font-medium">Urina</button>
+                        <button onclick="enviarSugestao('Preparo para colesterol e triglicérides?')" class="text-xs px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:border-cda-primary hover:text-cda-primary transition text-slate-600 font-medium">Colesterol</button>
+                        <button onclick="enviarSugestao('Como fazer preparo para TSH e T4?')" class="text-xs px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:border-cda-primary hover:text-cda-primary transition text-slate-600 font-medium">Tireoide</button>
                     </div>
+                </div>
 
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="fezes parasitologico coprocultura">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Exame de Fezes (Parasitológico)</span>
-                            <span class="text-xs text-slate-500">Coleta de Amostra</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-amber-50 text-amber-700 px-3 py-1 rounded-full"><i class="fa-solid fa-box mr-1"></i> Coletar em frasco estéril</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Evitar laxantes</span>
-                        </div>
+                <!-- Indicador de digitação -->
+                <div id="chatTyping" class="hidden px-4 py-2 flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#E8F8F8">
+                        <i class="fa-solid fa-robot text-xs" style="color:#49BCBE"></i>
                     </div>
+                    <div class="bg-slate-100 rounded-2xl rounded-tl-sm px-3 py-2 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:0ms"></span>
+                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:150ms"></span>
+                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:300ms"></span>
+                    </div>
+                </div>
 
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="colesterol triglicerides lipidograma gordura sangue">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Colesterol / Triglicérides (Lipidograma)</span>
-                            <span class="text-xs text-slate-500">Perfil Lipídico</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-red-50 text-red-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum de 12 horas</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Sem álcool por 72h</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Dieta normal 3 dias antes</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="tsh t3 t4 tireóide hormônio tireoide">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">TSH / T3 / T4 (Hormônios da Tireoide)</span>
-                            <span class="text-xs text-slate-500">Função Tireoidiana</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum de 3 a 4 horas</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Colher antes de tomar medicação</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="psa prostate antígeno prostático">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">PSA (Antígeno Prostático)</span>
-                            <span class="text-xs text-slate-500">Exame Masculino</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-purple-50 text-purple-700 px-3 py-1 rounded-full"><i class="fa-solid fa-ban mr-1"></i> Sem relação sexual por 3 dias</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Sem atividade física intensa por 48h</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Jejum de 3 horas</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="creatinina ureia função renal rim">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Creatinina / Ureia (Função Renal)</span>
-                            <span class="text-xs text-slate-500">Exame de Sangue</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum de 8 horas</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Evitar carne vermelha no dia anterior</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="urocultura urina cultura infecção">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Urocultura</span>
-                            <span class="text-xs text-slate-500">Cultura Urinária</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full"><i class="fa-solid fa-droplet mr-1"></i> 1ª urina da manhã (jato médio)</span>
-                            <span class="bg-red-50 text-red-700 px-3 py-1 rounded-full">Não usar antibiótico por 7 dias antes</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Frasco estéril fornecido pelo CDA</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 preparo-item" data-name="vitamina d 25 oh vitamina">
-                        <div>
-                            <span class="font-bold text-slate-800 block text-base">Vitamina D (25-OH)</span>
-                            <span class="text-xs text-slate-500">Exame de Sangue</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="bg-amber-50 text-amber-700 px-3 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i> Jejum de 4 horas</span>
-                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Sem restrição alimentar especial</span>
-                        </div>
-                    </div>
+                <!-- Input de mensagem -->
+                <div class="px-4 py-3 border-t border-slate-100 flex items-center gap-2">
+                    <input type="text" id="chatInput" placeholder="Qual exame você vai fazer?" 
+                        class="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                        style="--tw-ring-color: #49BCBE"
+                        onkeydown="if(event.key==='Enter')enviarMensagemPreparo()">
+                    <button onclick="enviarMensagemPreparo()" class="btn-cda-primary text-white w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
                 </div>
             </div>
+
+            <p class="text-xs text-center text-slate-400">
+                <i class="fa-solid fa-circle-info mr-1"></i>
+                Assistente com IA — respostas com base em diretrizes laboratoriais. Sempre siga as orientações do seu médico.
+            </p>
         </section>
 
         <!-- PÁGINA 3: AGENDAMENTO ONLINE -->
@@ -601,167 +529,52 @@
         </section>
 
         <!-- PÁGINA 4: RESULTADO ONLINE -->
-        <section id="page-resultados" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-cda-dark">Acesso a Resultados Online</h2>
-            <p class="text-slate-500 -mt-4 text-sm font-medium">Insira os dados do protocolo entregue na coleta para obter o laudo técnico digital.</p>
-
-            <!-- Acesso Direto WorkLab -->
-            <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 text-white shadow-lg">
-                <div class="flex items-start space-x-4">
-                    <div class="bg-white/20 rounded-xl p-3 text-2xl flex-shrink-0">
-                        <i class="fa-solid fa-microscope"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-base">Retirar Laudo pelo WorkLab</h4>
-                        <p class="text-sm text-blue-100 mt-0.5">Acesse diretamente o sistema WorkLab para consultar e baixar seu laudo digital com autenticação segura.</p>
-                    </div>
+        <section id="page-resultados" class="page">
+            <!-- Header compacto -->
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <h2 class="text-xl font-bold text-cda-dark flex items-center gap-2">
+                        <i class="fa-solid fa-microscope text-cda-primary"></i> Resultados Online
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-0.5">Portal seguro WorkLab — Laboratório CDA</p>
                 </div>
-                <a href="https://worklab.com.br" target="_blank" class="flex-shrink-0 bg-white text-blue-700 hover:bg-blue-50 font-bold px-6 py-3 rounded-xl text-sm transition shadow-sm flex items-center space-x-2">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    <span>Acessar WorkLab</span>
-                </a>
+                <button onclick="recarregarWorklab()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-rotate-right"></i> Atualizar
+                </button>
             </div>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- Formulário de Login de Laudo -->
-                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 md:col-span-1 space-y-4 h-fit">
-                    <h3 class="font-bold text-slate-800 text-lg flex items-center">
-                        <i class="fa-solid fa-lock text-cda-primary mr-2"></i> Área Segura
-                    </h3>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Código de Protocolo:</label>
-                        <input type="text" id="resultProtocol" placeholder="Ex: CDA-2026" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none font-mono uppercase">
+            <!-- iframe WorkLab direto -->
+            <div class="relative bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100" style="height: calc(100vh - 200px); min-height: 520px;">
+                <div id="worklabLoader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 gap-3">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background:#E8F8F8">
+                        <i class="fa-solid fa-spinner animate-spin text-2xl" style="color:#49BCBE"></i>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Senha de Acesso:</label>
-                        <input type="password" id="resultPass" placeholder="••••" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
-                    </div>
-                    
-                    <button onclick="buscarExames()" class="w-full bg-cda-primary hover:bg-opacity-95 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-sm">
-                        <i class="fa-solid fa-circle-check mr-2"></i>Visualizar Laudo
-                    </button>
-
-                    <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-200 text-xs text-slate-500">
-                        <span class="font-bold block text-cda-dark mb-1"><i class="fa-solid fa-circle-info text-cda-primary"></i> Código de teste:</span>
-                        Utilize <span class="font-bold font-mono bg-white px-1.5 py-0.5 border border-slate-300 rounded text-cda-primary">CDA-2026</span> com qualquer senha para simular e inspecionar a interface do laudo médico.
-                    </div>
+                    <p class="text-sm text-slate-500 font-semibold">Carregando portal de resultados...</p>
                 </div>
-
-                <!-- Visualizador do Laudo Laboratorial -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 md:col-span-2 min-h-[400px] flex items-center justify-center p-6 relative" id="laudoDisplayContainer">
-                    
-                    <!-- Estado Inicial (Sem buscas) -->
-                    <div id="laudoEmptyState" class="text-center max-w-sm">
-                        <div class="text-6xl text-slate-300 mb-4">
-                            <i class="fa-solid fa-file-invoice"></i>
-                        </div>
-                        <h4 class="font-bold text-slate-700 text-base">Aguardando Credenciais</h4>
-                        <p class="text-sm text-slate-400 mt-2">Os laudos emitidos possuem assinatura digital e validade jurídica para apresentação médica.</p>
+                <iframe id="worklabFrame"
+                    src="https://portal.worklabweb.com.br/resultados-on-line/1824"
+                    class="w-full h-full border-0"
+                    onload="document.getElementById('worklabLoader').style.display='none'"
+                    title="Portal de Resultados WorkLab CDA"
+                ></iframe>
+                <!-- Fallback se iframe bloquear (X-Frame-Options) -->
+                <div id="worklabFallback" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-white z-20 gap-4 px-8 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-3xl text-blue-600">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
-
-                    <!-- Estado Carregando -->
-                    <div id="laudoLoaderState" class="hidden text-center">
-                        <i class="fa-solid fa-spinner animate-spin text-4xl text-cda-primary"></i>
-                        <p class="text-sm text-slate-500 mt-3 font-semibold">Buscando banco de dados...</p>
+                    <div>
+                        <h4 class="font-bold text-slate-800">Acesso Seguro ao Portal</h4>
+                        <p class="text-sm text-slate-500 mt-1">O portal de laudos utiliza proteção de segurança. Toque no botão abaixo para acessar seus resultados.</p>
                     </div>
-
-                    <!-- Laudo Renderizado Realista -->
-                    <div id="laudoContentState" class="hidden w-full space-y-6 text-xs text-left p-2 md:p-6">
-                        <!-- Cabeçalho Institucional do Laudo -->
-                        <div class="flex justify-between items-start border-b pb-4">
-                            <div>
-                                <img src="logo CDA Transparente.png" alt="Laboratório CDA" class="h-10 w-auto mb-2">
-                                <span class="text-[10px] text-slate-400 block">LABORATÓRIO CDA LTDA | CNPJ: 12.525.717/0001-36</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded text-[10px] uppercase">Laudo Assinado Digitalmente</span>
-                                <span class="text-slate-400 block mt-1 text-[10px]">Autenticação: #928374-CDA</span>
-                            </div>
-                        </div>
-
-                        <!-- Dados do Paciente -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl font-medium text-[11px]">
-                            <div>
-                                <span class="text-slate-400 block text-[9px] uppercase">Paciente:</span>
-                                <span class="text-slate-800 font-bold">José Afonso de Souza</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block text-[9px] uppercase">Data de Nascimento:</span>
-                                <span class="text-slate-800">14/08/1979 (46 anos)</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block text-[9px] uppercase">Coleta:</span>
-                                <span class="text-slate-800">02/06/2026 07:15h</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block text-[9px] uppercase">Solicitante:</span>
-                                <span class="text-slate-800">Dr. Marcos Viana CRM-ES</span>
-                            </div>
-                        </div>
-
-                        <!-- Tabela de Resultados Científicos -->
-                        <div class="space-y-4">
-                            <h4 class="font-bold text-cda-dark text-sm border-b pb-1">Análises de Glicose e Hemograma</h4>
-                            
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="border-b text-slate-400 uppercase text-[9px] tracking-wider">
-                                        <th class="pb-2">Parâmetro Analisado</th>
-                                        <th class="pb-2">Resultado Encontrado</th>
-                                        <th class="pb-2">Unidade</th>
-                                        <th class="pb-2 text-right">Valores de Referência</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y text-[11px] text-slate-700">
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="py-2.5 font-semibold">Glicose em Jejum</td>
-                                        <td class="py-2.5 font-bold text-emerald-700">88,00</td>
-                                        <td class="py-2.5">mg/dL</td>
-                                        <td class="py-2.5 text-right">70,00 a 99,00 mg/dL</td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="py-2.5 font-semibold">Hemoglobina</td>
-                                        <td class="py-2.5 font-bold text-emerald-700">14,2</td>
-                                        <td class="py-2.5">g/dL</td>
-                                        <td class="py-2.5 text-right">13,5 a 17,5 g/dL</td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="py-2.5 font-semibold">Colesterol Total</td>
-                                        <td class="py-2.5 font-bold text-amber-600">198,00</td>
-                                        <td class="py-2.5">mg/dL</td>
-                                        <td class="py-2.5 text-right">Desejável menor que 200</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Notas e Responsabilidade Técnica -->
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-t pt-4 gap-4">
-                            <div class="text-[9px] text-slate-400 max-w-sm">
-                                <p class="font-bold text-slate-500">Nota Científica:</p>
-                                <p>Os exames laboratoriais correlacionam-se com as condições clínicas no momento da coleta. Resultados isolados devem ser correlacionados com o histórico clínico pelo seu médico de confiança.</p>
-                            </div>
-                            <div class="text-right w-full md:w-auto">
-                                <div class="border-b border-slate-300 w-44 inline-block text-center mb-1">
-                                    <span class="font-bold text-slate-800 text-[10px] block">Dra. Clara Silveira</span>
-                                    <span class="text-slate-400 text-[9px] block">CRBM-ES 4482-P</span>
-                                </div>
-                                <p class="text-[9px] text-slate-400">Farmacêutica-Bioquímica Responsável</p>
-                            </div>
-                        </div>
-
-                        <!-- Botão de Ação do Laudo -->
-                        <div class="flex justify-end space-x-2 pt-2">
-                            <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-lg text-[10px] transition">
-                                <i class="fa-solid fa-print mr-1"></i> Imprimir Laudo
-                            </button>
-                            <button onclick="baixarLaudoSimulado()" class="bg-cda-primary hover:bg-opacity-90 text-white font-bold px-4 py-2 rounded-lg text-[10px] transition shadow-sm">
-                                <i class="fa-solid fa-file-pdf mr-1"></i> Baixar PDF
-                            </button>
-                        </div>
-                    </div>
-
+                    <a href="https://portal.worklabweb.com.br/resultados-on-line/1824" target="_blank" class="btn-cda-primary text-white font-bold px-8 py-3 rounded-xl text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-file-medical"></i> Acessar Meus Resultados
+                    </a>
                 </div>
+            </div>
+            <!-- Elementos hidden para não quebrar JS existente -->
+            <div class="hidden">
+                <div id="laudoEmptyState"></div><div id="laudoLoaderState"></div>
+                <input id="resultProtocol"><input id="resultPass">
+                <div id="laudoContentState" class="hidden"></div>
             </div>
         </section>
 
@@ -838,33 +651,31 @@
         <!-- PÁGINA 7: ORÇAMENTO DE EXAMES -->
         <section id="page-orcamento" class="page space-y-6">
             <h2 class="text-2xl font-bold text-cda-dark">Solicitar Orçamento de Exames</h2>
-            <p class="text-slate-500 -mt-4 text-sm">Informe os exames que o médico solicitou e enviaremos o orçamento no seu WhatsApp em breve.</p>
+            <p class="text-slate-500 -mt-4 text-sm">Informe os exames solicitados pelo médico — digitando ou enviando foto do pedido — e retornaremos o orçamento no seu WhatsApp.</p>
 
-            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-teal-200 rounded-2xl p-5 flex items-start space-x-4">
-                <div class="bg-teal-600 text-white rounded-xl p-3 text-xl flex-shrink-0">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </div>
+            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-teal-200 rounded-2xl p-4 flex items-start space-x-4">
+                <div class="bg-teal-600 text-white rounded-xl p-3 text-xl flex-shrink-0"><i class="fa-brands fa-whatsapp"></i></div>
                 <div>
                     <h4 class="font-bold text-slate-800">Como funciona?</h4>
-                    <p class="text-sm text-slate-600 mt-1">Preencha o formulário abaixo com seu nome, WhatsApp e os exames solicitados. Sua mensagem será enviada para nossa equipe e retornaremos o orçamento diretamente no seu WhatsApp.</p>
+                    <p class="text-sm text-slate-600 mt-1">Preencha o formulário, adicione a foto do pedido médico (opcional) e envie. Nossa equipe calcula o orçamento e responde direto no seu WhatsApp.</p>
                 </div>
             </div>
 
-            <form id="orcamentoForm" onsubmit="submitOrcamento(event)" class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 space-y-5">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Seu Nome Completo:</label>
-                        <input type="text" name="orcNome" required placeholder="Digite seu nome completo" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nome Completo <span class="text-red-500">*</span></label>
+                        <input type="text" id="orcNome" required placeholder="Digite seu nome completo" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Seu WhatsApp:</label>
-                        <input type="tel" name="orcWhatsapp" required placeholder="(27) 99999-9999" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">WhatsApp para retorno <span class="text-red-500">*</span></label>
+                        <input type="tel" id="orcWhatsapp" required placeholder="(27) 99999-9999" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Convênio / Plano de Saúde:</label>
-                    <select name="orcConvenio" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Convênio / Plano de Saúde</label>
+                    <select id="orcConvenio" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                         <option value="Particular">Particular</option>
                         <option value="Unimed">Unimed</option>
                         <option value="Saude Caixa">Saúde Caixa</option>
@@ -879,22 +690,40 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Exames que deseja orçar:</label>
-                    <p class="text-xs text-slate-400 mb-2">Você pode digitar os nomes dos exames ou descrever o que está escrito na sua solicitação médica.</p>
-                    <textarea name="orcExames" rows="4" required placeholder="Ex: Hemograma completo, Glicemia de jejum, TSH, Colesterol total e frações..." class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Exames solicitados (digitados)</label>
+                    <p class="text-xs text-slate-400 mb-2">Digite os nomes dos exames que aparecem no pedido médico, ou deixe em branco se preferir enviar só a foto.</p>
+                    <textarea id="orcExames" rows="3" placeholder="Ex: Hemograma completo, Glicemia de jejum, TSH, Colesterol total..." class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                </div>
+
+                <!-- Upload de foto do pedido médico -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Foto do Pedido Médico (opcional)</label>
+                    <p class="text-xs text-slate-400 mb-2">Você pode adicionar uma ou mais fotos do pedido médico para facilitar o orçamento.</p>
+                    <div id="uploadArea" onclick="document.getElementById('orcFotos').click()" class="border-2 border-dashed border-slate-200 hover:border-cda-primary rounded-xl p-5 text-center cursor-pointer transition-colors group">
+                        <i class="fa-solid fa-camera text-3xl text-slate-300 group-hover:text-cda-primary transition-colors mb-2 block"></i>
+                        <p class="text-sm font-semibold text-slate-500 group-hover:text-cda-primary transition-colors">Toque para adicionar foto(s)</p>
+                        <p class="text-xs text-slate-400 mt-1">JPG, PNG ou PDF • Múltiplas fotos permitidas</p>
+                        <input type="file" id="orcFotos" multiple accept="image/*,application/pdf" class="hidden" onchange="mostrarPreviewFotos(event)">
+                    </div>
+                    <!-- Preview das fotos selecionadas -->
+                    <div id="fotosPreview" class="hidden mt-3 grid grid-cols-3 gap-2"></div>
+                    <div id="fotosInfo" class="hidden mt-2 text-xs text-slate-500 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                        <span id="fotosInfoText"></span>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Observações adicionais (opcional):</label>
-                    <input type="text" name="orcObs" placeholder="Ex: Coleta domiciliar, urgência, etc." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Observações adicionais (opcional)</label>
+                    <input type="text" id="orcObs" placeholder="Ex: Coleta domiciliar, urgência, melhor horário para contato..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl text-sm transition shadow-md flex justify-center items-center space-x-2">
+                <button onclick="submitOrcamento()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition-all shadow-md flex justify-center items-center space-x-2">
                     <i class="fa-brands fa-whatsapp text-lg"></i>
                     <span>Solicitar Orçamento pelo WhatsApp</span>
                 </button>
                 <p class="text-xs text-center text-slate-400">Nossa equipe responde em horário comercial (Seg–Sex 07h–17h)</p>
-            </form>
+            </div>
         </section>
 
         <!-- PÁGINA 6: CONTATO / FALE CONOSCO -->
@@ -1109,38 +938,8 @@
             }
         }
 
-        // 4. Sistema de Busca de Laudo Médico de Teste
-        function buscarExames() {
-            const protocol = document.getElementById('resultProtocol').value.trim().toUpperCase();
-            const pass = document.getElementById('resultPass').value.trim();
-
-            const emptyState = document.getElementById('laudoEmptyState');
-            const loaderState = document.getElementById('laudoLoaderState');
-            const contentState = document.getElementById('laudoContentState');
-
-            if (!protocol) {
-                alert('Por favor, informe o código do protocolo.');
-                return;
-            }
-
-            // Exibir carregamento
-            emptyState.classList.add('hidden');
-            contentState.classList.add('hidden');
-            loaderState.classList.remove('hidden');
-
-            setTimeout(() => {
-                loaderState.classList.add('hidden');
-                
-                if (protocol === 'CDA-2026') {
-                    // Renderiza laudo com sucesso
-                    contentState.classList.remove('hidden');
-                } else {
-                    // Restaura estado inicial e alerta erro
-                    emptyState.classList.remove('hidden');
-                    alert('Protocolo de teste não encontrado. Insira "CDA-2026" para testar o laudo.');
-                }
-            }, 1200);
-        }
+        // 4. buscarExames - mantido como stub (laudos agora via iframe WorkLab)
+        function buscarExames() { /* noop */ }
 
         // Ação de download simulado (substituição para evitar alert() conforme as regras do sistema)
         function baixarLaudoSimulado() {
@@ -1170,30 +969,6 @@
                     item.style.display = 'none';
                 }
             });
-        }
-
-        // 6a. Envio de Orçamento por WhatsApp
-        function submitOrcamento(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const nome = formData.get('orcNome');
-            const whatsapp = formData.get('orcWhatsapp');
-            const convenio = formData.get('orcConvenio');
-            const exames = formData.get('orcExames');
-            const obs = formData.get('orcObs') || 'Nenhuma';
-
-            const text = `Olá, Laboratório CDA! Gostaria de solicitar um *orçamento de exames*.%0A%0A` +
-                         `*Dados do Paciente:*%0A` +
-                         `- *Nome:* ${nome}%0A` +
-                         `- *WhatsApp para retorno:* ${whatsapp}%0A` +
-                         `- *Convênio/Plano:* ${convenio}%0A%0A` +
-                         `*Exames solicitados:*%0A${exames}%0A%0A` +
-                         `*Observações:* ${obs}%0A%0A` +
-                         `_Por favor, enviar o orçamento no WhatsApp informado acima._`;
-
-            const phone = "5527998980658";
-            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
-            event.target.reset();
         }
 
         // 6. Envio de Agendamento por Whatsapp
@@ -1296,6 +1071,217 @@
                 dismissInstall();
             }
         }
+
+        // ── WorkLab iframe ──────────────────────────────────────────
+        function recarregarWorklab() {
+            const frame = document.getElementById('worklabFrame');
+            const loader = document.getElementById('worklabLoader');
+            if (frame) {
+                if(loader) loader.style.display = 'flex';
+                frame.src = frame.src;
+            }
+        }
+
+        // Detect X-Frame-Options block (no load event within 8s = likely blocked)
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const frame = document.getElementById('worklabFrame');
+                const loader = document.getElementById('worklabLoader');
+                const fallback = document.getElementById('worklabFallback');
+                if (frame && loader && loader.style.display !== 'none') {
+                    // Still showing loader → iframe probably blocked
+                    loader.style.display = 'none';
+                    if(fallback) fallback.classList.remove('hidden');
+                }
+            }, 8000);
+        });
+
+        // ── Orçamento ────────────────────────────────────────────────
+        function mostrarPreviewFotos(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('fotosPreview');
+            const info = document.getElementById('fotosInfo');
+            const infoText = document.getElementById('fotosInfoText');
+            preview.innerHTML = '';
+            if (files.length === 0) { preview.classList.add('hidden'); info.classList.add('hidden'); return; }
+            preview.classList.remove('hidden');
+            info.classList.remove('hidden');
+            infoText.textContent = files.length + ' arquivo(s) selecionado(s)';
+            Array.from(files).forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-xl overflow-hidden border border-slate-200 aspect-square bg-slate-50 flex items-center justify-center';
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.className = 'w-full h-full object-cover';
+                    const reader = new FileReader();
+                    reader.onload = e => { img.src = e.target.result; };
+                    reader.readAsDataURL(file);
+                    div.appendChild(img);
+                } else {
+                    div.innerHTML = '<i class="fa-solid fa-file-pdf text-2xl text-red-400"></i><span class="text-[9px] text-slate-500 mt-1 text-center px-1">'+file.name.substring(0,15)+'</span>';
+                    div.classList.add('flex-col', 'gap-0.5');
+                }
+                preview.appendChild(div);
+            });
+        }
+
+        function submitOrcamento() {
+            const nome = document.getElementById('orcNome').value.trim();
+            const whatsapp = document.getElementById('orcWhatsapp').value.trim();
+            const convenio = document.getElementById('orcConvenio').value;
+            const exames = document.getElementById('orcExames').value.trim();
+            const obs = document.getElementById('orcObs').value.trim() || 'Nenhuma';
+            const fotosInput = document.getElementById('orcFotos');
+            const temFotos = fotosInput && fotosInput.files.length > 0;
+
+            if (!nome) { mostrarAlerta('Por favor, informe seu nome completo.', 'erro'); return; }
+            if (!whatsapp) { mostrarAlerta('Por favor, informe seu WhatsApp para retorno.', 'erro'); return; }
+            if (!exames && !temFotos) { mostrarAlerta('Por favor, descreva os exames ou adicione uma foto do pedido.', 'erro'); return; }
+
+            const fotosInfo = temFotos ? `%0A%0A📎 *Fotos do pedido:* ${fotosInput.files.length} imagem(ns) anexada(s) — enviarei em seguida` : '';
+            const examesInfo = exames ? `%0A*Exames descritos:* ${exames}` : '%0A*(Exames via foto em anexo)*';
+
+            const text = `Olá, Laboratório CDA! Gostaria de solicitar um *orçamento de exames* 🧪%0A%0A` +
+                `*Nome:* ${nome}%0A` +
+                `*WhatsApp p/ retorno:* ${whatsapp}%0A` +
+                `*Convênio/Plano:* ${convenio}` +
+                examesInfo +
+                `%0A*Observações:* ${obs}` +
+                fotosInfo +
+                `%0A%0A_Por favor, enviar o orçamento no WhatsApp informado acima. Obrigado!_`;
+
+            const phone = "5527998980658";
+            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+
+            // Toast de confirmação
+            setTimeout(() => mostrarAlerta('✅ Mensagem enviada! Nossa equipe retornará no seu WhatsApp em breve.', 'sucesso'), 600);
+
+            // Limpar formulário
+            document.getElementById('orcNome').value = '';
+            document.getElementById('orcWhatsapp').value = '';
+            document.getElementById('orcExames').value = '';
+            document.getElementById('orcObs').value = '';
+            if (fotosInput) fotosInput.value = '';
+            document.getElementById('fotosPreview').classList.add('hidden');
+            document.getElementById('fotosInfo').classList.add('hidden');
+        }
+
+        function mostrarAlerta(msg, tipo) {
+            const toast = document.createElement('div');
+            const cor = tipo === 'sucesso' ? 'bg-emerald-600' : 'bg-red-600';
+            toast.className = `fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 ${cor} text-white px-4 py-3.5 rounded-2xl shadow-2xl flex items-center justify-between z-50 text-sm font-medium`;
+            toast.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" class="ml-3 text-white/70 hover:text-white font-bold text-base leading-none">✕</button>`;
+            document.body.appendChild(toast);
+            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 5000);
+        }
+
+        // ── Chat de Preparo com Gemini AI (gratuito) ─────────────────
+        async function enviarMensagemPreparo() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            adicionarMensagemChat(msg, 'user');
+            await responderPreparo(msg);
+        }
+
+        function enviarSugestao(texto) {
+            document.getElementById('chatInput').value = texto;
+            enviarMensagemPreparo();
+        }
+
+        function adicionarMensagemChat(texto, tipo) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            if (tipo === 'user') {
+                div.className = 'flex justify-end';
+                div.innerHTML = `<div class="px-4 py-3 rounded-2xl rounded-tr-sm max-w-xs md:max-w-sm text-sm text-white shadow-sm" style="background:#49BCBE">${escHtml(texto)}</div>`;
+            } else {
+                div.className = 'flex items-start gap-2';
+                div.innerHTML = `
+                    <div class="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#E8F8F8">
+                        <i class="fa-solid fa-robot text-xs" style="color:#49BCBE"></i>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs md:max-w-sm text-sm text-slate-700 shadow-sm border border-slate-100 preparo-bot-msg">${texto}</div>`;
+            }
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        // Para ativar IA gratuita: obtenha chave grátis em aistudio.google.com e coloque abaixo
+        const GEMINI_API_KEY = ''; // Cole sua chave aqui (ex: 'AIzaSy...')
+
+        async function responderPreparo(pergunta) {
+            const typing = document.getElementById('chatTyping');
+            typing.classList.remove('hidden');
+            document.getElementById('chatMessages').scrollTop = 99999;
+
+            const GEMINI_KEY = GEMINI_API_KEY;
+            const systemPrompt = `Você é o assistente de preparo de exames do Laboratório CDA, localizado em Afonso Cláudio - ES. Responda APENAS perguntas sobre preparo de exames laboratoriais. Seja claro, objetivo e use linguagem simples. Formate com bullet points quando necessário. Se a pergunta não for sobre preparo de exames laboratoriais, diga educadamente que só pode ajudar com preparo de exames. Não invente informações; baseie-se em diretrizes laboratoriais padrão. Responda em português brasileiro. Máximo 200 palavras.`;
+
+            if (!GEMINI_KEY) {
+                typing.classList.add('hidden');
+                adicionarMensagemChat(respostaPadrao(pergunta), 'bot');
+                return;
+            }
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        contents: [{ parts: [{ text: pergunta }] }]
+                    })
+                });
+                const data = await res.json();
+                typing.classList.add('hidden');
+                const resposta = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (resposta) {
+                    // Converter markdown simples para HTML
+                    const html = resposta
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/^[-•] (.+)$/gm, '<li class="ml-3 list-disc">$1</li>')
+                        .replace(/(<li.*<\/li>\n?)+/g, s => `<ul class="space-y-1 mt-1">${s}</ul>`)
+                        .replace(/\n/g, '<br>');
+                    adicionarMensagemChat(html, 'bot');
+                } else {
+                    adicionarMensagemChat('Desculpe, não consegui processar sua pergunta. Tente novamente ou ligue para a gente: <a href="tel:27998980658" class="text-cda-primary font-semibold underline">(27) 99898-0658</a>', 'bot');
+                }
+            } catch(e) {
+                typing.classList.add('hidden');
+                // Fallback: base de conhecimento local
+                const resp = respostaPadrao(pergunta);
+                adicionarMensagemChat(resp, 'bot');
+            }
+        }
+
+
+        // Base de conhecimento local (fallback sem internet/chave)
+        function respostaPadrao(q) {
+            const q2 = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+            const kb = [
+                { k: ['hemograma','sangue completo'], r: '<strong>Hemograma Completo</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum recomendado de <strong>3 horas</strong> (não obrigatório)</li><li>Evitar álcool por <strong>24 horas</strong> antes</li><li>Água pode ser consumida normalmente</li><li>Informe medicamentos em uso na recepção</li></ul>' },
+                { k: ['glicemia','glicose','glicose em jejum'], r: '<strong>Glicemia / Glicose em Jejum</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum <strong>obrigatório de 8 a 12 horas</strong></li><li>Pode beber água pura</li><li>Não fumar antes do exame</li><li>Informe uso de insulina ou hipoglicemiantes</li></ul>' },
+                { k: ['urina','eas','tipo 1','urocultura'], r: '<strong>Urina (EAS / Tipo 1 / Urocultura)</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Preferencialmente a <strong>1ª urina da manhã</strong></li><li>Desprezar o <strong>primeiro jato</strong>, coletar o jato do meio</li><li>Higienizar a região íntima antes da coleta</li><li>Para urocultura: não usar antibiótico 7 dias antes</li><li>Frasco estéril fornecido pelo CDA</li></ul>' },
+                { k: ['fezes','parasitologico','coprocultura'], r: '<strong>Exame de Fezes</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Coletar em frasco estéril fornecido pelo laboratório</li><li>Evitar laxantes ou enemas</li><li>Não contaminar com urina ou água</li><li>Entregar no laboratório em até 2 horas após coleta</li></ul>' },
+                { k: ['colesterol','triglicerides','triglicerideos','lipidograma'], r: '<strong>Colesterol / Triglicérides (Lipidograma)</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum de <strong>12 horas</strong></li><li>Sem álcool por <strong>72 horas</strong></li><li>Manter dieta normal nos 3 dias anteriores</li><li>Evitar atividade física intensa no dia anterior</li></ul>' },
+                { k: ['tsh','t3','t4','tireóide','tireoide'], r: '<strong>TSH / T3 / T4 (Tireoide)</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum de <strong>3 a 4 horas</strong> (recomendado)</li><li>Colher <strong>antes de tomar a medicação</strong> da tireoide</li><li>Informe dosagem e horário do medicamento</li></ul>' },
+                { k: ['psa','prostata','prostatico'], r: '<strong>PSA (Antígeno Prostático)</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Sem relação sexual por <strong>3 dias</strong></li><li>Sem atividade física intensa por <strong>48 horas</strong></li><li>Não realizar toque retal 7 dias antes</li><li>Jejum de 3 horas</li></ul>' },
+                { k: ['creatinina','ureia','renal','rim'], r: '<strong>Creatinina / Ureia (Função Renal)</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum de <strong>8 horas</strong></li><li>Evitar carne vermelha no dia anterior</li><li>Manter hidratação normal</li></ul>' },
+                { k: ['vitamina d','vitamina','25-oh'], r: '<strong>Vitamina D (25-OH)</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum de <strong>4 horas</strong></li><li>Sem restrição alimentar especial</li><li>Informe suplementação de vitamina D em uso</li></ul>' },
+                { k: ['ck','cpk','creatinofosfoquinase'], r: '<strong>CK / CPK (Músculo)</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum de <strong>4 horas</strong></li><li><strong>Não praticar exercícios</strong> por 48–72 horas antes</li></ul>' },
+                { k: ['acido urico','urato'], r: '<strong>Ácido Úrico</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum de <strong>8 horas</strong></li><li>Evitar frutos do mar e vísceras por 24h</li><li>Sem álcool por 24h</li></ul>' },
+                { k: ['ferritina','ferro','transferrina'], r: '<strong>Ferro Sérico / Ferritina</strong><br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Jejum de <strong>8 a 12 horas</strong></li><li>Não tomar suplemento de ferro 24h antes</li><li>Colher preferencialmente pela manhã</li></ul>' },
+            ];
+            for (const item of kb) {
+                if (item.k.some(k => q2.includes(k))) return item.r;
+            }
+            return 'Não encontrei informações específicas sobre esse exame na minha base. 🔍<br><br>Para instruções detalhadas, você pode:<br><ul class="space-y-1 mt-1 ml-3 list-disc"><li>Ligar para o CDA: <a href="tel:27998980658" class="text-cda-primary font-semibold underline">(27) 99898-0658</a></li><li>Consultar o guia completo do <a href="https://www.alvaroapoio.com.br/preparo-de-exames/" target="_blank" class="text-cda-primary font-semibold underline">Álvaro Apoio</a></li></ul>';
+        }
+
     </script>
 </body>
 </html>
