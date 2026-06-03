@@ -2124,7 +2124,7 @@ CREATINA FOSFOQUINASE: R$ 26.67
         }
 
         async function gerarOrcamentoIA() {
-            const API_KEY_GEMINI = "AQ.Ab8RN6IRnFXV9IUhpPMRiXeixhPI-zsGZKPB8pOP2UBwI6qzUQ"; // Chave de API configurada
+            const API_KEY_GEMINI = "AQ.Ab8RN6JcdSEPT6rmQ4snYxZqQcaBnTLtEyFAcSlumRHbHEvuLA"; // Chave de API configurada
             const nome = document.getElementById('iaOrcNome').value.trim() || 'Paciente';
             const examesTexto = document.getElementById('iaOrcExames').value.trim();
             const temImagens = orcPedidosBase64.length > 0;
@@ -2152,19 +2152,13 @@ CREATINA FOSFOQUINASE: R$ 26.67
             const dataAtual = new Date().toLocaleDateString('pt-BR');
 
             try {
-                let prompt = `Você é um assistente do Laboratório CDA. 
-                Sua tarefa é extrair nomes de exames laboratoriais de um pedido médico (imagem) ou de uma lista de texto.
+                // ETAPA 1: Gemini identifica apenas os nomes dos exames (sem tabela de preços)
+                let prompt = `Você é um assistente do Laboratório CDA.
+                Extraia apenas os nomes dos exames laboratoriais do pedido médico abaixo (texto ou imagem).
+                Retorne SOMENTE um JSON no formato: {"exames": ["nome do exame 1", "nome do exame 2"]}
+                Não inclua mais nada além do JSON. Nomes em português, como aparecem no pedido.
                 
-                INSTRUÇÕES:
-                1. Identifique todos os exames solicitados.
-                2. Para cada exame, verifique se ele existe na TABELA DE PREÇOS abaixo.
-                3. Se existir, retorne o nome exato da tabela e o preço.
-                4. Se NÃO existir, retorne o nome do exame e coloque "A consultar" no preço.
-                5. Retorne APENAS um JSON no formato: {"exames": [{"nome": "...", "preco": 0.0, "status": "encontrado/nao_encontrado"}], "total": 0.0}
-                
-                TABELA DE PREÇOS (JSON): ${JSON.stringify(TABELA_PRECOS)}
-                
-                Texto adicional do usuário: ${examesTexto}`;
+                Texto: ${examesTexto || '(ver imagem anexada)'}`;
 
                 let contents = [{
                     parts: [{ text: prompt }]
@@ -2184,10 +2178,40 @@ CREATINA FOSFOQUINASE: R$ 26.67
                     body: JSON.stringify({ contents })
                 });
 
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(`API error ${response.status}: ${JSON.stringify(errData)}`);
+                }
+
                 const data = await response.json();
                 const rawText = data.candidates[0].content.parts[0].text;
                 const jsonStr = rawText.match(/\{[\s\S]*\}/)[0];
-                const resultadoIA = JSON.parse(jsonStr);
+                const listaIA = JSON.parse(jsonStr);
+
+                // ETAPA 2: Busca de preços localmente (sem enviar tabela para a IA)
+                function buscarPreco(nomeExame) {
+                    const nomeBusca = nomeExame.toUpperCase().trim();
+                    // Busca exata
+                    if (TABELA_PRECOS[nomeBusca] !== undefined) {
+                        return { nome: nomeBusca, preco: TABELA_PRECOS[nomeBusca], status: 'encontrado' };
+                    }
+                    // Busca parcial
+                    const chaves = Object.keys(TABELA_PRECOS);
+                    const parcial = chaves.find(k => k.includes(nomeBusca) || nomeBusca.includes(k));
+                    if (parcial) {
+                        return { nome: parcial, preco: TABELA_PRECOS[parcial], status: 'encontrado' };
+                    }
+                    // Busca por palavras-chave
+                    const palavras = nomeBusca.split(' ').filter(p => p.length > 3);
+                    const porPalavra = chaves.find(k => palavras.some(p => k.includes(p)));
+                    if (porPalavra) {
+                        return { nome: porPalavra, preco: TABELA_PRECOS[porPalavra], status: 'encontrado' };
+                    }
+                    return { nome: nomeExame, preco: 0, status: 'nao_encontrado' };
+                }
+
+                const examesComPreco = listaIA.exames.map(nome => buscarPreco(nome));
+                const total = examesComPreco.reduce((acc, ex) => acc + (ex.status === 'encontrado' ? ex.preco : 0), 0);
 
                 loader.classList.add('hidden');
 
@@ -2196,12 +2220,12 @@ CREATINA FOSFOQUINASE: R$ 26.67
                 htmlResultado += `📅 <strong>Data:</strong> ${dataAtual}<br><br>`;
                 htmlResultado += `<strong>Exames solicitados:</strong><br>`;
                 
-                resultadoIA.exames.forEach(ex => {
+                examesComPreco.forEach(ex => {
                     const precoStr = ex.status === 'encontrado' ? `R$ ${ex.preco.toFixed(2)}` : `<strong>A consultar</strong>`;
                     htmlResultado += `• ${ex.nome} .......... ${precoStr}<br>`;
                 });
 
-                htmlResultado += `<br><strong>💰 Valor total estimado: R$ ${resultadoIA.total.toFixed(2)}</strong><br><br>`;
+                htmlResultado += `<br><strong>💰 Valor total estimado: R$ ${total.toFixed(2)}</strong><br><br>`;
                 htmlResultado += `Pacientes com convênio ou Cartão Fidelidade CDA têm descontos especiais. Confirme pelo WhatsApp! 😊`;
 
                 document.getElementById('orcDataHeader').textContent = dataAtual;
@@ -2210,9 +2234,9 @@ CREATINA FOSFOQUINASE: R$ 26.67
                 resDiv.scrollIntoView({ behavior: 'smooth' });
 
             } catch(e) {
-                console.error(e);
+                console.error('Erro detalhado:', e);
                 loader.classList.add('hidden');
-                mostrarAlerta('Erro na IA do Gemini. Verifique sua chave e conexão.', 'erro');
+                mostrarAlerta('Erro na IA do Gemini. Verifique sua chave e conexão. Detalhe: ' + e.message, 'erro');
             }
         }
 
