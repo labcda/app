@@ -75,7 +75,12 @@
         #splashScreen {
             background: #ffffff;
             overflow: hidden;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
         }
 
         /* Animação de DNA na Splash */
@@ -974,8 +979,22 @@
 
     <!-- SCRIPTS DE GERENCIAMENTO DO APP -->
     <script>
-        // 1. Simular Splash Screen sumindo após carregar assets básicos
-        window.addEventListener('load', () => {
+        // 1. Gerenciamento da Tela de Splash
+        function fecharSplashScreen() {
+            const splash = document.getElementById('splashScreen');
+            if (splash && !splash.classList.contains('opacity-0')) {
+                splash.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 700); // Tempo da transição duration-700
+                
+                // Mostrar banner do PWA
+                showPwaInstallBanner();
+            }
+        }
+
+        // Tentar fechar após o carregamento do DOM (mais rápido que 'load')
+        document.addEventListener('DOMContentLoaded', () => {
             // Aplicar tema salvo no localStorage, se houver
             const savedDark = localStorage.getItem('cda-theme-dark');
             const savedPrimary = localStorage.getItem('cda-theme-primary');
@@ -984,14 +1003,12 @@
                 setTheme(savedDark, savedPrimary, savedLight, 'stored');
             }
 
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                splash.classList.add('opacity-0', 'pointer-events-none');
-                
-                // Mostrar banner do PWA temporário para fins de demonstração
-                showPwaInstallBanner();
-            }, 1800);
+            // Garante que o splash saia após um tempo razoável mesmo que o load demore
+            setTimeout(fecharSplashScreen, 2000);
         });
+
+        // Fallback para o evento load
+        window.addEventListener('load', fecharSplashScreen);
 
         // 2. Sistema de Personalização Dinâmica de Cores (CSS Variables)
         function toggleThemePanel() {
