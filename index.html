@@ -2124,7 +2124,7 @@ CREATINA FOSFOQUINASE: R$ 26.67
         }
 
         async function gerarOrcamentoIA() {
-            const API_KEY_GEMINI = "AQ.Ab8RN6JcdSEPT6rmQ4snYxZqQcaBnTLtEyFAcSlumRHbHEvuLA"; // Chave de API configurada
+            const ANTHROPIC_API_KEY = "sk-ant-REMOVIDO"; // Chave Anthropic: começa com sk-ant-
             const nome = document.getElementById('iaOrcNome').value.trim() || 'Paciente';
             const examesTexto = document.getElementById('iaOrcExames').value.trim();
             const temImagens = orcPedidosBase64.length > 0;
@@ -2134,8 +2134,8 @@ CREATINA FOSFOQUINASE: R$ 26.67
                 return;
             }
 
-            if (API_KEY_GEMINI === "COLE_SUA_CHAVE_GEMINI_AQUI") {
-                mostrarAlerta('Por favor, configure sua Chave de API do Gemini no código para usar a IA.', 'erro');
+            if (ANTHROPIC_API_KEY === "COLE_SUA_CHAVE_AQUI") {
+                mostrarAlerta('Por favor, configure sua Chave de API no código.', 'erro');
                 return;
             }
 
@@ -2152,30 +2152,43 @@ CREATINA FOSFOQUINASE: R$ 26.67
             const dataAtual = new Date().toLocaleDateString('pt-BR');
 
             try {
-                // ETAPA 1: Gemini identifica apenas os nomes dos exames (sem tabela de preços)
-                let prompt = `Você é um assistente do Laboratório CDA.
-                Extraia apenas os nomes dos exames laboratoriais do pedido médico abaixo (texto ou imagem).
-                Retorne SOMENTE um JSON no formato: {"exames": ["nome do exame 1", "nome do exame 2"]}
-                Não inclua mais nada além do JSON. Nomes em português, como aparecem no pedido.
-                
-                Texto: ${examesTexto || '(ver imagem anexada)'}`;
-
-                let contents = [{
-                    parts: [{ text: prompt }]
-                }];
+                // Montar mensagem para a API Anthropic
+                let userContent = [];
 
                 if (temImagens) {
                     orcPedidosBase64.forEach(img => {
-                        contents[0].parts.push({
-                            inline_data: { mime_type: img.mediaType, data: img.base64 }
+                        userContent.push({
+                            type: 'image',
+                            source: {
+                                type: 'base64',
+                                media_type: img.mediaType,
+                                data: img.base64
+                            }
                         });
                     });
                 }
 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`, {
+                userContent.push({
+                    type: 'text',
+                    text: `Extraia apenas os nomes dos exames laboratoriais do pedido médico ${temImagens ? '(ver imagem acima)' : 'abaixo'}.
+Retorne SOMENTE um JSON no formato: {"exames": ["nome do exame 1", "nome do exame 2"]}
+Não inclua mais nada além do JSON. Nomes em português, como aparecem no pedido.
+${examesTexto ? 'Texto: ' + examesTexto : ''}`
+                });
+
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': API_KEY_GEMINI },
-                    body: JSON.stringify({ contents })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': ANTHROPIC_API_KEY,
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-haiku-4-5-20251001',
+                        max_tokens: 1024,
+                        messages: [{ role: 'user', content: userContent }]
+                    })
                 });
 
                 if (!response.ok) {
@@ -2184,24 +2197,21 @@ CREATINA FOSFOQUINASE: R$ 26.67
                 }
 
                 const data = await response.json();
-                const rawText = data.candidates[0].content.parts[0].text;
+                const rawText = data.content[0].text;
                 const jsonStr = rawText.match(/\{[\s\S]*\}/)[0];
                 const listaIA = JSON.parse(jsonStr);
 
-                // ETAPA 2: Busca de preços localmente (sem enviar tabela para a IA)
+                // Busca de preços localmente
                 function buscarPreco(nomeExame) {
                     const nomeBusca = nomeExame.toUpperCase().trim();
-                    // Busca exata
                     if (TABELA_PRECOS[nomeBusca] !== undefined) {
                         return { nome: nomeBusca, preco: TABELA_PRECOS[nomeBusca], status: 'encontrado' };
                     }
-                    // Busca parcial
                     const chaves = Object.keys(TABELA_PRECOS);
                     const parcial = chaves.find(k => k.includes(nomeBusca) || nomeBusca.includes(k));
                     if (parcial) {
                         return { nome: parcial, preco: TABELA_PRECOS[parcial], status: 'encontrado' };
                     }
-                    // Busca por palavras-chave
                     const palavras = nomeBusca.split(' ').filter(p => p.length > 3);
                     const porPalavra = chaves.find(k => palavras.some(p => k.includes(p)));
                     if (porPalavra) {
@@ -2210,16 +2220,15 @@ CREATINA FOSFOQUINASE: R$ 26.67
                     return { nome: nomeExame, preco: 0, status: 'nao_encontrado' };
                 }
 
-                const examesComPreco = listaIA.exames.map(nome => buscarPreco(nome));
+                const examesComPreco = listaIA.exames.map(n => buscarPreco(n));
                 const total = examesComPreco.reduce((acc, ex) => acc + (ex.status === 'encontrado' ? ex.preco : 0), 0);
 
                 loader.classList.add('hidden');
 
-                // Gerar o HTML do resultado
                 let htmlResultado = `👤 <strong>Paciente:</strong> ${nome}<br>`;
                 htmlResultado += `📅 <strong>Data:</strong> ${dataAtual}<br><br>`;
                 htmlResultado += `<strong>Exames solicitados:</strong><br>`;
-                
+
                 examesComPreco.forEach(ex => {
                     const precoStr = ex.status === 'encontrado' ? `R$ ${ex.preco.toFixed(2)}` : `<strong>A consultar</strong>`;
                     htmlResultado += `• ${ex.nome} .......... ${precoStr}<br>`;
@@ -2236,7 +2245,7 @@ CREATINA FOSFOQUINASE: R$ 26.67
             } catch(e) {
                 console.error('Erro detalhado:', e);
                 loader.classList.add('hidden');
-                mostrarAlerta('Erro na IA do Gemini. Verifique sua chave e conexão. Detalhe: ' + e.message, 'erro');
+                mostrarAlerta('Erro na IA. Verifique sua chave e conexão. Detalhe: ' + e.message, 'erro');
             }
         }
 
