@@ -2124,12 +2124,18 @@ CREATINA FOSFOQUINASE: R$ 26.67
         }
 
         async function gerarOrcamentoIA() {
+            const API_KEY_GEMINI = "AQ.Ab8RN6JcdSEPT6rmQ4snYxZqQcaBnTLtEyFAcSlumRHbHEvuLA"; // Chave de API configurada
             const nome = document.getElementById('iaOrcNome').value.trim() || 'Paciente';
             const examesTexto = document.getElementById('iaOrcExames').value.trim();
             const temImagens = orcPedidosBase64.length > 0;
 
             if (!examesTexto && !temImagens) {
                 mostrarAlerta('Anexe o pedido médico ou digite os exames.', 'erro');
+                return;
+            }
+
+            if (API_KEY_GEMINI === "COLE_SUA_CHAVE_GEMINI_AQUI") {
+                mostrarAlerta('Por favor, configure sua Chave de API do Gemini no código para usar a IA.', 'erro');
                 return;
             }
 
@@ -2140,89 +2146,73 @@ CREATINA FOSFOQUINASE: R$ 26.67
             loader.classList.remove('hidden');
             resDiv.classList.add('hidden');
 
-            // Mensagens de progresso
-            const msgs = temImagens 
-                ? ['Lendo o pedido médico...', 'Identificando os exames...', 'Consultando tabela de preços...']
-                : ['Processando exames...', 'Consultando tabela de preços...'];
-            let mi = 0;
             const msgEl = document.getElementById('orcLoaderMsg');
-            const msgInterval = setInterval(() => {
-                if (mi < msgs.length - 1) { mi++; msgEl.textContent = msgs[mi]; }
-            }, 2000);
+            msgEl.textContent = temImagens ? 'IA lendo pedido médico...' : 'IA processando exames...';
 
             const dataAtual = new Date().toLocaleDateString('pt-BR');
 
             try {
-                // Simulação de processamento local se não houver chave de API
-                // Em um cenário real, você deve inserir sua chave Anthropic.
-                // Vou implementar um processador básico baseado na tabela local para que o app funcione.
+                let prompt = `Você é um assistente do Laboratório CDA. 
+                Sua tarefa é extrair nomes de exames laboratoriais de um pedido médico (imagem) ou de uma lista de texto.
                 
-                let examesEncontrados = [];
-                let total = 0;
-                let examesNaoEncontrados = [];
+                INSTRUÇÕES:
+                1. Identifique todos os exames solicitados.
+                2. Para cada exame, verifique se ele existe na TABELA DE PREÇOS abaixo.
+                3. Se existir, retorne o nome exato da tabela e o preço.
+                4. Se NÃO existir, retorne o nome do exame e coloque "A consultar" no preço.
+                5. Retorne APENAS um JSON no formato: {"exames": [{"nome": "...", "preco": 0.0, "status": "encontrado/nao_encontrado"}], "total": 0.0}
+                
+                TABELA DE PREÇOS (JSON): ${JSON.stringify(TABELA_PRECOS)}
+                
+                Texto adicional do usuário: ${examesTexto}`;
 
-                // Se houver texto, processar os nomes
-                if (examesTexto) {
-                    const lista = examesTexto.split(/,|\n/).map(t => t.trim().toUpperCase()).filter(t => t);
-                    lista.forEach(ex => {
-                        let preco = null;
-                        // Busca exata ou parcial na tabela
-                        for (let nomeExame in TABELA_PRECOS) {
-                            if (nomeExame.includes(ex) || ex.includes(nomeExame)) {
-                                preco = TABELA_PRECOS[nomeExame];
-                                examesEncontrados.push({ nome: nomeExame, preco: preco });
-                                total += preco;
-                                break;
-                            }
-                        }
-                        if (!preco) examesNaoEncontrados.push(ex);
+                let contents = [{
+                    parts: [{ text: prompt }]
+                }];
+
+                if (temImagens) {
+                    orcPedidosBase64.forEach(img => {
+                        contents[0].parts.push({
+                            inline_data: { mime_type: img.mediaType, data: img.base64 }
+                        });
                     });
                 }
 
-                // Se houver imagens, informar que a análise de visão requer a chave de API
-                let avisoImagem = "";
-                if (temImagens) {
-                    avisoImagem = "<br><em>Nota: A leitura automática de fotos requer integração com IA ativa. Por enquanto, processei os exames digitados.</em><br>";
-                }
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_GEMINI}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents })
+                });
 
-                // Gerar o texto do orçamento
+                const data = await response.json();
+                const rawText = data.candidates[0].content.parts[0].text;
+                const jsonStr = rawText.match(/\{[\s\S]*\}/)[0];
+                const resultadoIA = JSON.parse(jsonStr);
+
+                loader.classList.add('hidden');
+
+                // Gerar o HTML do resultado
                 let htmlResultado = `👤 <strong>Paciente:</strong> ${nome}<br>`;
                 htmlResultado += `📅 <strong>Data:</strong> ${dataAtual}<br><br>`;
                 htmlResultado += `<strong>Exames solicitados:</strong><br>`;
                 
-                examesEncontrados.forEach(ex => {
-                    htmlResultado += `• ${ex.nome} .......... R$ ${ex.preco.toFixed(2)}<br>`;
-                });
-                
-                examesNaoEncontrados.forEach(ex => {
-                    htmlResultado += `• ${ex} .......... <strong>A consultar</strong><br>`;
+                resultadoIA.exames.forEach(ex => {
+                    const precoStr = ex.status === 'encontrado' ? `R$ ${ex.preco.toFixed(2)}` : `<strong>A consultar</strong>`;
+                    htmlResultado += `• ${ex.nome} .......... ${precoStr}<br>`;
                 });
 
-                if (examesEncontrados.length === 0 && examesNaoEncontrados.length === 0 && temImagens) {
-                    htmlResultado += `• Análise de pedido via foto .......... <strong>Aguardando Consultor</strong><br>`;
-                }
-
-                htmlResultado += `<br><strong>💰 Valor total estimado: R$ ${total.toFixed(2)}</strong><br><br>`;
+                htmlResultado += `<br><strong>💰 Valor total estimado: R$ ${resultadoIA.total.toFixed(2)}</strong><br><br>`;
                 htmlResultado += `Pacientes com convênio ou Cartão Fidelidade CDA têm descontos especiais. Confirme pelo WhatsApp! 😊`;
-                htmlResultado += avisoImagem;
-
-                // Simular tempo de processamento
-                await new Promise(r => setTimeout(r, 2500));
-
-                clearInterval(msgInterval);
-                loader.classList.add('hidden');
 
                 document.getElementById('orcDataHeader').textContent = dataAtual;
                 textoDiv.innerHTML = htmlResultado;
-                
                 resDiv.classList.remove('hidden');
                 resDiv.scrollIntoView({ behavior: 'smooth' });
 
             } catch(e) {
                 console.error(e);
-                clearInterval(msgInterval);
                 loader.classList.add('hidden');
-                mostrarAlerta('Erro ao processar orçamento.', 'erro');
+                mostrarAlerta('Erro na IA do Gemini. Verifique sua chave e conexão.', 'erro');
             }
         }
 
