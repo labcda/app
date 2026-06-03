@@ -651,40 +651,114 @@
         <!-- PÁGINA 7: ORÇAMENTO DE EXAMES -->
         
         <section id="page-orcamento" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-cda-dark">Orçamento Inteligente</h2>
-            <p class="text-slate-500 -mt-4 text-sm">Gere seu orçamento na hora! Digite os exames ou cole o texto do pedido médico.</p>
+            <div>
+                <h2 class="text-2xl font-bold text-cda-dark">Orçamento Inteligente</h2>
+                <p class="text-slate-500 text-sm mt-1">A IA do CDA lê seu pedido médico e gera o orçamento automaticamente com nossa tabela de preços.</p>
+            </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 space-y-4">
+            <!-- Badge de recurso IA -->
+            <div class="flex items-center gap-2 bg-gradient-to-r from-cda-primary/10 to-emerald-50 border border-cda-primary/20 rounded-2xl px-4 py-3">
+                <div class="w-8 h-8 rounded-xl bg-cda-primary flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-brain text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-800">IA com visão de documentos ativa</p>
+                    <p class="text-[11px] text-slate-500">Anexe a foto do pedido médico — a IA identifica os exames e consulta nossa tabela de preços automaticamente.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 space-y-5">
+                <!-- Nome do paciente -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Nome do Paciente:</label>
                     <input type="text" id="iaOrcNome" placeholder="Ex: João da Silva" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
                 </div>
+
+                <!-- Upload de pedido médico -->
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Digite ou Cole os Exames:</label>
-                    <textarea id="iaOrcExames" rows="5" placeholder="Ex: Hemograma, Glicose, TSH..." class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <i class="fa-solid fa-file-medical text-cda-primary mr-1"></i>
+                        Pedido(s) Médico(s) — Foto ou PDF:
+                    </label>
+                    
+                    <!-- Drop zone -->
+                    <label for="orcPedidoInput" id="orcDropZone" class="flex flex-col items-center justify-center border-2 border-dashed border-cda-primary/40 rounded-2xl p-6 cursor-pointer hover:border-cda-primary hover:bg-cda-primary/5 transition-all group">
+                        <div class="w-12 h-12 rounded-2xl bg-cda-primary/10 flex items-center justify-center mb-3 group-hover:bg-cda-primary/20 transition">
+                            <i class="fa-solid fa-cloud-arrow-up text-xl text-cda-primary"></i>
+                        </div>
+                        <p class="text-sm font-semibold text-slate-700 text-center">Toque para anexar pedido médico</p>
+                        <p class="text-xs text-slate-400 mt-1 text-center">JPG, PNG, PDF — até 3 arquivos</p>
+                        <input type="file" id="orcPedidoInput" accept="image/*,application/pdf" multiple class="hidden" onchange="onPedidoSelecionado(event)">
+                    </label>
+
+                    <!-- Preview dos arquivos -->
+                    <div id="orcPedidoPreview" class="hidden mt-3 space-y-2"></div>
                 </div>
-                <button onclick="gerarOrcamentoIA()" class="w-full btn-cda-primary py-3 flex justify-center items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Orçamento Agora
+
+                <!-- Divider OU -->
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 h-px bg-slate-100"></div>
+                    <span class="text-xs text-slate-400 font-semibold">OU DIGITE MANUALMENTE</span>
+                    <div class="flex-1 h-px bg-slate-100"></div>
+                </div>
+
+                <!-- Campo texto manual -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Exames (texto):</label>
+                    <textarea id="iaOrcExames" rows="3" placeholder="Ex: Hemograma, Glicose em jejum, TSH, Vitamina D..." class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                </div>
+
+                <!-- Botão gerar -->
+                <button onclick="gerarOrcamentoIA()" id="btnGerarOrc" class="w-full btn-cda-primary py-3.5 flex justify-center items-center gap-2 text-sm font-bold rounded-xl">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Orçamento com IA
                 </button>
             </div>
 
-            <!-- Resultado do Orçamento -->
-            <div id="iaOrcResultado" class="hidden bg-white rounded-2xl shadow-md p-6 border-l-4 border-cda-primary space-y-4">
-                <div id="iaOrcTexto" class="text-sm whitespace-pre-wrap text-slate-700 leading-relaxed"></div>
-                <div class="flex gap-2">
-                    <button onclick="enviarOrcamentoWhats()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-2">
-                        <i class="fa-brands fa-whatsapp"></i> Enviar p/ WhatsApp
-                    </button>
-                    <button onclick="copyOrcamento()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 rounded-xl text-sm">
-                        <i class="fa-regular fa-copy"></i>
-                    </button>
+            <!-- Loader -->
+            <div id="iaOrcLoader" class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm p-8 flex flex-col items-center gap-4">
+                <div class="relative">
+                    <div class="w-14 h-14 rounded-2xl bg-cda-primary/10 flex items-center justify-center">
+                        <i class="fa-solid fa-magnifying-glass text-2xl text-cda-primary"></i>
+                    </div>
+                    <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-notch animate-spin text-white text-[10px]"></i>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm font-bold text-slate-800" id="orcLoaderMsg">Analisando pedido médico...</p>
+                    <p class="text-xs text-slate-400 mt-1">A IA está identificando os exames e consultando nossa tabela de preços</p>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="h-full bg-cda-primary rounded-full animate-pulse" style="width:70%"></div>
                 </div>
             </div>
 
-            <!-- Loader -->
-            <div id="iaOrcLoader" class="hidden flex flex-col items-center py-10 gap-3">
-                <i class="fa-solid fa-circle-notch animate-spin text-3xl text-cda-primary"></i>
-                <p class="text-xs text-slate-400 font-medium">Calculando valores e descontos...</p>
+            <!-- Resultado do Orçamento -->
+            <div id="iaOrcResultado" class="hidden bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
+                <!-- Header do resultado -->
+                <div class="bg-gradient-to-r from-cda-primary to-cda-primary-dark px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-white">
+                        <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
+                        <span class="font-bold text-sm">Orçamento gerado</span>
+                    </div>
+                    <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/30">CDA · <span id="orcDataHeader"></span></span>
+                </div>
+                <!-- Conteúdo -->
+                <div class="p-6">
+                    <div id="iaOrcTexto" class="text-sm text-slate-700 leading-relaxed space-y-1"></div>
+                </div>
+                <!-- Ações -->
+                <div class="px-6 pb-5 flex gap-2">
+                    <button onclick="enviarOrcamentoWhats()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-2 transition">
+                        <i class="fa-brands fa-whatsapp"></i> Confirmar via WhatsApp
+                    </button>
+                    <button onclick="copyOrcamento()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 rounded-xl text-sm transition" title="Copiar">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                    <button onclick="limparOrcamento()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 rounded-xl text-sm transition" title="Novo orçamento">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -1132,7 +1206,26 @@
         }
 
         const orcamentoPrompt = `Você é o especialista em orçamentos do Laboratório CDA.
-        SUA TAREFA: Receber nomes de exames e gerar um orçamento formal.
+        SUA TAREFA: Receber nomes de exames (via texto OU imagem de pedido médico) e gerar um orçamento formal com base NA TABELA DE PREÇOS abaixo.
+        
+        SE RECEBER UMA IMAGEM: Leia cuidadosamente o pedido médico, extraia TODOS os nomes dos exames e depois consulte a tabela para precificá-los.
+        SE NÃO ENCONTRAR UM EXAME NA TABELA: Liste-o com "A consultar" e informe que o CDA entrará em contato.
+        
+        FORMATO DE RESPOSTA OBRIGATÓRIO:
+        🧾 **Orçamento — Laboratório CDA**
+        👤 **Paciente:** [NOME]
+        📅 **Data:** [DATA]
+        
+        **Exames solicitados:**
+        • [Exame 1] .......... R$ [valor]
+        • [Exame 2] .......... R$ [valor]
+        (listar todos encontrados)
+        
+        **💰 Valor total estimado: R$ [SOMA]**
+        
+        Pacientes com convênio ou Cartão Fidelidade CDA têm descontos especiais. Confirme pelo WhatsApp! 😊
+        
+        TABELA DE PREÇOS PARA CONSULTA:
         
         TABELA DE PREÇOS PARA CONSULTA:
         ACIDO URICO URINARIO (ISOLADA): R$ 33.34
@@ -1899,30 +1992,61 @@ CORTISOL 16HORAS: R$ 50.01
 TRANSCOBALAMINA II- VITAMINA B12 ATIVA: R$ 1000.20
 CREATINA FOSFOQUINASE: R$ 26.67
         
-        FORMATO DE RESPOSTA OBRIGATÓRIO (SIGA EXATAMENTE):
-        🧾 Orçamento
-        👤 Paciente: [NOME DO PACIENTE]
-        📅 [DATA ATUAL]
-        Exames solicitados:
-        [LISTA DE EXAMES ENCONTRADOS COM NOMES CORRETOS]
-        
-        💰 Valor total: R$ [SOMA TOTAL]
-        Olá! É um prazer atendê-lo! 😊 Aqui no CDA, pacientes que possuem convênio ou cartão fidelidade CDA têm direito a descontos especiais. O(a) senhor(a) já possui algum convênio ou nosso cartão fidelidade?
-        Caso sim, os valores ficam assim:
-        📱 Pix, dinheiro ou débito (à vista) — 40% de desconto → R$ [VALOR COM 40% OFF]
-        💳 Cartão de crédito — 35% de desconto → parcele em até 10x de R$ [VALOR COM 35% OFF DIVIDIDO POR 10]
-        Se desejar saber mais sobre o nosso cartão fidelidade, é só perguntar! 💙
-        E que tal já aproveitar para agendar a coleta? 🗓️ Pacientes agendados têm mimos especiais:
-        ✅ Atendimento sem fila 🛋️ Sala VIP com TV e ar-condicionado ☕ Café expresso 🍪 Biscoitinho Club Social
-        
-        [SE O PACIENTE FOR MENOR DE IDADE OU PARECER CRIANÇA, ADICIONE O AVISO ABAIXO, CASO CONTRÁRIO OMITA]:
-        ⚠️ Atenção: Por se tratar de um paciente menor de idade, no momento do atendimento é obrigatória a presença do responsável legal, com documento com foto do responsável e documento do menor — conforme exigido pela Lei nº 13.709/2018 (LGPD) e normas de proteção ao menor. Não realizamos atendimento sem esses documentos.
-        
         Qualquer dúvida, pode perguntar à vontade! 💙`;
+        // ── Pedido Médico: Preview de arquivos ──────────────────────
+        let orcPedidosBase64 = []; // armazena {base64, mediaType, name}
+
+        function onPedidoSelecionado(event) {
+            const files = Array.from(event.target.files);
+            const preview = document.getElementById('orcPedidoPreview');
+            const dropZone = document.getElementById('orcDropZone');
+            
+            if (files.length === 0) { preview.classList.add('hidden'); return; }
+
+            preview.classList.remove('hidden');
+            preview.innerHTML = '';
+            orcPedidosBase64 = [];
+
+            files.slice(0,3).forEach((file, idx) => {
+                const isImg = file.type.startsWith('image/');
+                const item = document.createElement('div');
+                item.className = 'flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5';
+                
+                const icon = isImg ? 'fa-image text-cda-primary' : 'fa-file-pdf text-red-500';
+                const name = file.name.length > 32 ? file.name.substring(0,29)+'...' : file.name;
+                
+                item.innerHTML = `
+                    <i class="fa-solid ${icon} text-lg flex-shrink-0"></i>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-slate-800 truncate">${name}</p>
+                        <p class="text-[10px] text-slate-400">${(file.size/1024).toFixed(0)} KB · ${isImg ? 'Imagem' : 'PDF'}</p>
+                    </div>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">✓ Pronto</span>
+                `;
+                preview.appendChild(item);
+
+                // Converter para base64
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const b64 = e.target.result.split(',')[1];
+                    orcPedidosBase64.push({ base64: b64, mediaType: file.type, name: file.name });
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Atualiza drop zone para mostrar count
+            dropZone.querySelector('p').textContent = `${Math.min(files.length,3)} arquivo(s) selecionado(s) — toque para trocar`;
+        }
+
         async function gerarOrcamentoIA() {
-            const nome = document.getElementById('iaOrcNome').value.trim();
-            const exames = document.getElementById('iaOrcExames').value.trim();
-            if(!nome || !exames) { mostrarAlerta('Por favor, informe o nome e os exames.', 'erro'); return; }
+            const nome = document.getElementById('iaOrcNome').value.trim() || 'Paciente';
+            const examesTexto = document.getElementById('iaOrcExames').value.trim();
+            const temImagens = orcPedidosBase64.length > 0;
+
+            if (!examesTexto && !temImagens) {
+                mostrarAlerta('Anexe o pedido médico ou digite os exames.', 'erro');
+                return;
+            }
 
             const loader = document.getElementById('iaOrcLoader');
             const resDiv = document.getElementById('iaOrcResultado');
@@ -1930,42 +2054,101 @@ CREATINA FOSFOQUINASE: R$ 26.67
 
             loader.classList.remove('hidden');
             resDiv.classList.add('hidden');
-            
+
+            // Mensagens de progresso
+            const msgs = temImagens 
+                ? ['Lendo o pedido médico...', 'Identificando os exames...', 'Consultando tabela de preços...']
+                : ['Processando exames...', 'Consultando tabela de preços...'];
+            let mi = 0;
+            const msgEl = document.getElementById('orcLoaderMsg');
+            const msgInterval = setInterval(() => {
+                if (mi < msgs.length - 1) { mi++; msgEl.textContent = msgs[mi]; }
+            }, 2000);
+
             const dataAtual = new Date().toLocaleDateString('pt-BR');
-            const promptFinal = `Paciente: ${nome}\nData: ${dataAtual}\nExames:\n${exames}`;
 
             try {
-                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                // Montar content do user (texto + imagens se houver)
+                const userContent = [];
+
+                if (temImagens) {
+                    orcPedidosBase64.forEach(img => {
+                        if (img.mediaType.startsWith('image/')) {
+                            userContent.push({
+                                type: 'image',
+                                source: { type: 'base64', media_type: img.mediaType, data: img.base64 }
+                            });
+                        }
+                    });
+                    userContent.push({
+                        type: 'text',
+                        text: `Paciente: ${nome}\nData: ${dataAtual}\n${examesTexto ? 'Exames adicionais (texto): ' + examesTexto : ''}\n\nLeia o(s) pedido(s) médico(s) acima e gere o orçamento conforme instruções.`
+                    });
+                } else {
+                    userContent.push({
+                        type: 'text',
+                        text: `Paciente: ${nome}\nData: ${dataAtual}\nExames solicitados:\n${examesTexto}`
+                    });
+                }
+
+                const res = await fetch('https://api.anthropic.com/v1/messages', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
-                        messages: [{role:"system", content:orcamentoPrompt}, {role:"user", content:promptFinal}],
-                        temperature: 0.1
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        system: orcamentoPrompt,
+                        messages: [{ role: 'user', content: userContent }]
                     })
                 });
-                const data = await res.json();
+
+                clearInterval(msgInterval);
                 loader.classList.add('hidden');
-                const orcamento = data.choices[0].message.content;
-                textoDiv.innerText = orcamento;
+
+                const data = await res.json();
+                if (!data.content || !data.content[0]) throw new Error('Sem resposta');
+                
+                const orcamento = data.content.map(b => b.text || '').join('');
+                
+                // Renderizar resultado formatado
+                document.getElementById('orcDataHeader').textContent = dataAtual;
+                textoDiv.innerHTML = orcamento
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>');
+                
                 resDiv.classList.remove('hidden');
                 resDiv.scrollIntoView({ behavior: 'smooth' });
+
             } catch(e) {
+                clearInterval(msgInterval);
                 loader.classList.add('hidden');
-                mostrarAlerta('Erro ao gerar orçamento. Tente novamente.', 'erro');
+                mostrarAlerta('Erro ao gerar orçamento. Verifique sua conexão e tente novamente.', 'erro');
             }
         }
 
         function enviarOrcamentoWhats() {
-            const texto = document.getElementById('iaOrcTexto').innerText;
+            const texto = document.getElementById('iaOrcTexto').innerText || document.getElementById('iaOrcTexto').textContent;
             const phone = "5527998980658";
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
         function copyOrcamento() {
-            const texto = document.getElementById('iaOrcTexto').innerText;
+            const texto = document.getElementById('iaOrcTexto').innerText || document.getElementById('iaOrcTexto').textContent;
             navigator.clipboard.writeText(texto);
             mostrarAlerta('Copiado para a área de transferência!', 'sucesso');
+        }
+
+        function limparOrcamento() {
+            document.getElementById('iaOrcNome').value = '';
+            document.getElementById('iaOrcExames').value = '';
+            document.getElementById('orcPedidoInput').value = '';
+            document.getElementById('orcPedidoPreview').classList.add('hidden');
+            document.getElementById('orcPedidoPreview').innerHTML = '';
+            document.getElementById('iaOrcResultado').classList.add('hidden');
+            const dropZone = document.getElementById('orcDropZone');
+            if(dropZone) dropZone.querySelector('p').textContent = 'Toque para anexar pedido médico';
+            orcPedidosBase64 = [];
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
 
