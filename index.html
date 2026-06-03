@@ -221,7 +221,7 @@
 <body class="bg-[#f8fafc] font-sans antialiased text-slate-800 min-h-screen flex flex-col pb-20 md:pb-0">
 
     <!-- SPLASH SCREEN DE CARREGAMENTO -->
-    <div id="splashScreen" class="fixed inset-0 z-50 bg-white flex flex-col justify-between items-center p-8 transition-all duration-700">
+    <div id="splashScreen" onclick="fecharSplashScreen()" class="fixed inset-0 bg-white flex flex-col justify-between items-center p-8 transition-all duration-700" style="z-index: 99999; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;">
         <!-- Fundo Animado DNA -->
         <div class="dna-container" id="dnaBackground"></div>
         <script>
@@ -982,33 +982,35 @@
         // 1. Gerenciamento da Tela de Splash
         function fecharSplashScreen() {
             const splash = document.getElementById('splashScreen');
-            if (splash && !splash.classList.contains('opacity-0')) {
-                splash.classList.add('opacity-0', 'pointer-events-none');
+            if (splash && splash.style.display !== 'none') {
+                console.log("Fechando splash screen...");
+                splash.style.opacity = '0';
+                splash.style.pointerEvents = 'none';
                 setTimeout(() => {
                     splash.style.display = 'none';
-                }, 700); // Tempo da transição duration-700
-                
-                // Mostrar banner do PWA
-                showPwaInstallBanner();
+                }, 800);
+                if (typeof showPwaInstallBanner === 'function') showPwaInstallBanner();
             }
         }
 
-        // Tentar fechar após o carregamento do DOM (mais rápido que 'load')
-        document.addEventListener('DOMContentLoaded', () => {
-            // Aplicar tema salvo no localStorage, se houver
+        // Garantia absoluta: Inicia o timer assim que o script é lido
+        // Não depende do window.onload que pode travar por causa de recursos externos
+        setTimeout(fecharSplashScreen, 4000); 
+
+        // Tentar aplicar o tema o mais cedo possível
+        (function() {
             const savedDark = localStorage.getItem('cda-theme-dark');
             const savedPrimary = localStorage.getItem('cda-theme-primary');
             const savedLight = localStorage.getItem('cda-theme-light');
-            if (savedDark && savedPrimary && savedLight) {
+            if (savedDark && savedPrimary && savedLight && typeof setTheme === 'function') {
                 setTheme(savedDark, savedPrimary, savedLight, 'stored');
             }
+        })();
 
-            // Garante que o splash saia após um tempo razoável mesmo que o load demore
-            setTimeout(fecharSplashScreen, 2000);
+        // Caso o usuário clique na tela, ela também fecha (fallback de emergência)
+        window.addEventListener('load', () => {
+            console.log("Página totalmente carregada.");
         });
-
-        // Fallback para o evento load
-        window.addEventListener('load', fecharSplashScreen);
 
         // 2. Sistema de Personalização Dinâmica de Cores (CSS Variables)
         function toggleThemePanel() {
