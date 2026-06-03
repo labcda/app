@@ -2124,7 +2124,7 @@ CREATINA FOSFOQUINASE: R$ 26.67
         }
 
         async function gerarOrcamentoIA() {
-            const ANTHROPIC_API_KEY = "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"; // Chave Anthropic: começa com sk-ant-
+            const ANTHROPIC_API_KEY = "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"; // Chave Anthropic: começa com sk-ant-
             const nome = document.getElementById('iaOrcNome').value.trim() || 'Paciente';
             const examesTexto = document.getElementById('iaOrcExames').value.trim();
             const temImagens = orcPedidosBase64.length > 0;
@@ -2134,7 +2134,7 @@ CREATINA FOSFOQUINASE: R$ 26.67
                 return;
             }
 
-            if (ANTHROPIC_API_KEY === "COLE_SUA_CHAVE_AQUI") {
+            if (ANTHROPIC_API_KEY === "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") {
                 mostrarAlerta('Por favor, configure sua Chave de API no código.', 'erro');
                 return;
             }
