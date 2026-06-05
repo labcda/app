@@ -1,0 +1,150 @@
+<!-- INCLUA ESTES SCRIPTS NO FINAL DO SEU index.html, ANTES DO FECHAMENTO DE </body> -->
+
+<!-- Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js').then(reg => {
+      console.log('✅ Service Worker registrado com sucesso');
+    }).catch(err => {
+      console.error('❌ Erro ao registrar Service Worker:', err);
+    });
+  }
+</script>
+
+<!-- Orçamento Config e Modal de Install -->
+<script src="./orçamento-config.js"></script>
+<script src="./install-info-modal.js"></script>
+
+<!-- Integração do Orçamento com IA -->
+<script>
+  // Interceptar o envio do formulário de orçamento
+  window.gerarOrcamentoIA = async function() {
+    const nomePaciente = document.getElementById('iaOrcNome')?.value;
+    const examesTexto = document.getElementById('iaOrcExames')?.value;
+    const pedidoInput = document.getElementById('orcPedidoInput');
+    
+    if (!nomePaciente) {
+      alert('⚠️ Por favor, insira o nome do paciente');
+      return;
+    }
+
+    if (!examesTexto && (!pedidoInput || pedidoInput.files.length === 0)) {
+      alert('⚠️ Por favor, insira os exames ou anexe um pedido médico');
+      return;
+    }
+
+    // Mostrar loader
+    document.getElementById('iaOrcLoader').classList.remove('hidden');
+    document.getElementById('iaOrcResultado').classList.add('hidden');
+
+    let examesExtraidos = examesTexto;
+
+    // Se houver arquivo de pedido, processar com IA
+    if (pedidoInput && pedidoInput.files.length > 0) {
+      document.getElementById('orcLoaderMsg').textContent = '📸 Analisando foto do pedido médico...';
+      examesExtraidos = await processarImagemComIA(pedidoInput.files[0]);
+      if (!examesExtraidos) {
+        document.getElementById('iaOrcLoader').classList.add('hidden');
+        return;
+      }
+    }
+
+    // Extrair e processar exames
+    const examesLista = examesExtraidos
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(e => e.length > 0);
+
+    document.getElementById('orcLoaderMsg').textContent = '💰 Consultando tabela de preços...';
+
+    // Simular processamento (remover em produção)
+    await new Promise(r => setTimeout(r, 800));
+
+    // Calcular preço total
+    let precoTotal = 0;
+    let descricaoExames = [];
+
+    examesLista.forEach(exame => {
+      const preco = ORCAMENTO_CONFIG.TABELA_PRECOS[exame] || 50.00;
+      precoTotal += preco;
+      descricaoExames.push(`${exame.charAt(0).toUpperCase() + exame.slice(1)}: R$ ${preco.toFixed(2)}`);
+    });
+
+    // Mostrar resultado
+    document.getElementById('iaOrcLoader').classList.add('hidden');
+    
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('orcDataHeader').textContent = dataAtual;
+    
+    let htmlResultado = `
+      <div class="space-y-2">
+        <p class="font-semibold text-slate-800">👤 Paciente: ${nomePaciente}</p>
+        <p class="text-xs text-slate-500">📅 Data: ${dataAtual}</p>
+        <hr class="my-2">
+        <div class="space-y-1">
+    `;
+
+    descricaoExames.forEach(desc => {
+      htmlResultado += `<p class="text-sm">• ${desc}</p>`;
+    });
+
+    htmlResultado += `
+        </div>
+        <hr class="my-2">
+        <p class="font-bold text-lg text-emerald-600">Total: R$ ${precoTotal.toFixed(2)}</p>
+      </div>
+    `;
+
+    document.getElementById('iaOrcTexto').innerHTML = htmlResultado;
+    document.getElementById('iaOrcResultado').classList.remove('hidden');
+
+    // Armazenar para envio via WhatsApp
+    window.oracamentoAtual = {
+      paciente: nomePaciente,
+      exames: examesLista,
+      total: precoTotal,
+      descricao: htmlResultado
+    };
+  };
+
+  // Enviar orçamento via WhatsApp
+  window.enviarOrcamentoWhats = function() {
+    if (!window.oracamentoAtual) return;
+
+    const { paciente, exames, total } = window.oracamentoAtual;
+    const data = new Date().toLocaleDateString('pt-BR');
+    
+    let mensagem = `🏥 *ORÇAMENTO DO LABORATÓRIO CDA*\n\n`;
+    mensagem += `👤 Paciente: *${paciente}*\n`;
+    mensagem += `📅 Data: *${data}*\n\n`;
+    mensagem += `📋 Exames Solicitados:\n`;
+    
+    exames.forEach(exame => {
+      const preco = ORCAMENTO_CONFIG.TABELA_PRECOS[exame] || 50.00;
+      mensagem += `• ${exame}: R$ ${preco.toFixed(2)}\n`;
+    });
+    
+    mensagem += `\n💰 *TOTAL: R$ ${total.toFixed(2)}*\n\n`;
+    mensagem += `Para confirmar, responda este orçamento ou ligue: (27) 99898-0658`;
+
+    const numeroWhatsApp = '5527998980658';
+    const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+  };
+
+  // Copiar orçamento para clipboard
+  window.copyOrcamento = function() {
+    if (!window.oracamentoAtual) return;
+    
+    const { paciente, exames, total } = window.oracamentoAtual;
+    const data = new Date().toLocaleDateString('pt-BR');
+    
+    let texto = `ORÇAMENTO DO LABORATÓRIO CDA\n\n`;
+    texto += `Paciente: ${paciente}\n`;
+    texto += `Data: ${data}\n\n`;
+    texto += `Exames Solicitados:\n`;
+    
+    exames.forEach(exame => {\n      const preco = ORCAMENTO_CONFIG.TABELA_PRECOS[exame] || 50.00;\n      texto += `• ${exame}: R$ ${preco.toFixed(2)}\n`;
+    });
+    
+    texto += `\nTOTAL: R$ ${total.toFixed(2)}`;\n\n    navigator.clipboard.writeText(texto).then(() => {\n      alert('✅ Orçamento copiado para área de transferência!');\n    });\n  };\n\n  // Limpar orçamento\n  window.limparOrcamento = function() {\n    document.getElementById('iaOrcNome').value = '';\n    document.getElementById('iaOrcExames').value = '';\n    document.getElementById('orcPedidoInput').value = '';\n    document.getElementById('orcPedidoPreview').classList.add('hidden');\n    document.getElementById('iaOrcResultado').classList.add('hidden');\n    window.oracamentoAtual = null;\n  };\n\n  // Handler para preview de arquivo\n  window.onPedidoSelecionado = function(event) {\n    const files = event.target.files;\n    const preview = document.getElementById('orcPedidoPreview');\n    preview.innerHTML = '';\n    \n    if (files.length > 0) {\n      preview.classList.remove('hidden');\n      for (let i = 0; i < files.length; i++) {\n        const file = files[i];\n        const item = document.createElement('div');\n        item.className = 'flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-sm';\n        item.innerHTML = `\n          <span class=\"text-emerald-700 font-semibold\">📄 ${file.name}</span>\n          <span class=\"text-emerald-600 text-xs\">${(file.size / 1024).toFixed(1)} KB</span>\n        `;\n        preview.appendChild(item);\n      }\n    }\n  };\n</script>\n
