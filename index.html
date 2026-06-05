@@ -560,10 +560,31 @@
                 <!-- LISTA DE EXAMES -->
                 <div class="md:col-span-2 space-y-4">
                     <div class="card-cda p-6">
-                        <h3 class="font-bold text-lg mb-4">Selecione os Exames</h3>
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">Selecione os Exames</h3>
+                                <p id="tabelaStatus" class="text-xs text-slate-400 mt-1">Carregando tabela de preços...</p>
+                            </div>
+                            <span class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-cda-light dark:bg-slate-700 text-cda-primary text-xs font-extrabold uppercase tracking-wider">
+                                <i class="fa-solid fa-database"></i> Tabela CDA
+                            </span>
+                        </div>
                         <div class="relative mb-4">
                             <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="searchExame" onkeyup="filterExames()" placeholder="Buscar exame (ex: Sangue, Urina...)" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                            <input type="text" id="searchExame" oninput="filterExames()" placeholder="Buscar por exame ou código" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 mb-4 border border-slate-100 dark:border-slate-700">
+                            <label for="pedidoTexto" class="text-xs font-bold text-slate-400 uppercase ml-1">Texto do pedido médico</label>
+                            <textarea id="pedidoTexto" rows="4" placeholder="Cole aqui o texto lido do PDF ou foto. Ex: Hemograma, TSH, Glicemia..." class="w-full mt-2 bg-white dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"></textarea>
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <button onclick="analisarPedidoTexto()" class="btn-cda-primary px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Encontrar exames
+                                </button>
+                                <button onclick="limparSelecao()" class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 px-4 py-3 rounded-xl font-bold text-sm border border-slate-200 dark:border-slate-600">
+                                    Limpar seleção
+                                </button>
+                            </div>
+                            <p id="pedidoStatus" class="text-xs text-slate-400 mt-3">Para foto/PDF, o ideal é usar uma IA/OCR no servidor e trazer o texto para esta análise.</p>
                         </div>
                         <div id="examesList" class="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                             <!-- Inserido via JS -->
@@ -683,58 +704,116 @@
     </nav>
 
     <script>
-        // BASE DE DADOS DE EXAMES COM PREÃ‡OS (Simulação)
-        const examesPrecos = [
-            { id: 1, nome: 'Hemograma Completo', preco: 25.00, categoria: 'Sangue' },
-            { id: 2, nome: 'Glicemia de Jejum', preco: 15.00, categoria: 'Sangue' },
-            { id: 3, nome: 'Colesterol Total', preco: 18.00, categoria: 'Sangue' },
-            { id: 4, nome: 'Urina Tipo 1 (EAS)', preco: 20.00, categoria: 'Urina' },
-            { id: 5, nome: 'Fezes (Parasitológico)', preco: 15.00, categoria: 'Fezes' },
-            { id: 6, nome: 'TSH (Hormônio)', preco: 35.00, categoria: 'Hormônios' },
-            { id: 7, nome: 'Creatinina', preco: 12.00, categoria: 'Sangue' },
-            { id: 8, nome: 'Beta HCG (Gravidez)', preco: 45.00, categoria: 'Hormônios' },
-            { id: 9, nome: 'Vitamina D', preco: 85.00, categoria: 'Sangue' },
-            { id: 10, nome: 'PSA Total', preco: 55.00, categoria: 'Próstata' }
-        ];
-
+        // BASE DE DADOS DE EXAMES COM PREÇOS
+        let examesPrecos = [];
         let examesSelecionados = [];
+
+        function normalizarTexto(texto) {
+            let normalizado = (texto || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toUpperCase()
+                .replace(/[^A-Z0-9]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            const sinonimos = [
+                ['GLICEMIA DE JEJUM', 'GLICOSE JEJUM'],
+                ['GLICEMIA', 'GLICOSE'],
+                ['EAS', 'URINA TIPO 1'],
+                ['URINA I', 'URINA TIPO 1'],
+                ['PARASITOLOGICO', 'FEZES PARASITOLOGICO'],
+                ['COLESTEROL TOTAL E FRACOES', 'COLESTEROL HDL LDL VLDL'],
+                ['TGO', 'AST'],
+                ['TGP', 'ALT']
+            ];
+
+            sinonimos.forEach(([entrada, saida]) => {
+                normalizado = normalizado.replace(new RegExp(`\\b${entrada}\\b`, 'g'), saida);
+            });
+
+            return normalizado.replace(/\s+/g, ' ').trim();
+        }
+
+        function formatCurrency(value) {
+            return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        async function carregarTabelaPrecos() {
+            const status = document.getElementById('tabelaStatus');
+            try {
+                const response = await fetch('./data/exames.json');
+                if (!response.ok) throw new Error('Tabela não encontrada');
+                examesPrecos = await response.json();
+                if (status) status.innerText = `${examesPrecos.length} exames carregados da sua tabela de preços.`;
+            } catch (error) {
+                examesPrecos = [];
+                if (status) status.innerText = 'Não foi possível carregar a tabela de preços.';
+            }
+            renderExames();
+        }
 
         function renderExames() {
             const list = document.getElementById('examesList');
-            list.innerHTML = examesPrecos.map(ex => `
-                <div class="exame-item p-4 rounded-2xl bg-white dark:bg-slate-800 flex justify-between items-center shadow-sm mb-2" onclick="toggleExame(${ex.id})">
+            if (!list) return;
+
+            const term = normalizarTexto(document.getElementById('searchExame')?.value || '');
+            const examesFiltrados = term
+                ? examesPrecos.filter(ex => ex.busca.includes(term))
+                : examesPrecos.slice(0, 80);
+
+            if (examesPrecos.length === 0) {
+                list.innerHTML = '<p class="text-sm text-slate-400 italic p-4">Nenhum exame carregado.</p>';
+                return;
+            }
+
+            if (examesFiltrados.length === 0) {
+                list.innerHTML = '<p class="text-sm text-slate-400 italic p-4">Nenhum exame encontrado para essa busca.</p>';
+                return;
+            }
+
+            list.innerHTML = examesFiltrados.map(ex => {
+                const checked = examesSelecionados.includes(ex.id);
+                return `
+                <div class="exame-item ${checked ? 'selected' : ''} p-4 rounded-2xl bg-white dark:bg-slate-800 flex justify-between items-center shadow-sm mb-2" onclick="toggleExame(${ex.id})">
                     <div>
                         <p class="font-bold text-sm dark:text-white">${ex.nome}</p>
-                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">${ex.categoria}</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">${ex.codigo || 'SEM CÓDIGO'} â€¢ ${ex.categoria}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-bold text-cda-primary">R$ ${ex.preco.toFixed(2)}</span>
-                        <div id="check-${ex.id}" class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center">
+                        <span class="font-bold text-cda-primary">${formatCurrency(ex.preco)}</span>
+                        <div id="check-${ex.id}" class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center ${checked ? 'bg-cda-primary border-cda-primary' : ''}">
                             <i class="fa-solid fa-check text-[10px] text-white"></i>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function toggleExame(id) {
             const index = examesSelecionados.indexOf(id);
-            const check = document.getElementById('check-' + id);
-            
             if (index > -1) {
                 examesSelecionados.splice(index, 1);
-                check.classList.remove('bg-cda-primary', 'border-cda-primary');
             } else {
                 examesSelecionados.push(id);
-                check.classList.add('bg-cda-primary', 'border-cda-primary');
             }
+            renderExames();
             updateResumo();
+        }
+
+        function limparSelecao() {
+            examesSelecionados = [];
+            renderExames();
+            updateResumo();
+            const status = document.getElementById('pedidoStatus');
+            if (status) status.innerText = 'Seleção limpa.';
         }
 
         function updateResumo() {
             const list = document.getElementById('selectedExamesList');
             const totalDisplay = document.getElementById('totalOrcamento');
-            
+
             if (examesSelecionados.length === 0) {
                 list.innerHTML = '<p class="text-sm text-slate-400 italic">Nenhum exame selecionado</p>';
                 totalDisplay.innerText = 'R$ 0,00';
@@ -744,26 +823,55 @@
             let total = 0;
             const html = examesSelecionados.map(id => {
                 const ex = examesPrecos.find(e => e.id === id);
-                total += ex.preco;
+                if (!ex) return '';
+                total += Number(ex.preco || 0);
                 return `
-                    <div class="flex justify-between items-center animate__animated animate__fadeIn">
+                    <div class="flex justify-between items-center animate__animated animate__fadeIn gap-3">
                         <span class="text-xs text-slate-600 dark:text-slate-300">${ex.nome}</span>
-                        <span class="text-xs font-bold dark:text-white">R$ ${ex.preco.toFixed(2)}</span>
+                        <span class="text-xs font-bold dark:text-white whitespace-nowrap">${formatCurrency(ex.preco)}</span>
                     </div>
                 `;
             }).join('');
 
             list.innerHTML = html;
-            totalDisplay.innerText = `R$ ${total.toFixed(2)}`;
+            totalDisplay.innerText = formatCurrency(total);
         }
 
         function filterExames() {
-            const term = document.getElementById('searchExame').value.toLowerCase();
-            const items = document.querySelectorAll('.exame-item');
-            items.forEach(item => {
-                const text = item.innerText.toLowerCase();
-                item.style.display = text.includes(term) ? 'flex' : 'none';
+            renderExames();
+        }
+
+        function analisarPedidoTexto() {
+            const texto = normalizarTexto(document.getElementById('pedidoTexto')?.value || '');
+            const status = document.getElementById('pedidoStatus');
+            if (!texto) {
+                if (status) status.innerText = 'Cole o texto do pedido médico antes de analisar.';
+                return;
+            }
+
+            const encontrados = examesPrecos.filter(ex => {
+                const nome = normalizarTexto(ex.nome);
+                const codigo = normalizarTexto(ex.codigo);
+                if (codigo && texto.includes(codigo)) return true;
+                if (nome.length >= 4 && texto.includes(nome)) return true;
+
+                const palavras = nome.split(' ').filter(p => p.length >= 4);
+                if (palavras.length === 1) return texto.includes(palavras[0]);
+                return palavras.length > 1 && palavras.filter(p => texto.includes(p)).length >= Math.min(2, palavras.length);
             });
+
+            encontrados.forEach(ex => {
+                if (!examesSelecionados.includes(ex.id)) examesSelecionados.push(ex.id);
+            });
+
+            document.getElementById('searchExame').value = '';
+            renderExames();
+            updateResumo();
+            if (status) {
+                status.innerText = encontrados.length
+                    ? `${encontrados.length} exame(s) encontrados no texto. Confira antes de enviar.`
+                    : 'Nenhum exame foi identificado automaticamente. Tente buscar pelo nome ou código.';
+            }
         }
 
         function finalizarOrcamento() {
@@ -771,7 +879,8 @@
                 alert('Por favor, selecione ao menos um exame.');
                 return;
             }
-            const examesNomes = examesSelecionados.map(id => examesPrecos.find(e => e.id === id).nome).join(', ');
+            const selecionados = examesSelecionados.map(id => examesPrecos.find(e => e.id === id)).filter(Boolean);
+            const examesNomes = selecionados.map(ex => `${ex.codigo ? ex.codigo + ' - ' : ''}${ex.nome}`).join(', ');
             const total = document.getElementById('totalOrcamento').innerText;
             const nome = localStorage.getItem('patient_name') || 'Paciente';
             const text = `Olá! Gostaria de confirmar o orçamento feito pelo app.%0A%0A- *Paciente:* ${nome}%0A- *Exames:* ${examesNomes}%0A- *Total Estimado:* ${total}`;
@@ -804,7 +913,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             updateThemeIcon();
-            renderExames();
+            carregarTabelaPrecos();
             loadProfile();
 
             // Splash Logic
@@ -865,4 +974,6 @@
         }
     </script></body>
 </html>
+
+
 
