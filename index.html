@@ -375,8 +375,8 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(6px);
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
             z-index: 10000;
             align-items: center;
             justify-content: center;
@@ -390,21 +390,12 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
-        .modal-close-btn {
-            width: 38px; height: 38px;
-            background: rgba(255,255,255,0.18);
-            border: 1.5px solid rgba(255,255,255,0.3);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-        .modal-close-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.1) rotate(90deg);
+        
+        /* Botão flutuante para fechar fora do modal (opcional, mas o X interno já resolve) */
+        .modal-overlay-close {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
         }
 
         .tab-btn {
@@ -440,11 +431,20 @@
         /* Animações escalonadas entrada */
         .anim-in {
             opacity: 0;
-            transform: translateY(20px);
-            animation: slideUp 0.6s ease forwards;
+            transform: translateY(30px);
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
         @keyframes slideUp {
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hover Effect em Cards */
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -452,52 +452,51 @@
 
     <!-- SPLASH SCREEN -->
     <div id="splashScreen">
-        <div class="dna-container" id="dnaBackground"></div>
-        <div class="relative z-10 flex flex-col items-center">
-            <div class="w-24 h-24 mb-6 animate-pulse">
-                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="80" fill="#49BCBE" opacity="0.1"/>
-                    <path d="M100 40C66.86 40 40 66.86 40 100C40 133.14 66.86 160 100 160C133.14 160 160 133.14 160 100C160 66.86 133.14 40 100 40ZM100 145C75.15 145 55 124.85 55 100C55 75.15 75.15 55 100 55C124.85 55 145 75.15 145 100C145 124.85 124.85 145 100 145Z" fill="#49BCBE"/>
-                    <circle cx="100" cy="100" r="30" fill="#49BCBE"/>
-                </svg>
+        <div id="dnaBackground" class="dna-container"></div>
+        <div class="relative z-10 text-center">
+            <div class="mb-8 animate-floating">
+                <div class="w-24 h-24 bg-cda-primary rounded-[24px] flex items-center justify-center shadow-2xl mx-auto">
+                    <i class="fa-solid fa-flask-vial text-white text-5xl"></i>
+                </div>
             </div>
-            <h1 class="text-xl font-bold text-slate-800 mb-4">Laboratório CDA</h1>
-            <div class="w-48 bg-slate-100 h-1 rounded-full overflow-hidden">
+            <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight mb-2">LABORATÓRIO CDA</h1>
+            <p class="text-slate-400 text-sm font-medium mb-8">Diagnóstico de Confiança</p>
+            <div class="w-48 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
                 <div id="progressBar" class="splash-progress-bar"></div>
             </div>
         </div>
     </div>
 
-    <!-- HEADER -->
-    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAC8CAYAAACOqlw/AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAATAaVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49J++7vycgaWQ9J1c1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCc/Pgo8eDp4bXBtZXRhIHhtbG5zOng9J2Fkb2JlOm5zOm1ldGEvJz4KPHJkZjpSREYgeG1sbnM6cmRmPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjJz4KCiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nJwogIHhtbG5zOkF0dHJpYj0naHR0cDovL25zLmF0dHJpYnV0aW9uLmNvbS9hZHMvMS4wLyc+CiAgPEF0dHJpYjpBZHM+CiAgIDxyZGY6U2VxPgogICAgPHJkZjpsaSByZGY6cGFyc2VUeXBlPSdSZXNvdXJjZSc+CiAgICAgPEF0dHJpYjpDcmVhdGVkPjIwMjUtMDMtMTM8L0F0dHJpYjpDcmVhdGVkPgogICAgIDxBdHRyaWI6RXh0SWQ+ZTc4ZmE1NTAtMmM3Ny00ZmNmLThlZDgtMzgxNTE3ZDhmZWExPC9BdHRyaWI6RXh0SWQ+CiAgICAgPEF0dHJpYjpGYklkPjUyNTI2NTkxNDE3OTU4MDwvQXR0cmliOkZiSWQ+CiAgICAgPEF0dHJpYjpUb3VjaFR5cGU+MjwvQXR0cmliOlRvdWNoVHlwZT4KICAgIDwvcmRmOmxpPgogICA8L3JkZjpTZXE+CiAgPC9BdHRyaWI6QWRzPgogPC9yZGY6RGVzY3JpcHRpb24+CgogPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycKICB4bWxuczpkYz0naHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8nPgogIDxkYzp0aXRsZT4KICAgPHJkZjpBbHQ+CiAgICA8cmRmOmxpIHhtbDpsYW5nPSd4LWRlZmF1bHQnPkRlc2lnbiBzZW0gbm9tZSAtIDE8L3JkZjpsaT4KICAgPC9yZGY6QWx0PgogIDwvZGM6dGl0bGU+CiA8L3JkZjpE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" alt="CDA Laboratório" class="h-10 object-contain">
-            </div>
-            <div class="flex items-center gap-3">
-                <a href="https://instagram.com/cdalaboratorio" target="_blank" class="w-10 h-10 text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-110 transition" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);" title="Instagram @cdalaboratorio">
-                    <i class="fa-brands fa-instagram text-xl"></i>
-                </a>
-                <button onclick="showInstallInstructions()" class="hidden md:flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-xl text-sm font-semibold transition">
-                    <i class="fa-solid fa-download"></i> Instalar App
-                </button>
-                <a href="https://wa.me/5527998980658" target="_blank" class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200 hover:scale-110 transition">
-                    <i class="fa-brands fa-whatsapp text-xl"></i>
-                </a>
-            </div>
-        </div>
-    </header>
-
     <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto px-4 py-6 mb-20 md:mb-6">
+    <main class="max-w-4xl mx-auto px-4 pt-6 pb-24">
         
         <!-- HOME PAGE -->
-        <section id="page-home" class="page active space-y-6">
+        <section id="page-home" class="page active space-y-8">
+            
+            <!-- HEADER -->
+            <header class="flex items-center justify-between anim-in">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-slate-100">
+                        <i class="fa-solid fa-flask-vial text-cda-primary text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-xl text-slate-800 leading-none">Lab CDA</h1>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Afonso Cláudio - ES</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                        <i class="fa-solid fa-bell"></i>
+                    </button>
+                    <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                        <i class="fa-solid fa-user"></i>
+                    </button>
+                </div>
+            </header>
 
-            <!-- ===== HERO MODERNO ===== -->
-            <div class="hero-modern p-7 md:p-12 anim-in" style="animation-delay:0.05s">
-                <!-- Elementos decorativos -->
-                <svg class="hero-circles" viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- HERO -->
+            <div class="hero-modern p-8 md:p-12 anim-in" style="animation-delay: 0.1s">
+                <svg class="hero-circles" viewBox="0 0 420 420">
                     <circle cx="210" cy="210" r="200"/>
                     <circle cx="210" cy="210" r="160"/>
                     <circle cx="210" cy="210" r="120"/>
@@ -566,32 +565,34 @@
                 </div>
             </div>
 
-            @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            <style>
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            </style>
 
             <!-- ===== QUICK ACTIONS ===== -->
-            <div class="qa-grid anim-in" style="animation-delay:0.15s">
-                <div onclick="navigateTo('resultados')" class="qa-card">
+            <div class="qa-grid">
+                <div onclick="navigateTo('resultados')" class="qa-card anim-in" style="animation-delay:0.2s">
                     <div class="qa-icon" style="background:#E8F8F8;color:#1a7a7c;">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <h3>Laudo Online</h3>
                     <p>Acesse seus exames com total segurança</p>
                 </div>
-                <div onclick="navigateTo('agendar')" class="qa-card">
+                <div onclick="navigateTo('agendar')" class="qa-card anim-in" style="animation-delay:0.3s">
                     <div class="qa-icon" style="background:#E8F8F8;color:#1a7a7c;">
                         <i class="fa-solid fa-house-chimney-medical"></i>
                     </div>
                     <h3>Coleta Domiciliar</h3>
                     <p>Conforto do seu lar, qualidade do laboratório</p>
                 </div>
-                <div onclick="navigateTo('preparo')" class="qa-card">
+                <div onclick="navigateTo('preparo')" class="qa-card anim-in" style="animation-delay:0.4s">
                     <div class="qa-icon" style="background:#EFF6FF;color:#1D4ED8;">
                         <i class="fa-solid fa-robot"></i>
                     </div>
                     <h3>IA Preparo</h3>
                     <p>Orientações inteligentes para seus exames</p>
                 </div>
-                <div onclick="navigateTo('orcamento')" class="qa-card">
+                <div onclick="navigateTo('orcamento')" class="qa-card anim-in" style="animation-delay:0.5s">
                     <div class="qa-icon" style="background:#F0FDF4;color:#15803D;">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
@@ -601,7 +602,7 @@
             </div>
 
             <!-- ===== UNIDADES ===== -->
-            <div class="anim-in" style="animation-delay:0.25s">
+            <div class="anim-in" style="animation-delay:0.6s">
                 <div class="flex items-center gap-3 mb-4">
                     <div style="width:36px;height:36px;background:#E8F8F8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#1a7a7c;">
                         <i class="fa-solid fa-location-dot"></i>
@@ -609,7 +610,7 @@
                     <h3 class="text-lg font-bold text-slate-800">Nossas Unidades</h3>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4">
-                    <div class="unit-card">
+                    <div class="unit-card hover-lift">
                         <div class="unit-accent"></div>
                         <div class="unit-badge">
                             <i class="fa-solid fa-circle-check" style="font-size:10px;"></i> Aberta agora
@@ -624,7 +625,7 @@
                             Seg. a Sex. — 07h às 17h
                         </div>
                     </div>
-                    <div class="unit-card">
+                    <div class="unit-card hover-lift">
                         <div class="unit-accent"></div>
                         <div class="unit-badge" style="background:#FFF7ED;color:#C2410C;">
                             <i class="fa-solid fa-calendar-days" style="font-size:10px;"></i> Dias específicos
@@ -643,11 +644,10 @@
             </div>
 
             <!-- WhatsApp CTA -->
-            <div class="anim-in" style="animation-delay:0.35s">
+            <div class="anim-in" style="animation-delay:0.7s">
                 <a href="https://wa.me/5527998980658" target="_blank"
-                   style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#075E54,#128C7E);border-radius:22px;padding:20px 24px;text-decoration:none;transition:transform 0.3s ease,box-shadow 0.3s ease;box-shadow:0 8px 24px rgba(7,94,84,0.25);"
-                   onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 36px rgba(7,94,84,0.3)'"
-                   onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 24px rgba(7,94,84,0.25)'">
+                   class="hover-lift"
+                   style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#075E54,#128C7E);border-radius:22px;padding:20px 24px;text-decoration:none;box-shadow:0 8px 24px rgba(7,94,84,0.25);">
                     <div>
                         <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">Fale conosco agora</p>
                         <p style="font-size:16px;font-weight:800;color:white;margin:0;">Atendimento via WhatsApp</p>
@@ -659,11 +659,10 @@
             </div>
 
             <!-- Instalar App mobile -->
-            <div class="md:hidden anim-in" style="animation-delay:0.4s">
+            <div class="md:hidden anim-in" style="animation-delay:0.8s">
                 <button onclick="showInstallInstructions()"
-                        style="width:100%;background:white;border:2px solid #49BCBE;color:#1a7a7c;font-weight:800;padding:16px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(73,188,190,0.1);transition:all 0.3s ease;"
-                        onmouseover="this.style.background='#E8F8F8'"
-                        onmouseout="this.style.background='white'">
+                        class="hover-lift"
+                        style="width:100%;background:white;border:2px solid #49BCBE;color:#1a7a7c;font-weight:800;padding:16px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(73,188,190,0.1);">
                     <i class="fa-solid fa-mobile-screen-button" style="animation:bounce 1s infinite;"></i>
                     INSTALAR APLICATIVO NO CELULAR
                 </button>
@@ -731,7 +730,7 @@
 
         <!-- RESULTADOS PAGE -->
         <section id="page-resultados" class="page h-[600px]">
-            <iframe src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full border-0 rounded-3xl shadow-lg"></iframe>
+            <iframe src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
         </section>
 
     </main>
@@ -760,13 +759,14 @@
 
     <!-- INSTALL MODAL -->
     <div id="installModal">
-        <div class="bg-white rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl">
+        <div class="modal-overlay-close" onclick="closeInstallModal()"></div>
+        <div class="bg-white rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl relative">
             <div class="p-6 bg-cda-primary text-white flex justify-between items-center">
                 <div>
                     <h3 class="font-extrabold text-xl text-white">Instalar Aplicativo</h3>
                     <p class="text-white/80 text-xs">Tenha o CDA sempre com você</p>
                 </div>
-                <button onclick="closeInstallModal()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <button onclick="closeInstallModal()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center transition hover:bg-white/30 hover:scale-110">
                     <i class="fa-solid fa-xmark text-white"></i>
                 </button>
             </div>
@@ -795,7 +795,7 @@
                         <div class="step-number">3</div>
                         <p class="text-sm text-slate-600">Selecione a opção <b>"Instalar aplicativo"</b> ou "Adicionar à tela inicial".</p>
                     </div>
-                    <button onclick="triggerInstall()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold mt-4">
+                    <button onclick="triggerInstall()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold mt-4 shadow-lg">
                         INSTALAR AGORA
                     </button>
                 </div>
@@ -827,6 +827,7 @@
             
             <div class="p-6 bg-slate-50 text-center">
                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Laboratório CDA - Tecnologia a seu serviço</p>
+                <button onclick="closeInstallModal()" class="mt-4 text-xs text-slate-400 font-semibold underline">Não quero instalar agora</button>
             </div>
         </div>
     </div>
@@ -922,14 +923,14 @@
             if (!msg) return;
             const chat = document.getElementById('chatMessages');
             const userDiv = document.createElement('div');
-            userDiv.className = "bg-cda-primary text-white rounded-2xl p-4 text-sm max-w-[85%] ml-auto shadow-md";
+            userDiv.className = "bg-cda-primary text-white rounded-2xl p-4 text-sm max-w-[85%] ml-auto shadow-md animate__animated animate__fadeInRight";
             userDiv.innerText = msg;
             chat.appendChild(userDiv);
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
             setTimeout(() => {
                 const botDiv = document.createElement('div');
-                botDiv.className = "bg-slate-50 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 shadow-sm";
+                botDiv.className = "bg-slate-50 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 shadow-sm animate__animated animate__fadeInLeft";
                 botDiv.innerText = "Recebido! Vou verificar o preparo para '" + msg + "' e te informo.";
                 chat.appendChild(botDiv);
                 chat.scrollTop = chat.scrollHeight;
@@ -938,12 +939,14 @@
 
         // DNA ANIMATION
         const dnaContainer = document.getElementById('dnaBackground');
-        for (let i = 0; i < 20; i++) {
-            const node = document.createElement('div');
-            node.className = 'dna-node';
-            node.style.top = (i * 5) + '%';
-            node.style.animationDelay = (i * 0.1) + 's';
-            dnaContainer.appendChild(node);
+        if (dnaContainer) {
+            for (let i = 0; i < 20; i++) {
+                const node = document.createElement('div');
+                node.className = 'dna-node';
+                node.style.top = (i * 5) + '%';
+                node.style.animationDelay = (i * 0.1) + 's';
+                dnaContainer.appendChild(node);
+            }
         }
     </script>
 </body>
