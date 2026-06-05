@@ -52,7 +52,7 @@
         
         /* Splash Screen */
         #splashScreen {
-            background: #ffffff;
+            background: #000000; /* Fundo preto para combinar com a logo oficial */
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -453,15 +453,13 @@
     <!-- SPLASH SCREEN -->
     <div id="splashScreen">
         <div id="dnaBackground" class="dna-container"></div>
-        <div class="relative z-10 text-center">
+        <div class="relative z-10 text-center px-6">
             <div class="mb-8 animate-floating">
-                <div class="w-24 h-24 bg-cda-primary rounded-[24px] flex items-center justify-center shadow-2xl mx-auto">
-                    <i class="fa-solid fa-flask-vial text-white text-5xl"></i>
-                </div>
+                <!-- Logo Oficial na Splash -->
+                <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Laboratório CDA Logo" class="w-64 mx-auto">
             </div>
-            <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight mb-2">LABORATÓRIO CDA</h1>
-            <p class="text-slate-400 text-sm font-medium mb-8">Diagnóstico de Confiança</p>
-            <div class="w-48 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
+            <p class="text-white/60 text-sm font-medium mb-8 tracking-widest uppercase">Diagnóstico de Confiança</p>
+            <div class="w-48 h-1.5 bg-white/10 rounded-full mx-auto overflow-hidden">
                 <div id="progressBar" class="splash-progress-bar"></div>
             </div>
         </div>
@@ -476,12 +474,13 @@
             <!-- HEADER -->
             <header class="flex items-center justify-between anim-in">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-slate-100">
-                        <i class="fa-solid fa-flask-vial text-cda-primary text-2xl"></i>
+                    <div class="h-12 flex items-center">
+                        <!-- Logo Oficial no Header -->
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-10 object-contain brightness-0 contrast-200" style="filter: drop-shadow(0 0 1px rgba(0,0,0,0.1));">
                     </div>
-                    <div>
-                        <h1 class="font-extrabold text-xl text-slate-800 leading-none">Lab CDA</h1>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Afonso Cláudio - ES</p>
+                    <div class="border-l border-slate-200 pl-3">
+                        <h1 class="font-extrabold text-sm text-slate-800 leading-none">Lab CDA</h1>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Afonso Cláudio - ES</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
