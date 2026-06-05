@@ -4,7 +4,10 @@
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#2F664F",
+  "theme_color": "#49BCBE",
+  "scope": "./",
+  "categories": ["health", "medical"],
+  "description": "Diagnóstico de Confiança - Laboratório CDA",
   "icons": [
     {
       "src": "logo.png",
@@ -15,7 +18,22 @@
     {
       "src": "logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "logo.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
 }
