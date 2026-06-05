@@ -20,6 +20,25 @@
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cda: {
+                            primary: '#49BCBE',
+                            dark: '#37A7AA',
+                            light: '#E8F8F8',
+                            bg: '#F0F6F7',
+                            text: '#1E293B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         :root {
             --cda-primary: #49BCBE;
@@ -33,9 +52,12 @@
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--cda-background); 
-            color: var(--cda-text); 
-            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark body {
+            background-color: #0F172A;
+            color: #F8FAFC;
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -52,7 +74,7 @@
         
         /* Splash Screen */
         #splashScreen {
-            background: #000000; /* Fundo preto para combinar com a logo oficial */
+            background: #ffffff; /* Cor branca solicitada */
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -90,7 +112,7 @@
             height: 4px;
             background: var(--cda-primary);
             border-radius: 2px;
-            transition: width 0.5s ease;
+            transition: width 0.1s ease;
         }
 
         /* ===== HERO MODERNO ===== */
@@ -270,6 +292,10 @@
             position: relative;
             overflow: hidden;
         }
+        .dark .qa-card {
+            background: #1E293B;
+            border-color: #334155;
+        }
         .qa-card::after {
             content: '';
             position: absolute;
@@ -296,6 +322,7 @@
         }
         .qa-card:hover .qa-icon { transform: scale(1.15) rotate(-5deg); }
         .qa-card h3 { font-size: 14px; font-weight: 700; color: #1E293B; margin: 0 0 5px; }
+        .dark .qa-card h3 { color: #F8FAFC; }
         .qa-card p { font-size: 11px; color: #94A3B8; margin: 0; line-height: 1.4; }
 
         /* ===== UNIDADES ===== */
@@ -307,6 +334,10 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
+        }
+        .dark .unit-card {
+            background: #1E293B;
+            border-color: #334155;
         }
         .unit-card:hover {
             border-color: var(--cda-primary);
@@ -338,6 +369,10 @@
             box-shadow: 0 4px 20px rgba(73,188,190,0.06);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(73,188,190,0.08);
+        }
+        .dark .card-cda {
+            background: #1E293B;
+            border-color: #334155;
         }
         .card-cda:hover {
             transform: translateY(-6px);
@@ -391,7 +426,6 @@
             to { opacity: 1; transform: scale(1); }
         }
         
-        /* Botão flutuante para fechar fora do modal (opcional, mas o X interno já resolve) */
         .modal-overlay-close {
             position: absolute;
             inset: 0;
@@ -446,9 +480,29 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+        .fab:hover { transform: scale(1.1) rotate(10deg); }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased bg-cda-bg dark:bg-slate-900">
 
     <!-- SPLASH SCREEN -->
     <div id="splashScreen">
@@ -458,12 +512,17 @@
                 <!-- Logo Oficial na Splash -->
                 <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Laboratório CDA Logo" class="w-64 mx-auto">
             </div>
-            <p class="text-white/60 text-sm font-medium mb-8 tracking-widest uppercase">Diagnóstico de Confiança</p>
-            <div class="w-48 h-1.5 bg-white/10 rounded-full mx-auto overflow-hidden">
+            <p class="text-slate-400 text-sm font-medium mb-8 tracking-widest uppercase">Diagnóstico de Confiança</p>
+            <div class="w-48 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
                 <div id="progressBar" class="splash-progress-bar"></div>
             </div>
         </div>
     </div>
+
+    <!-- FLOATING WHATSAPP -->
+    <a href="https://wa.me/5527998980658" target="_blank" class="fab md:hidden">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
 
     <!-- MAIN CONTENT -->
     <main class="max-w-4xl mx-auto px-4 pt-6 pb-24">
@@ -476,22 +535,38 @@
                 <div class="flex items-center gap-3">
                     <div class="h-12 flex items-center">
                         <!-- Logo Oficial no Header -->
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-10 object-contain brightness-0 contrast-200" style="filter: drop-shadow(0 0 1px rgba(0,0,0,0.1));">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-10 object-contain dark:brightness-200">
                     </div>
-                    <div class="border-l border-slate-200 pl-3">
-                        <h1 class="font-extrabold text-sm text-slate-800 leading-none">Lab CDA</h1>
+                    <div class="border-l border-slate-200 dark:border-slate-700 pl-3">
+                        <h1 class="font-extrabold text-sm text-slate-800 dark:text-white leading-none">Lab CDA</h1>
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Afonso Cláudio - ES</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
-                        <i class="fa-solid fa-bell"></i>
+                    <button onclick="toggleDarkMode()" class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 dark:border-slate-700">
+                        <i id="theme-icon" class="fa-solid fa-moon"></i>
                     </button>
-                    <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                    <button onclick="navigateTo('perfil')" class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 dark:border-slate-700">
                         <i class="fa-solid fa-user"></i>
                     </button>
                 </div>
             </header>
+
+            <!-- ÁREA DO PACIENTE RÁPIDA -->
+            <div id="quick-patient-area" class="anim-in" style="animation-delay: 0.05s">
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-cda-light dark:bg-slate-700 rounded-2xl flex items-center justify-center text-cda-primary">
+                            <i class="fa-solid fa-id-card-clip text-xl"></i>
+                        </div>
+                        <div>
+                            <p id="patient-name-display" class="font-bold text-slate-800 dark:text-white">Olá, Paciente!</p>
+                            <p id="patient-status-display" class="text-xs text-slate-400">Acesse seus dados rapidamente</p>
+                        </div>
+                    </div>
+                    <button onclick="navigateTo('perfil')" class="text-cda-primary font-bold text-xs uppercase tracking-wider">Editar</button>
+                </div>
+            </div>
 
             <!-- HERO -->
             <div class="hero-modern p-8 md:p-12 anim-in" style="animation-delay: 0.1s">
@@ -524,51 +599,19 @@
                                 <i class="fa-solid fa-calendar-check"></i> Agendar Coleta
                             </button>
                         </div>
-                        <div class="hero-stats">
-                            <div>
-                                <div class="hero-stat-num">+15 anos</div>
-                                <div class="hero-stat-label">de experiência</div>
-                            </div>
-                            <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
-                            <div>
-                                <div class="hero-stat-num">2 unidades</div>
-                                <div class="hero-stat-label">na região</div>
-                            </div>
-                            <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
-                            <div>
-                                <div class="hero-stat-num">Coleta</div>
-                                <div class="hero-stat-label">domiciliar</div>
-                            </div>
-                        </div>
                     </div>
                     <div class="hidden md:flex items-center justify-center">
                         <div class="float-illus relative">
-                            <!-- Anel decorativo atrás -->
                             <div style="position:absolute;inset:-20px;border-radius:50%;border:2px dashed rgba(255,255,255,0.2);animation:spin 18s linear infinite;"></div>
-                            <div style="position:absolute;inset:-50px;border-radius:50%;border:1px dashed rgba(255,255,255,0.1);animation:spin 30s linear infinite reverse;"></div>
-                            <!-- Ícone central -->
                             <div style="width:180px;height:180px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
                                 <i class="fa-solid fa-flask-vial" style="font-size:70px;color:white;opacity:0.9;"></i>
-                            </div>
-                            <!-- Chips flutuantes -->
-                            <div style="position:absolute;top:-10px;right:-50px;background:white;border-radius:14px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
-                                <div style="width:8px;height:8px;background:#22C55E;border-radius:50%;"></div>
-                                <span style="font-size:12px;font-weight:700;color:#1E293B;">Resultado pronto</span>
-                            </div>
-                            <div style="position:absolute;bottom:0px;left:-60px;background:white;border-radius:14px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
-                                <i class="fa-solid fa-shield-halved" style="color:#49BCBE;font-size:14px;"></i>
-                                <span style="font-size:12px;font-weight:700;color:#1E293B;">100% seguro</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <style>
-                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-            </style>
-
-            <!-- ===== QUICK ACTIONS ===== -->
+            <!-- QUICK ACTIONS -->
             <div class="qa-grid">
                 <div onclick="navigateTo('resultados')" class="qa-card anim-in" style="animation-delay:0.2s">
                     <div class="qa-icon" style="background:#E8F8F8;color:#1a7a7c;">
@@ -577,19 +620,19 @@
                     <h3>Laudo Online</h3>
                     <p>Acesse seus exames com total segurança</p>
                 </div>
-                <div onclick="navigateTo('agendar')" class="qa-card anim-in" style="animation-delay:0.3s">
-                    <div class="qa-icon" style="background:#E8F8F8;color:#1a7a7c;">
-                        <i class="fa-solid fa-house-chimney-medical"></i>
-                    </div>
-                    <h3>Coleta Domiciliar</h3>
-                    <p>Conforto do seu lar, qualidade do laboratório</p>
-                </div>
-                <div onclick="navigateTo('preparo')" class="qa-card anim-in" style="animation-delay:0.4s">
+                <div onclick="navigateTo('preparo')" class="qa-card anim-in" style="animation-delay:0.3s">
                     <div class="qa-icon" style="background:#EFF6FF;color:#1D4ED8;">
                         <i class="fa-solid fa-robot"></i>
                     </div>
                     <h3>IA Preparo</h3>
                     <p>Orientações inteligentes para seus exames</p>
+                </div>
+                <div onclick="navigateTo('saude')" class="qa-card anim-in" style="animation-delay:0.4s">
+                    <div class="qa-icon" style="background:#FFF1F2;color:#E11D48;">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <h3>Minha Saúde</h3>
+                    <p>Calculadoras e ferramentas de bem-estar</p>
                 </div>
                 <div onclick="navigateTo('orcamento')" class="qa-card anim-in" style="animation-delay:0.5s">
                     <div class="qa-icon" style="background:#F0FDF4;color:#15803D;">
@@ -600,13 +643,13 @@
                 </div>
             </div>
 
-            <!-- ===== UNIDADES ===== -->
+            <!-- UNIDADES -->
             <div class="anim-in" style="animation-delay:0.6s">
                 <div class="flex items-center gap-3 mb-4">
                     <div style="width:36px;height:36px;background:#E8F8F8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#1a7a7c;">
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-800">Nossas Unidades</h3>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-white">Nossas Unidades</h3>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4">
                     <div class="unit-card hover-lift">
@@ -614,82 +657,98 @@
                         <div class="unit-badge">
                             <i class="fa-solid fa-circle-check" style="font-size:10px;"></i> Aberta agora
                         </div>
-                        <h4 class="font-extrabold text-slate-800 text-base mb-1">Matriz — Centro</h4>
+                        <h4 class="font-extrabold text-slate-800 dark:text-white text-base mb-1">Matriz — Centro</h4>
                         <p class="text-sm text-slate-400 mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-map-pin" style="color:#49BCBE;font-size:12px;"></i>
                             Rua José Giestas, nº 46, Centro
                         </p>
-                        <div class="flex items-center gap-2 text-sm font-semibold" style="color:#1a7a7c;">
-                            <i class="fa-regular fa-clock"></i>
-                            Seg. a Sex. — 07h às 17h
-                        </div>
                     </div>
                     <div class="unit-card hover-lift">
                         <div class="unit-accent"></div>
                         <div class="unit-badge" style="background:#FFF7ED;color:#C2410C;">
                             <i class="fa-solid fa-calendar-days" style="font-size:10px;"></i> Dias específicos
                         </div>
-                        <h4 class="font-extrabold text-slate-800 text-base mb-1">Mata Fria — Filial</h4>
+                        <h4 class="font-extrabold text-slate-800 dark:text-white text-base mb-1">Mata Fria — Filial</h4>
                         <p class="text-sm text-slate-400 mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-map-pin" style="color:#49BCBE;font-size:12px;"></i>
                             Cór. Francisco Correia, Zona Rural
                         </p>
-                        <div class="flex items-center gap-2 text-sm font-semibold" style="color:#1a7a7c;">
-                            <i class="fa-regular fa-clock"></i>
-                            Ter, Qua e Qui — 06h às 09h
-                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- WhatsApp CTA -->
-            <div class="anim-in" style="animation-delay:0.7s">
-                <a href="https://wa.me/5527998980658" target="_blank"
-                   class="hover-lift"
-                   style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#075E54,#128C7E);border-radius:22px;padding:20px 24px;text-decoration:none;box-shadow:0 8px 24px rgba(7,94,84,0.25);">
-                    <div>
-                        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">Fale conosco agora</p>
-                        <p style="font-size:16px;font-weight:800;color:white;margin:0;">Atendimento via WhatsApp</p>
-                    </div>
-                    <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;">
-                        <i class="fa-brands fa-whatsapp" style="font-size:26px;color:white;"></i>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Instalar App mobile -->
-            <div class="md:hidden anim-in" style="animation-delay:0.8s">
-                <button onclick="showInstallInstructions()"
-                        class="hover-lift"
-                        style="width:100%;background:white;border:2px solid #49BCBE;color:#1a7a7c;font-weight:800;padding:16px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(73,188,190,0.1);">
-                    <i class="fa-solid fa-mobile-screen-button" style="animation:bounce 1s infinite;"></i>
-                    INSTALAR APLICATIVO NO CELULAR
-                </button>
-            </div>
-
         </section>
 
-        <!-- PREPARO PAGE -->
-        <section id="page-preparo" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800">Guia de Preparo</h2>
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-[500px] flex flex-col">
-                <div class="p-4 border-b bg-slate-50 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-cda-primary rounded-full flex items-center justify-center text-white">
-                        <i class="fa-solid fa-robot"></i>
+        <!-- PERFIL PAGE (ÁREA DO PACIENTE) -->
+        <section id="page-perfil" class="page space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Meus Dados</h2>
+            <div class="card-cda p-6 space-y-6">
+                <p class="text-slate-500 text-sm">Salve seus dados para facilitar o acesso aos resultados e agendamentos.</p>
+                <form id="profileForm" onsubmit="saveProfile(event)" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Nome Completo</label>
+                        <input type="text" id="prof-nome" placeholder="Seu nome" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                     <div>
-                        <p class="font-bold text-sm">Assistente CDA</p>
-                        <p class="text-[10px] text-emerald-500 font-bold uppercase">Online agora</p>
+                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Protocolo / CPF</label>
+                        <input type="text" id="prof-protocolo" placeholder="Dados para resultados" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
+                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold">Salvar Dados</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- SAUDE PAGE (CALCULADORAS) -->
+        <section id="page-saude" class="page space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Ferramentas de Saúde</h2>
+            
+            <!-- IMC -->
+            <div class="card-cda p-6">
+                <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-weight-scale text-cda-primary"></i> Calculadora de IMC
+                </h3>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <input type="number" id="imc-peso" placeholder="Peso (kg)" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    <input type="number" id="imc-altura" placeholder="Altura (ex: 1.75)" step="0.01" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                </div>
+                <button onclick="calcularIMC()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white py-3 rounded-xl font-bold text-sm">Calcular IMC</button>
+                <div id="imc-result" class="mt-4 hidden p-4 rounded-xl text-center font-bold"></div>
+            </div>
+
+            <!-- ÁGUA -->
+            <div class="card-cda p-6">
+                <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-droplet text-blue-500"></i> Meta de Hidratação
+                </h3>
+                <p class="text-xs text-slate-500 mb-4">Saiba quanto de água você deve beber por dia com base no seu peso.</p>
+                <button onclick="calcularAgua()" class="w-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 py-3 rounded-xl font-bold text-sm">Ver Minha Meta</button>
+                <div id="agua-result" class="mt-4 hidden p-4 bg-blue-500 text-white rounded-xl text-center font-bold"></div>
+            </div>
+        </section>
+
+        <!-- PREPARO PAGE (IA APRIMORADA) -->
+        <section id="page-preparo" class="page space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Guia de Preparo Inteligente</h2>
+            <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden h-[500px] flex flex-col">
+                <div class="p-4 border-b dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-cda-primary rounded-full flex items-center justify-center text-white">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm dark:text-white">Assistente CDA</p>
+                            <p class="text-[10px] text-emerald-500 font-bold uppercase">Base de dados ativa</p>
+                        </div>
+                    </div>
+                    <button onclick="clearChat()" class="text-[10px] font-bold text-slate-400 uppercase">Limpar</button>
                 </div>
                 <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
-                    <div class="bg-slate-50 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100">
-                        Olá! Sou o assistente do Laboratório CDA. Digite o nome do exame que você vai fazer para eu te orientar.
+                    <div class="bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 dark:border-slate-600 dark:text-white">
+                        Olá! Digite o nome do seu exame (ex: Hemograma, Glicemia, Urina) e eu te direi o preparo necessário.
                     </div>
                 </div>
-                <div class="p-4 border-t bg-white">
+                <div class="p-4 border-t dark:border-slate-700 bg-white dark:bg-slate-800">
                     <div class="flex gap-2">
-                        <input type="text" id="chatInput" placeholder="Ex: Hemograma, Glicemia..." class="flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary">
+                        <input type="text" id="chatInput" placeholder="Qual o exame?" class="flex-1 bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                         <button onclick="enviarMensagemPreparo()" class="w-12 h-12 bg-cda-primary text-white rounded-xl flex items-center justify-center">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
@@ -698,44 +757,34 @@
             </div>
         </section>
 
-        <!-- AGENDAR PAGE -->
-        <section id="page-agendar" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800">Agendamento</h2>
-            <div class="card-cda p-6">
-                <p class="text-slate-500 mb-6">Preencha os dados e nossa equipe entrará em contato via WhatsApp.</p>
-                <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="unidade" value="Matriz" checked class="hidden peer">
-                            <div class="p-4 border-2 rounded-2xl text-center peer-checked:border-cda-primary peer-checked:bg-cda-primary-light transition">
-                                <p class="font-bold text-sm">Matriz</p>
-                                <p class="text-[10px] text-slate-400">Centro</p>
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="unidade" value="Mata Fria" class="hidden peer">
-                            <div class="p-4 border-2 rounded-2xl text-center peer-checked:border-cda-primary peer-checked:bg-cda-primary-light transition">
-                                <p class="font-bold text-sm">Mata Fria</p>
-                                <p class="text-[10px] text-slate-400">Zona Rural</p>
-                            </div>
-                        </label>
-                    </div>
-                    <input type="text" name="nome" placeholder="Nome Completo" required class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary">
-                    <input type="tel" name="whatsapp" placeholder="WhatsApp" required class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary">
-                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold">Enviar Solicitação</button>
-                </form>
-            </div>
-        </section>
-
         <!-- RESULTADOS PAGE -->
         <section id="page-resultados" class="page h-[600px]">
             <iframe src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
         </section>
 
+        <!-- AGENDAR PAGE -->
+        <section id="page-agendar" class="page space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Agendamento</h2>
+            <div class="card-cda p-6">
+                <p class="text-slate-500 mb-6">Preencha os dados e nossa equipe entrará em contato.</p>
+                <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="space-y-4">
+                    <input type="text" name="nome" id="agen-nome" placeholder="Nome Completo" required class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    <div class="grid grid-cols-2 gap-4">
+                        <select name="periodo" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                        </select>
+                        <input type="date" name="data" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
+                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold">Solicitar Agendamento</button>
+                </form>
+            </div>
+        </section>
+
     </main>
 
     <!-- BOTTOM NAVIGATION (MOBILE) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 md:hidden z-50">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 px-6 py-3 md:hidden z-50">
         <div class="flex items-center justify-between max-w-lg mx-auto">
             <button onclick="navigateTo('home')" id="nav-home" class="nav-item active-nav flex flex-col items-center gap-1">
                 <i class="fa-solid fa-house text-xl"></i>
@@ -759,7 +808,7 @@
     <!-- INSTALL MODAL -->
     <div id="installModal">
         <div class="modal-overlay-close" onclick="closeInstallModal()"></div>
-        <div class="bg-white rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl relative">
+        <div class="bg-white dark:bg-slate-800 rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl relative">
             <div class="p-6 bg-cda-primary text-white flex justify-between items-center">
                 <div>
                     <h3 class="font-extrabold text-xl text-white">Instalar Aplicativo</h3>
@@ -770,79 +819,85 @@
                 </button>
             </div>
             
-            <div class="p-2 flex border-b">
-                <button onclick="switchInstallTab('android')" id="tab-android" class="tab-btn active flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2">
+            <div class="p-2 flex border-b dark:border-slate-700">
+                <button onclick="switchInstallTab('android')" id="tab-android" class="tab-btn active flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 dark:text-white">
                     <i class="fa-brands fa-android text-lg"></i> Android
                 </button>
-                <button onclick="switchInstallTab('iphone')" id="tab-iphone" class="tab-btn flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2">
+                <button onclick="switchInstallTab('iphone')" id="tab-iphone" class="tab-btn flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 dark:text-white">
                     <i class="fa-brands fa-apple text-lg"></i> iPhone / iOS
                 </button>
             </div>
 
             <div class="p-8">
-                <!-- Android Content -->
                 <div id="content-android" class="space-y-6">
-                    <div class="flex gap-4">
-                        <div class="step-number">1</div>
-                        <p class="text-sm text-slate-600">Abra este site no navegador <b>Google Chrome</b>.</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="step-number">2</div>
-                        <p class="text-sm text-slate-600">Toque nos <b>três pontinhos (⋮)</b> no canto superior direito.</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="step-number">3</div>
-                        <p class="text-sm text-slate-600">Selecione a opção <b>"Instalar aplicativo"</b> ou "Adicionar à tela inicial".</p>
-                    </div>
-                    <button onclick="triggerInstall()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold mt-4 shadow-lg">
-                        INSTALAR AGORA
-                    </button>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">1. Abra no <b>Chrome</b>.</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">2. Toque nos <b>três pontinhos (⋮)</b>.</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">3. Selecione <b>"Instalar aplicativo"</b>.</p>
+                    <button onclick="triggerInstall()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold mt-4 shadow-lg">INSTALAR AGORA</button>
                 </div>
-
-                <!-- iPhone Content -->
                 <div id="content-iphone" class="hidden space-y-6">
-                    <div class="flex gap-4">
-                        <div class="step-number">1</div>
-                        <p class="text-sm text-slate-600">Abra este site no navegador <b>Safari</b>.</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="step-number">2</div>
-                        <div class="text-sm text-slate-600">
-                            Toque no botão de <b>Compartilhar</b> 
-                            <i class="fa-solid fa-arrow-up-from-bracket text-blue-500 mx-1"></i> 
-                            (o ícone quadrado com uma seta para cima na barra inferior).
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="step-number">3</div>
-                        <p class="text-sm text-slate-600">Role a lista para baixo e toque em <b>"Adicionar à Tela de Início"</b>.</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="step-number">4</div>
-                        <p class="text-sm text-slate-600">Toque em <b>"Adicionar"</b> no canto superior direito.</p>
-                    </div>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">1. Abra no <b>Safari</b>.</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">2. Toque no botão <b>Compartilhar</b> <i class="fa-solid fa-arrow-up-from-bracket text-blue-500"></i>.</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">3. Toque em <b>"Adicionar à Tela de Início"</b>.</p>
                 </div>
             </div>
             
-            <div class="p-6 bg-slate-50 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Laboratório CDA - Tecnologia a seu serviço</p>
-                <button onclick="closeInstallModal()" class="mt-4 text-xs text-slate-400 font-semibold underline">Não quero instalar agora</button>
+            <div class="p-6 bg-slate-50 dark:bg-slate-900/50 text-center">
+                <button onclick="closeInstallModal()" class="text-xs text-slate-400 font-semibold underline">Não quero instalar agora</button>
             </div>
         </div>
     </div>
 
     <script>
-        // SPLASH SCREEN LOGIC
-        window.addEventListener('load', () => {
+        // BASE DE DADOS DE EXAMES
+        const examesDB = {
+            'hemograma': 'Não exige jejum obrigatório, mas recomenda-se 3h após refeição leve.',
+            'glicemia': 'Jejum obrigatório de 8 a 12 horas. Não ultrapassar 14h de jejum.',
+            'colesterol': 'Jejum de 12 horas recomendado para perfil lipídico completo.',
+            'urina': 'Preferencialmente a primeira urina da manhã. Higienizar bem antes da coleta.',
+            'fezes': 'Coletar em frasco limpo. Não misturar com urina.',
+            'tsh': 'Jejum não obrigatório, mas recomenda-se colher pela manhã.',
+            'psa': 'Jejum de 4h. Não ter tido relações sexuais ou exercício pesado em 48h.',
+            'beta hcg': 'Não exige jejum. Pode ser feito a qualquer hora do dia.'
+        };
+
+        // DARK MODE
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        // LOAD THEME & PROFILE
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check theme
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon();
+            }
+            loadProfile();
+
+            // Splash Screen Logic
             const bar = document.getElementById('progressBar');
             let width = 0;
             const interval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
-                        document.getElementById('splashScreen').style.opacity = '0';
-                        setTimeout(() => {
-                            document.getElementById('splashScreen').style.display = 'none';
+                        const splash = document.getElementById('splashScreen');
+                        splash.style.opacity = '0';
+                        setTimeout(() => { 
+                            splash.style.display = 'none'; 
                         }, 500);
                     }, 500);
                 } else {
@@ -851,6 +906,60 @@
                 }
             }, 50);
         });
+
+        // PROFILE LOGIC
+        function saveProfile(e) {
+            e.preventDefault();
+            const nome = document.getElementById('prof-nome').value;
+            const protocolo = document.getElementById('prof-protocolo').value;
+            localStorage.setItem('patient_name', nome);
+            localStorage.setItem('patient_id', protocolo);
+            loadProfile();
+            alert('Dados salvos com sucesso!');
+            navigateTo('home');
+        }
+
+        function loadProfile() {
+            const nome = localStorage.getItem('patient_name');
+            if (nome) {
+                document.getElementById('patient-name-display').innerText = 'Olá, ' + nome.split(' ')[0] + '!';
+                document.getElementById('prof-nome').value = nome;
+                document.getElementById('agen-nome').value = nome;
+            }
+            const id = localStorage.getItem('patient_id');
+            if (id) {
+                document.getElementById('patient-status-display').innerText = 'Protocolo: ' + id;
+                document.getElementById('prof-protocolo').value = id;
+            }
+        }
+
+        // CALCULADORAS
+        function calcularIMC() {
+            const peso = parseFloat(document.getElementById('imc-peso').value);
+            const altura = parseFloat(document.getElementById('imc-altura').value);
+            if (!peso || !altura) return;
+            const imc = (peso / (altura * altura)).toFixed(1);
+            let cat = '';
+            let color = '';
+            if (imc < 18.5) { cat = 'Abaixo do peso'; color = 'bg-yellow-500'; }
+            else if (imc < 25) { cat = 'Peso normal'; color = 'bg-green-500'; }
+            else if (imc < 30) { cat = 'Sobrepeso'; color = 'bg-orange-500'; }
+            else { cat = 'Obesidade'; color = 'bg-red-500'; }
+            
+            const res = document.getElementById('imc-result');
+            res.className = `mt-4 p-4 rounded-xl text-center font-bold text-white ${color}`;
+            res.innerHTML = `Seu IMC é ${imc}<br><span class="text-xs uppercase">${cat}</span>`;
+            res.classList.remove('hidden');
+        }
+
+        function calcularAgua() {
+            const pesoInput = document.getElementById('imc-peso').value;
+            const peso = parseFloat(pesoInput) || parseFloat(localStorage.getItem('patient_weight')) || 70;
+            const meta = (peso * 35) / 1000;
+            const res = document.getElementById('agua-result');
+            res.innerText = `Sua meta diária: ${meta.toFixed(1)} Litros`;
+            res.classList.remove('hidden');
+        }
 
         // NAVIGATION
         function navigateTo(pageId) {
@@ -865,24 +974,45 @@
             window.scrollTo(0, 0);
         }
 
-        // INSTALL LOGIC
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
+        // IA PREPARO
+        function enviarMensagemPreparo() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim().toLowerCase();
+            if (!msg) return;
+            
+            const chat = document.getElementById('chatMessages');
+            const userDiv = document.createElement('div');
+            userDiv.className = "bg-cda-primary text-white rounded-2xl p-4 text-sm max-w-[85%] ml-auto shadow-md animate__animated animate__fadeInRight";
+            userDiv.innerText = input.value;
+            chat.appendChild(userDiv);
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
 
-        function showInstallInstructions() {
-            document.getElementById('installModal').classList.add('active');
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS) switchInstallTab('iphone');
-            else switchInstallTab('android');
+            setTimeout(() => {
+                const botDiv = document.createElement('div');
+                botDiv.className = "bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 dark:border-slate-600 shadow-sm animate__animated animate__fadeInLeft dark:text-white";
+                
+                let resposta = "Desculpe, não encontrei o preparo para esse exame específico na minha base. Por favor, fale com nossa equipe no WhatsApp para orientações precisas.";
+                for (let key in examesDB) {
+                    if (msg.includes(key)) {
+                        resposta = `**${key.toUpperCase()}**: ${examesDB[key]}`;
+                        break;
+                    }
+                }
+                
+                botDiv.innerHTML = resposta;
+                chat.appendChild(botDiv);
+                chat.scrollTop = chat.scrollHeight;
+            }, 800);
         }
 
-        function closeInstallModal() {
-            document.getElementById('installModal').classList.remove('active');
+        function clearChat() {
+            document.getElementById('chatMessages').innerHTML = '<div class="bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 dark:border-slate-600 dark:text-white">Olá! Digite o nome do seu exame e eu te direi o preparo necessário.</div>';
         }
 
+        // INSTALL MODAL
+        function showInstallInstructions() { document.getElementById('installModal').classList.add('active'); }
+        function closeInstallModal() { document.getElementById('installModal').classList.remove('active'); }
         function switchInstallTab(platform) {
             ['android', 'iphone'].forEach(t => {
                 document.getElementById('tab-' + t).classList.remove('active');
@@ -893,47 +1023,17 @@
         }
 
         function triggerInstall() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') closeInstallModal();
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("Para instalar, siga as instruções manuais.");
-            }
+            alert("Para instalar, siga as instruções manuais abaixo.");
         }
 
-        // AGENDAMENTO
         function submitAgendamento(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const text = `Olá, Laboratório CDA! Gostaria de agendar uma coleta.%0A%0A` +
+            const text = `Olá, CDA! Gostaria de agendar uma coleta.%0A%0A` +
                          `- *Nome:* ${formData.get('nome')}%0A` +
-                         `- *WhatsApp:* ${formData.get('whatsapp')}%0A` +
-                         `- *Unidade:* ${formData.get('unidade')}`;
+                         `- *Data:* ${formData.get('data')}%0A` +
+                         `- *Período:* ${formData.get('periodo')}`;
             window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
-        }
-
-        // CHAT SIMULATION
-        function enviarMensagemPreparo() {
-            const input = document.getElementById('chatInput');
-            const msg = input.value.trim();
-            if (!msg) return;
-            const chat = document.getElementById('chatMessages');
-            const userDiv = document.createElement('div');
-            userDiv.className = "bg-cda-primary text-white rounded-2xl p-4 text-sm max-w-[85%] ml-auto shadow-md animate__animated animate__fadeInRight";
-            userDiv.innerText = msg;
-            chat.appendChild(userDiv);
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
-            setTimeout(() => {
-                const botDiv = document.createElement('div');
-                botDiv.className = "bg-slate-50 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 shadow-sm animate__animated animate__fadeInLeft";
-                botDiv.innerText = "Recebido! Vou verificar o preparo para '" + msg + "' e te informo.";
-                chat.appendChild(botDiv);
-                chat.scrollTop = chat.scrollHeight;
-            }, 1000);
         }
 
         // DNA ANIMATION
