@@ -1,0 +1,133 @@
+        <!-- PÁGINA 2: ORÇAMENTO DE EXAMES -->
+        <section id="page-orcamento" class="page space-y-6">
+            <div>
+                <h2 class="text-2xl font-bold text-cda-dark">Orçamento de Exames</h2>
+                <p class="text-slate-500 text-sm mt-1">Gere orçamentos automaticamente com nossa tabela de preços atualizada.</p>
+            </div>
+
+            <!-- Card de Instrução -->
+            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+                <p class="text-sm text-blue-900 font-semibold mb-2">💡 Como Usar:</p>
+                <ol class="text-xs text-blue-800 space-y-1 ml-4 list-decimal">
+                    <li><strong>Insira a Chave API</strong> (obtenha em <a href="https://platform.openai.com/api-keys" target="_blank" class="text-blue-600 font-bold hover:underline">OpenAI</a>)</li>
+                    <li><strong>Digite o nome do paciente</strong></li>
+                    <li><strong>Liste os exames</strong> ou anexe a foto do pedido</li>
+                    <li>Clique em <strong>"Gerar Orçamento"</strong></li>
+                    <li>Envie via WhatsApp!</li>
+                </ol>
+            </div>
+
+            <!-- Campo de Chave API -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">
+                        🔑 Chave API OpenAI (Obrigatória):
+                    </label>
+                    <input type="password" id="orcApiKey" placeholder="sk-..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none" title="Sua chave será usada APENAS para este orçamento">
+                    <p class="text-xs text-slate-500 mt-2">
+                        ✅ <strong>Segura:</strong> Sua chave NÃO é armazenada, usada apenas nesta seção<br>
+                        📖 <strong>Não tem?</strong> <a href="https://platform.openai.com/api-keys" target="_blank" class="text-cda-primary font-bold hover:underline">Clique aqui para obter</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Badge de IA -->
+            <div class="flex items-center gap-2 bg-gradient-to-r from-cda-primary/10 to-emerald-50 border border-cda-primary/20 rounded-2xl px-4 py-3">
+                <div class="w-8 h-8 rounded-xl bg-cda-primary flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-brain text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-800">IA com Visão de Documentos</p>
+                    <p class="text-[11px] text-slate-500">Anexe foto do pedido ou digite os exames manualmente</p>
+                </div>
+            </div>
+
+            <!-- Formulário de Orçamento -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 space-y-5">
+                <!-- Nome do paciente -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nome do Paciente:</label>
+                    <input type="text" id="iaOrcNome" placeholder="Ex: João Silva" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none">
+                </div>
+
+                <!-- Upload de pedido médico -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        📸 Pedido Médico (Foto/PDF - Opcional):
+                    </label>
+                    
+                    <label for="orcPedidoInput" class="flex flex-col items-center justify-center border-2 border-dashed border-cda-primary/40 rounded-2xl p-6 cursor-pointer hover:border-cda-primary/60 transition">
+                        <div class="w-12 h-12 rounded-2xl bg-cda-primary/10 flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-cloud-arrow-up text-xl text-cda-primary"></i>
+                        </div>
+                        <p class="text-sm font-semibold text-slate-700 text-center">Toque para anexar pedido</p>
+                        <p class="text-xs text-slate-400 mt-1 text-center">JPG, PNG, PDF — até 3 arquivos</p>
+                        <input type="file" id="orcPedidoInput" accept="image/*,application/pdf" multiple class="hidden" onchange="onPedidoSelecionado(event)">
+                    </label>
+
+                    <div id="orcPedidoPreview" class="hidden mt-3 space-y-2"></div>
+                </div>
+
+                <!-- Divider OU -->
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 h-px bg-slate-100"></div>
+                    <span class="text-xs text-slate-400 font-semibold">OU DIGITE OS EXAMES</span>
+                    <div class="flex-1 h-px bg-slate-100"></div>
+                </div>
+
+                <!-- Campo texto manual -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Exames (separe por vírgula):</label>
+                    <textarea id="iaOrcExames" rows="3" placeholder="Ex: Hemograma, Glicose, TSH, Vitamina D" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-cda-primary focus:outline-none"></textarea>
+                </div>
+
+                <!-- Botão gerar -->
+                <button onclick="gerarOrcamentoIA()" class="w-full btn-cda-primary py-3.5 flex justify-center items-center gap-2 text-sm font-bold rounded-xl hover:opacity-90 transition">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Orçamento
+                </button>
+            </div>
+
+            <!-- Loader -->
+            <div id="iaOrcLoader" class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm p-8 flex flex-col items-center gap-4">
+                <div class="relative">
+                    <div class="w-14 h-14 rounded-2xl bg-cda-primary/10 flex items-center justify-center">
+                        <i class="fa-solid fa-magnifying-glass text-2xl text-cda-primary"></i>
+                    </div>
+                    <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-notch animate-spin text-white text-[10px]"></i>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm font-bold text-slate-800" id="orcLoaderMsg">Analisando pedido...</p>
+                    <p class="text-xs text-slate-400 mt-1">Consultando tabela de preços</p>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="h-full bg-cda-primary rounded-full animate-pulse" style="width:70%"></div>
+                </div>
+            </div>
+
+            <!-- Resultado do Orçamento -->
+            <div id="iaOrcResultado" class="hidden bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-cda-primary to-cda-primary-dark px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-white">
+                        <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
+                        <span class="font-bold text-sm">Orçamento Gerado ✅</span>
+                    </div>
+                    <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/30">CDA · <span id="orcDataHeader"></span></span>
+                </div>
+                <div class="p-6">
+                    <div id="iaOrcTexto" class="text-sm text-slate-700 leading-relaxed space-y-1"></div>
+                </div>
+                <div class="px-6 pb-5 flex gap-2">
+                    <button onclick="enviarOrcamentoWhats()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-2 transition">
+                        <i class="fa-brands fa-whatsapp"></i> Enviar via WhatsApp
+                    </button>
+                    <button onclick="copyOrcamento()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 rounded-xl text-sm transition" title="Copiar">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                    <button onclick="limparOrcamento()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 rounded-xl text-sm transition" title="Novo">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
