@@ -754,16 +754,30 @@
 
         async function carregarTabelaPrecos() {
             const status = document.getElementById('tabelaStatus');
+            const aplicarTabela = (dados, origem) => {
+                examesPrecos = Array.isArray(dados) ? dados : [];
+                if (status) {
+                    status.innerText = examesPrecos.length
+                        ? `${examesPrecos.length} exames carregados da sua tabela de preços.`
+                        : 'Não foi possível carregar a tabela de preços.';
+                }
+                renderExames();
+                return examesPrecos.length > 0;
+            };
+
+            if (window.EXAMES_CDA_DATA && aplicarTabela(window.EXAMES_CDA_DATA, 'script')) return;
+
             try {
-                const response = await fetch('./data/exames.json');
+                const response = await fetch(`./data/exames.json?v=${Date.now()}`, { cache: 'no-store' });
                 if (!response.ok) throw new Error('Tabela não encontrada');
-                examesPrecos = await response.json();
-                if (status) status.innerText = `${examesPrecos.length} exames carregados da sua tabela de preços.`;
+                const dados = await response.json();
+                if (aplicarTabela(dados, 'json')) return;
             } catch (error) {
+                if (window.EXAMES_CDA_DATA && aplicarTabela(window.EXAMES_CDA_DATA, 'fallback')) return;
                 examesPrecos = [];
                 if (status) status.innerText = 'Não foi possível carregar a tabela de preços.';
+                renderExames();
             }
-            renderExames();
         }
 
         function renderExames() {
@@ -1053,6 +1067,90 @@
             window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
         }
 
+        const preparoOrientacoes = [
+            {
+                termos: ['HEMOGRAMA', 'HG'],
+                titulo: 'Hemograma',
+                texto: 'Geralmente não exige jejum. Informe uso de medicamentos e leve documento pessoal. Se houver outros exames no mesmo pedido, o jejum pode mudar.'
+            },
+            {
+                termos: ['GLICOSE', 'GLICEMIA', 'GLI'],
+                titulo: 'Glicose / glicemia',
+                texto: 'Normalmente pede jejum de 8 horas, salvo orientação médica diferente. Evite exageros alimentares no dia anterior.'
+            },
+            {
+                termos: ['COLESTEROL', 'TRIGLICERIDEOS', 'TRI'],
+                titulo: 'Perfil lipídico',
+                texto: 'Alguns pedidos dispensam jejum, mas muitos laboratórios ainda orientam jejum conforme solicitação médica. Confirme antes da coleta.'
+            },
+            {
+                termos: ['URINA', 'EAS', 'URINA TIPO 1'],
+                titulo: 'Urina tipo 1',
+                texto: 'Use frasco limpo, preferencialmente primeira urina da manhã ou conforme orientação. Higienize antes da coleta e entregue rapidamente.'
+            },
+            {
+                termos: ['FEZES', 'PARASITOLOGICO'],
+                titulo: 'Exame de fezes',
+                texto: 'Colete em frasco apropriado, sem misturar com urina ou água. Alguns exames exigem conservante ou amostras em dias alternados.'
+            },
+            {
+                termos: ['TSH', 'T4', 'T3'],
+                titulo: 'Hormônios tireoidianos',
+                texto: 'Em geral não exige jejum. Se usa levotiroxina, confirme se deve coletar antes de tomar o medicamento no dia.'
+            }
+        ];
+
+        function adicionarMensagemChat(tipo, texto) {
+            const messages = document.getElementById('chatMessages');
+            if (!messages) return;
+            const wrapper = document.createElement('div');
+            wrapper.className = tipo === 'user' ? 'flex justify-end' : 'flex justify-start';
+            const bubble = document.createElement('div');
+            bubble.className = tipo === 'user'
+                ? 'max-w-[82%] bg-cda-primary text-white rounded-2xl rounded-br-md px-4 py-3 text-sm leading-relaxed shadow-sm'
+                : 'max-w-[86%] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-100 rounded-2xl rounded-bl-md px-4 py-3 text-sm leading-relaxed';
+            bubble.innerText = texto;
+            wrapper.appendChild(bubble);
+            messages.appendChild(wrapper);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function responderPreparo(pergunta) {
+            const texto = normalizarTexto(pergunta);
+            const achado = preparoOrientacoes.find(item => item.termos.some(termo => texto.includes(normalizarTexto(termo))));
+            if (achado) {
+                return `${achado.titulo}: ${achado.texto}\n\nEsta orientação é geral. Se o pedido tiver vários exames, confirme com o laboratório antes da coleta.`;
+            }
+            return 'Não encontrei uma orientação específica para esse exame. Me envie o nome como está no pedido, ou chame o laboratório pelo WhatsApp para confirmar preparo, jejum e horário de coleta.';
+        }
+
+        function enviarMensagemPreparo() {
+            const input = document.getElementById('chatInput');
+            const pergunta = (input?.value || '').trim();
+            if (!pergunta) return;
+            adicionarMensagemChat('user', pergunta);
+            input.value = '';
+            setTimeout(() => adicionarMensagemChat('bot', responderPreparo(pergunta)), 180);
+        }
+
+        function iniciarChatPreparo() {
+            const messages = document.getElementById('chatMessages');
+            const input = document.getElementById('chatInput');
+            if (messages && !messages.dataset.ready) {
+                messages.dataset.ready = 'true';
+                adicionarMensagemChat('bot', 'Digite o nome do exame para ver uma orientação inicial de preparo.');
+            }
+            if (input && !input.dataset.ready) {
+                input.dataset.ready = 'true';
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        enviarMensagemPreparo();
+                    }
+                });
+            }
+        }
+
         // DARK MODE
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
@@ -1067,12 +1165,24 @@
 
         // NAVIGATION
         function navigateTo(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
+            const target = document.getElementById('page-' + pageId);
+            if (!target) return;
+
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            target.classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active-nav'));
             const navBtn = document.getElementById('nav-' + pageId);
             if (navBtn) navBtn.classList.add('active-nav');
-            window.scrollTo(0, 0);
+
+            const resetScroll = () => {
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            };
+            resetScroll();
+            requestAnimationFrame(resetScroll);
+            setTimeout(resetScroll, 80);
         }
 
         // INITIAL LOAD
@@ -1080,6 +1190,7 @@
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             updateThemeIcon();
             carregarTabelaPrecos();
+            iniciarChatPreparo();
             loadProfile();
 
             // Splash Logic
@@ -1134,8 +1245,17 @@
 
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('./service-worker.js');
+                    registration.update();
+                } catch (error) {}
             });
         }
     </script></body>
