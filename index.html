@@ -74,7 +74,7 @@
         
         /* Splash Screen */
         #splashScreen {
-            background: #ffffff; /* Cor branca solicitada */
+            background: #ffffff;
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -232,47 +232,6 @@
             transform: translateY(-2px);
         }
 
-        /* Stats no hero */
-        .hero-stats {
-            display: flex;
-            gap: 24px;
-            margin-top: 28px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255,255,255,0.15);
-        }
-        .hero-stat-num {
-            font-size: 22px;
-            font-weight: 800;
-            color: white;
-            line-height: 1;
-        }
-        .hero-stat-label {
-            font-size: 11px;
-            color: rgba(255,255,255,0.6);
-            margin-top: 3px;
-            font-weight: 500;
-        }
-
-        /* Ilustração hero */
-        .hero-illustration {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            height: 100%;
-            display: flex;
-            align-items: flex-end;
-            justify-content: flex-end;
-            padding-right: 30px;
-            pointer-events: none;
-        }
-        @keyframes float-hero {
-            0%, 100% { transform: translateY(0px) rotate(-2deg); }
-            50% { transform: translateY(-14px) rotate(2deg); }
-        }
-        .float-illus {
-            animation: float-hero 4s ease-in-out infinite;
-        }
-
         /* ===== QUICK ACTION CARDS ===== */
         .qa-grid {
             display: grid;
@@ -296,20 +255,11 @@
             background: #1E293B;
             border-color: #334155;
         }
-        .qa-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(73,188,190,0.05) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
         .qa-card:hover {
             transform: translateY(-8px) scale(1.02);
             border-color: var(--cda-primary);
             box-shadow: 0 20px 40px rgba(73,188,190,0.14);
         }
-        .qa-card:hover::after { opacity: 1; }
         .qa-icon {
             width: 50px; height: 50px;
             border-radius: 16px;
@@ -432,28 +382,6 @@
             z-index: -1;
         }
 
-        .tab-btn {
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-        .tab-btn.active {
-            border-bottom-color: var(--cda-primary);
-            color: var(--cda-primary);
-        }
-
-        .step-number {
-            width: 26px; height: 26px;
-            background: #E8F8F8;
-            color: #1a7a7c;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
         /* Floating Animation */
         @keyframes floating {
             0% { transform: translateY(0px); }
@@ -509,7 +437,6 @@
         <div id="dnaBackground" class="dna-container"></div>
         <div class="relative z-10 text-center px-6">
             <div class="mb-8 animate-floating">
-                <!-- Logo Oficial na Splash -->
                 <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Laboratório CDA Logo" class="w-64 mx-auto">
             </div>
             <p class="text-slate-400 text-sm font-medium mb-8 tracking-widest uppercase">Diagnóstico de Confiança</p>
@@ -529,12 +456,10 @@
         
         <!-- HOME PAGE -->
         <section id="page-home" class="page active space-y-8">
-            
             <!-- HEADER -->
             <header class="flex items-center justify-between anim-in">
                 <div class="flex items-center gap-3">
                     <div class="h-12 flex items-center">
-                        <!-- Logo Oficial no Header -->
                         <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-10 object-contain dark:brightness-200">
                     </div>
                     <div class="border-l border-slate-200 dark:border-slate-700 pl-3">
@@ -678,6 +603,37 @@
             </div>
         </section>
 
+        <!-- ORÇAMENTO PAGE -->
+        <section id="page-orcamento" class="page space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Solicitar Orçamento</h2>
+            <div class="card-cda p-6 space-y-6">
+                <div class="bg-cda-light dark:bg-slate-700/50 p-4 rounded-2xl border border-cda-primary/20">
+                    <p class="text-sm text-cda-dark dark:text-cda-primary font-medium">
+                        <i class="fa-solid fa-info-circle mr-2"></i>
+                        Para orçamentos precisos, informe os exames solicitados ou envie uma foto do pedido médico.
+                    </p>
+                </div>
+                
+                <form id="orcamentoForm" onsubmit="submitOrcamento(event)" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Seu Nome</label>
+                        <input type="text" name="nome" id="orc-nome" required placeholder="Como podemos te chamar?" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Lista de Exames</label>
+                        <textarea name="exames" id="orc-exames" rows="4" placeholder="Ex: Hemograma, Glicemia, Colesterol..." class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"></textarea>
+                    </div>
+                    <div class="p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-center">
+                        <i class="fa-solid fa-camera text-3xl text-slate-300 mb-2"></i>
+                        <p class="text-xs text-slate-400 font-bold uppercase">Enviar foto pelo WhatsApp</p>
+                    </div>
+                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> ENVIAR PELO WHATSAPP
+                    </button>
+                </form>
+            </div>
+        </section>
+
         <!-- PERFIL PAGE (ÁREA DO PACIENTE) -->
         <section id="page-perfil" class="page space-y-6">
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Meus Dados</h2>
@@ -805,49 +761,6 @@
         </div>
     </nav>
 
-    <!-- INSTALL MODAL -->
-    <div id="installModal">
-        <div class="modal-overlay-close" onclick="closeInstallModal()"></div>
-        <div class="bg-white dark:bg-slate-800 rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl relative">
-            <div class="p-6 bg-cda-primary text-white flex justify-between items-center">
-                <div>
-                    <h3 class="font-extrabold text-xl text-white">Instalar Aplicativo</h3>
-                    <p class="text-white/80 text-xs">Tenha o CDA sempre com você</p>
-                </div>
-                <button onclick="closeInstallModal()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center transition hover:bg-white/30 hover:scale-110">
-                    <i class="fa-solid fa-xmark text-white"></i>
-                </button>
-            </div>
-            
-            <div class="p-2 flex border-b dark:border-slate-700">
-                <button onclick="switchInstallTab('android')" id="tab-android" class="tab-btn active flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 dark:text-white">
-                    <i class="fa-brands fa-android text-lg"></i> Android
-                </button>
-                <button onclick="switchInstallTab('iphone')" id="tab-iphone" class="tab-btn flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 dark:text-white">
-                    <i class="fa-brands fa-apple text-lg"></i> iPhone / iOS
-                </button>
-            </div>
-
-            <div class="p-8">
-                <div id="content-android" class="space-y-6">
-                    <p class="text-sm text-slate-600 dark:text-slate-400">1. Abra no <b>Chrome</b>.</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">2. Toque nos <b>três pontinhos (⋮)</b>.</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">3. Selecione <b>"Instalar aplicativo"</b>.</p>
-                    <button onclick="triggerInstall()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold mt-4 shadow-lg">INSTALAR AGORA</button>
-                </div>
-                <div id="content-iphone" class="hidden space-y-6">
-                    <p class="text-sm text-slate-600 dark:text-slate-400">1. Abra no <b>Safari</b>.</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">2. Toque no botão <b>Compartilhar</b> <i class="fa-solid fa-arrow-up-from-bracket text-blue-500"></i>.</p>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">3. Toque em <b>"Adicionar à Tela de Início"</b>.</p>
-                </div>
-            </div>
-            
-            <div class="p-6 bg-slate-50 dark:bg-slate-900/50 text-center">
-                <button onclick="closeInstallModal()" class="text-xs text-slate-400 font-semibold underline">Não quero instalar agora</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // BASE DE DADOS DE EXAMES
         const examesDB = {
@@ -880,7 +793,6 @@
 
         // LOAD THEME & PROFILE
         window.addEventListener('DOMContentLoaded', () => {
-            // Check theme
             if (localStorage.getItem('theme') === 'dark') {
                 document.documentElement.classList.add('dark');
                 updateThemeIcon();
@@ -896,9 +808,7 @@
                     setTimeout(() => {
                         const splash = document.getElementById('splashScreen');
                         splash.style.opacity = '0';
-                        setTimeout(() => { 
-                            splash.style.display = 'none'; 
-                        }, 500);
+                        setTimeout(() => { splash.style.display = 'none'; }, 500);
                     }, 500);
                 } else {
                     width += 5;
@@ -925,6 +835,7 @@
                 document.getElementById('patient-name-display').innerText = 'Olá, ' + nome.split(' ')[0] + '!';
                 document.getElementById('prof-nome').value = nome;
                 document.getElementById('agen-nome').value = nome;
+                document.getElementById('orc-nome').value = nome;
             }
             const id = localStorage.getItem('patient_id');
             if (id) {
@@ -953,8 +864,7 @@
         }
 
         function calcularAgua() {
-            const pesoInput = document.getElementById('imc-peso').value;
-            const peso = parseFloat(pesoInput) || parseFloat(localStorage.getItem('patient_weight')) || 70;
+            const peso = parseFloat(document.getElementById('imc-peso').value) || 70;
             const meta = (peso * 35) / 1000;
             const res = document.getElementById('agua-result');
             res.innerText = `Sua meta diária: ${meta.toFixed(1)} Litros`;
@@ -963,10 +873,13 @@
 
         // NAVIGATION
         function navigateTo(pageId) {
+            // Esconder todas as páginas
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Mostrar página alvo
             const target = document.getElementById('page-' + pageId);
             if (target) target.classList.add('active');
 
+            // Atualizar navegação inferior
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
             const navBtn = document.getElementById('nav-' + pageId);
             if (navBtn) navBtn.classList.add('active-nav');
@@ -1010,22 +923,7 @@
             document.getElementById('chatMessages').innerHTML = '<div class="bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 dark:border-slate-600 dark:text-white">Olá! Digite o nome do seu exame e eu te direi o preparo necessário.</div>';
         }
 
-        // INSTALL MODAL
-        function showInstallInstructions() { document.getElementById('installModal').classList.add('active'); }
-        function closeInstallModal() { document.getElementById('installModal').classList.remove('active'); }
-        function switchInstallTab(platform) {
-            ['android', 'iphone'].forEach(t => {
-                document.getElementById('tab-' + t).classList.remove('active');
-                document.getElementById('content-' + t).classList.add('hidden');
-            });
-            document.getElementById('tab-' + platform).classList.add('active');
-            document.getElementById('content-' + platform).classList.remove('hidden');
-        }
-
-        function triggerInstall() {
-            alert("Para instalar, siga as instruções manuais abaixo.");
-        }
-
+        // FORM SUBMISSIONS
         function submitAgendamento(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
@@ -1033,6 +931,15 @@
                          `- *Nome:* ${formData.get('nome')}%0A` +
                          `- *Data:* ${formData.get('data')}%0A` +
                          `- *Período:* ${formData.get('periodo')}`;
+            window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
+        }
+
+        function submitOrcamento(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const text = `Olá, CDA! Gostaria de um orçamento de exames.%0A%0A` +
+                         `- *Nome:* ${formData.get('nome')}%0A` +
+                         `- *Exames:* ${formData.get('exames') || 'Vou enviar a foto do pedido.'}`;
             window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
         }
 
