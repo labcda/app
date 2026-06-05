@@ -598,6 +598,22 @@
 
     <!-- MAIN APP LOGIC -->
     <script>
+        // Função para fechar a Splash Screen
+        function fecharSplashScreen() {
+            const splash = document.getElementById('splashScreen');
+            if (splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 700); // Tempo da transição duration-700
+            }
+        }
+
+        // Fechar splash automaticamente após 2.5 segundos (tempo para ver a animação)
+        window.addEventListener('load', () => {
+            setTimeout(fecharSplashScreen, 2500);
+        });
+
         // Navegação entre páginas
         function navigateTo(page) {
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
