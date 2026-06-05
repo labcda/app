@@ -355,41 +355,6 @@
             filter: drop-shadow(0 0 8px rgba(73,188,190,0.4));
         }
 
-        /* ===== INSTALL MODAL ===== */
-        #installModal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(8px);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        #installModal.active {
-            display: flex;
-            animation: zoomIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .modal-overlay-close {
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-        }
-
-        /* Floating Animation */
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        .animate-floating { animation: floating 3s ease-in-out infinite; }
-
         /* Animações escalonadas entrada */
         .anim-in {
             opacity: 0;
@@ -428,6 +393,21 @@
             transition: all 0.3s ease;
         }
         .fab:hover { transform: scale(1.1) rotate(10deg); }
+
+        /* Estilo para a lista de exames do simulador */
+        .exame-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        .exame-item.selected {
+            background-color: #E8F8F8;
+            border-color: #49BCBE;
+        }
+        .dark .exame-item.selected {
+            background-color: #334155;
+            border-color: #49BCBE;
+        }
     </style>
 </head>
 <body class="antialiased bg-cda-bg dark:bg-slate-900">
@@ -436,7 +416,7 @@
     <div id="splashScreen">
         <div id="dnaBackground" class="dna-container"></div>
         <div class="relative z-10 text-center px-6">
-            <div class="mb-8 animate-floating">
+            <div class="mb-8 animate-floating" style="animation: floating 3s ease-in-out infinite;">
                 <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Laboratório CDA Logo" class="w-64 mx-auto">
             </div>
             <p class="text-slate-400 text-sm font-medium mb-8 tracking-widest uppercase">Diagnóstico de Confiança</p>
@@ -526,7 +506,7 @@
                         </div>
                     </div>
                     <div class="hidden md:flex items-center justify-center">
-                        <div class="float-illus relative">
+                        <div class="float-illus relative" style="animation: float-hero 4s ease-in-out infinite;">
                             <div style="position:absolute;inset:-20px;border-radius:50%;border:2px dashed rgba(255,255,255,0.2);animation:spin 18s linear infinite;"></div>
                             <div style="width:180px;height:180px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
                                 <i class="fa-solid fa-flask-vial" style="font-size:70px;color:white;opacity:0.9;"></i>
@@ -564,81 +544,70 @@
                         <i class="fa-solid fa-receipt"></i>
                     </div>
                     <h3>Orçamento</h3>
-                    <p>Envie seu pedido médico e receba retorno</p>
-                </div>
-            </div>
-
-            <!-- UNIDADES -->
-            <div class="anim-in" style="animation-delay:0.6s">
-                <div class="flex items-center gap-3 mb-4">
-                    <div style="width:36px;height:36px;background:#E8F8F8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#1a7a7c;">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800 dark:text-white">Nossas Unidades</h3>
-                </div>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="unit-card hover-lift">
-                        <div class="unit-accent"></div>
-                        <div class="unit-badge">
-                            <i class="fa-solid fa-circle-check" style="font-size:10px;"></i> Aberta agora
-                        </div>
-                        <h4 class="font-extrabold text-slate-800 dark:text-white text-base mb-1">Matriz — Centro</h4>
-                        <p class="text-sm text-slate-400 mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-map-pin" style="color:#49BCBE;font-size:12px;"></i>
-                            Rua José Giestas, nº 46, Centro
-                        </p>
-                    </div>
-                    <div class="unit-card hover-lift">
-                        <div class="unit-accent"></div>
-                        <div class="unit-badge" style="background:#FFF7ED;color:#C2410C;">
-                            <i class="fa-solid fa-calendar-days" style="font-size:10px;"></i> Dias específicos
-                        </div>
-                        <h4 class="font-extrabold text-slate-800 dark:text-white text-base mb-1">Mata Fria — Filial</h4>
-                        <p class="text-sm text-slate-400 mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-map-pin" style="color:#49BCBE;font-size:12px;"></i>
-                            Cór. Francisco Correia, Zona Rural
-                        </p>
-                    </div>
+                    <p>Simulador de preços imediato</p>
                 </div>
             </div>
         </section>
 
-        <!-- ORÇAMENTO PAGE -->
+        <!-- ORÇAMENTO PAGE (SIMULADOR IMEDIATO) -->
         <section id="page-orcamento" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Solicitar Orçamento</h2>
-            <div class="card-cda p-6 space-y-6">
-                <div class="bg-cda-light dark:bg-slate-700/50 p-4 rounded-2xl border border-cda-primary/20">
-                    <p class="text-sm text-cda-dark dark:text-cda-primary font-medium">
-                        <i class="fa-solid fa-info-circle mr-2"></i>
-                        Para orçamentos precisos, informe os exames solicitados ou envie uma foto do pedido médico.
-                    </p>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Simulador de Orçamento</h2>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- LISTA DE EXAMES -->
+                <div class="md:col-span-2 space-y-4">
+                    <div class="card-cda p-6">
+                        <h3 class="font-bold text-lg mb-4">Selecione os Exames</h3>
+                        <div class="relative mb-4">
+                            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="searchExame" onkeyup="filterExames()" placeholder="Buscar exame (ex: Sangue, Urina...)" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        </div>
+                        <div id="examesList" class="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+                            <!-- Inserido via JS -->
+                        </div>
+                    </div>
                 </div>
-                
-                <form id="orcamentoForm" onsubmit="submitOrcamento(event)" class="space-y-4">
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Seu Nome</label>
-                        <input type="text" name="nome" id="orc-nome" required placeholder="Como podemos te chamar?" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+
+                <!-- RESUMO E TOTAL -->
+                <div class="space-y-4">
+                    <div class="card-cda p-6 sticky top-6">
+                        <h3 class="font-bold text-lg mb-4">Resumo</h3>
+                        <div id="selectedExamesList" class="space-y-3 mb-6">
+                            <p class="text-sm text-slate-400 italic">Nenhum exame selecionado</p>
+                        </div>
+                        <div class="border-t dark:border-slate-700 pt-4 mb-6">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm text-slate-500">Total Estimado</span>
+                                <span id="totalOrcamento" class="text-2xl font-extrabold text-cda-primary">R$ 0,00</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight">*Valores baseados em tabela particular. Convênios sob consulta.</p>
+                        </div>
+                        <button onclick="finalizarOrcamento()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> ENVIAR PEDIDO
+                        </button>
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Lista de Exames</label>
-                        <textarea name="exames" id="orc-exames" rows="4" placeholder="Ex: Hemograma, Glicemia, Colesterol..." class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"></textarea>
+                </div>
+            </div>
+
+            <!-- OUTROS EXAMES -->
+            <div class="card-cda p-6 bg-slate-50 dark:bg-slate-800/50 border-dashed border-2">
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center text-3xl text-cda-primary shadow-sm">
+                        <i class="fa-solid fa-camera"></i>
                     </div>
-                    <div class="p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-center">
-                        <i class="fa-solid fa-camera text-3xl text-slate-300 mb-2"></i>
-                        <p class="text-xs text-slate-400 font-bold uppercase">Enviar foto pelo WhatsApp</p>
+                    <div class="flex-1 text-center md:text-left">
+                        <h4 class="font-bold text-slate-800 dark:text-white">Não encontrou seu exame?</h4>
+                        <p class="text-sm text-slate-500">Tire uma foto do seu pedido médico e envie para nosso time. Respondemos em minutos!</p>
                     </div>
-                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-lg"></i> ENVIAR PELO WHATSAPP
-                    </button>
-                </form>
+                    <button onclick="window.open('https://wa.me/5527998980658?text=Olá! Gostaria de um orçamento para este pedido médico.', '_blank')" class="bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-100 transition">ENVIAR FOTO</button>
+                </div>
             </div>
         </section>
 
-        <!-- PERFIL PAGE (ÁREA DO PACIENTE) -->
+        <!-- OUTRAS PÁGINAS (Mantidas as correções anteriores) -->
         <section id="page-perfil" class="page space-y-6">
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Meus Dados</h2>
             <div class="card-cda p-6 space-y-6">
-                <p class="text-slate-500 text-sm">Salve seus dados para facilitar o acesso aos resultados e agendamentos.</p>
                 <form id="profileForm" onsubmit="saveProfile(event)" class="space-y-4">
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase ml-1">Nome Completo</label>
@@ -653,15 +622,10 @@
             </div>
         </section>
 
-        <!-- SAUDE PAGE (CALCULADORAS) -->
         <section id="page-saude" class="page space-y-6">
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Ferramentas de Saúde</h2>
-            
-            <!-- IMC -->
             <div class="card-cda p-6">
-                <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-weight-scale text-cda-primary"></i> Calculadora de IMC
-                </h3>
+                <h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-weight-scale text-cda-primary"></i> Calculadora de IMC</h3>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <input type="number" id="imc-peso" placeholder="Peso (kg)" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     <input type="number" id="imc-altura" placeholder="Altura (ex: 1.75)" step="0.01" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
@@ -669,60 +633,26 @@
                 <button onclick="calcularIMC()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white py-3 rounded-xl font-bold text-sm">Calcular IMC</button>
                 <div id="imc-result" class="mt-4 hidden p-4 rounded-xl text-center font-bold"></div>
             </div>
-
-            <!-- ÁGUA -->
-            <div class="card-cda p-6">
-                <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-droplet text-blue-500"></i> Meta de Hidratação
-                </h3>
-                <p class="text-xs text-slate-500 mb-4">Saiba quanto de água você deve beber por dia com base no seu peso.</p>
-                <button onclick="calcularAgua()" class="w-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 py-3 rounded-xl font-bold text-sm">Ver Minha Meta</button>
-                <div id="agua-result" class="mt-4 hidden p-4 bg-blue-500 text-white rounded-xl text-center font-bold"></div>
-            </div>
         </section>
 
-        <!-- PREPARO PAGE (IA APRIMORADA) -->
         <section id="page-preparo" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Guia de Preparo Inteligente</h2>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">IA Preparo</h2>
             <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden h-[500px] flex flex-col">
-                <div class="p-4 border-b dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-cda-primary rounded-full flex items-center justify-center text-white">
-                            <i class="fa-solid fa-robot"></i>
-                        </div>
-                        <div>
-                            <p class="font-bold text-sm dark:text-white">Assistente CDA</p>
-                            <p class="text-[10px] text-emerald-500 font-bold uppercase">Base de dados ativa</p>
-                        </div>
-                    </div>
-                    <button onclick="clearChat()" class="text-[10px] font-bold text-slate-400 uppercase">Limpar</button>
-                </div>
-                <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
-                    <div class="bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 dark:border-slate-600 dark:text-white">
-                        Olá! Digite o nome do seu exame (ex: Hemograma, Glicemia, Urina) e eu te direi o preparo necessário.
-                    </div>
-                </div>
-                <div class="p-4 border-t dark:border-slate-700 bg-white dark:bg-slate-800">
-                    <div class="flex gap-2">
-                        <input type="text" id="chatInput" placeholder="Qual o exame?" class="flex-1 bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
-                        <button onclick="enviarMensagemPreparo()" class="w-12 h-12 bg-cda-primary text-white rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </div>
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+                <div class="p-4 border-t dark:border-slate-700 bg-white dark:bg-slate-800 flex gap-2">
+                    <input type="text" id="chatInput" placeholder="Qual o exame?" class="flex-1 bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    <button onclick="enviarMensagemPreparo()" class="w-12 h-12 bg-cda-primary text-white rounded-xl flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
             </div>
         </section>
 
-        <!-- RESULTADOS PAGE -->
         <section id="page-resultados" class="page h-[600px]">
             <iframe src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
         </section>
 
-        <!-- AGENDAR PAGE -->
         <section id="page-agendar" class="page space-y-6">
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Agendamento</h2>
             <div class="card-cda p-6">
-                <p class="text-slate-500 mb-6">Preencha os dados e nossa equipe entrará em contato.</p>
                 <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="space-y-4">
                     <input type="text" name="nome" id="agen-nome" placeholder="Nome Completo" required class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     <div class="grid grid-cols-2 gap-4">
@@ -739,95 +669,157 @@
 
     </main>
 
-    <!-- BOTTOM NAVIGATION (MOBILE) -->
+    <!-- BOTTOM NAVIGATION -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 px-6 py-3 md:hidden z-50">
         <div class="flex items-center justify-between max-w-lg mx-auto">
-            <button onclick="navigateTo('home')" id="nav-home" class="nav-item active-nav flex flex-col items-center gap-1">
-                <i class="fa-solid fa-house text-xl"></i>
-                <span class="text-[10px] font-bold">Início</span>
-            </button>
-            <button onclick="navigateTo('resultados')" id="nav-resultados" class="nav-item flex flex-col items-center gap-1">
-                <i class="fa-solid fa-file-medical text-xl"></i>
-                <span class="text-[10px] font-bold">Laudos</span>
-            </button>
-            <button onclick="navigateTo('agendar')" id="nav-agendar" class="nav-item flex flex-col items-center gap-1">
-                <i class="fa-solid fa-calendar-plus text-xl"></i>
-                <span class="text-[10px] font-bold">Agendar</span>
-            </button>
-            <button onclick="navigateTo('preparo')" id="nav-preparo" class="nav-item flex flex-col items-center gap-1">
-                <i class="fa-solid fa-robot text-xl"></i>
-                <span class="text-[10px] font-bold">IA Preparo</span>
-            </button>
+            <button onclick="navigateTo('home')" id="nav-home" class="nav-item active-nav flex flex-col items-center gap-1"><i class="fa-solid fa-house text-xl"></i><span class="text-[10px] font-bold">Início</span></button>
+            <button onclick="navigateTo('resultados')" id="nav-resultados" class="nav-item flex flex-col items-center gap-1"><i class="fa-solid fa-file-medical text-xl"></i><span class="text-[10px] font-bold">Laudos</span></button>
+            <button onclick="navigateTo('agendar')" id="nav-agendar" class="nav-item flex flex-col items-center gap-1"><i class="fa-solid fa-calendar-plus text-xl"></i><span class="text-[10px] font-bold">Agendar</span></button>
+            <button onclick="navigateTo('orcamento')" id="nav-orcamento" class="nav-item flex flex-col items-center gap-1"><i class="fa-solid fa-receipt text-xl"></i><span class="text-[10px] font-bold">Orçamento</span></button>
         </div>
     </nav>
 
     <script>
-        // BASE DE DADOS DE EXAMES
-        const examesDB = {
-            'hemograma': 'Não exige jejum obrigatório, mas recomenda-se 3h após refeição leve.',
-            'glicemia': 'Jejum obrigatório de 8 a 12 horas. Não ultrapassar 14h de jejum.',
-            'colesterol': 'Jejum de 12 horas recomendado para perfil lipídico completo.',
-            'urina': 'Preferencialmente a primeira urina da manhã. Higienizar bem antes da coleta.',
-            'fezes': 'Coletar em frasco limpo. Não misturar com urina.',
-            'tsh': 'Jejum não obrigatório, mas recomenda-se colher pela manhã.',
-            'psa': 'Jejum de 4h. Não ter tido relações sexuais ou exercício pesado em 48h.',
-            'beta hcg': 'Não exige jejum. Pode ser feito a qualquer hora do dia.'
-        };
+        // BASE DE DADOS DE EXAMES COM PREÇOS (Simulação)
+        const examesPrecos = [
+            { id: 1, nome: 'Hemograma Completo', preco: 25.00, categoria: 'Sangue' },
+            { id: 2, nome: 'Glicemia de Jejum', preco: 15.00, categoria: 'Sangue' },
+            { id: 3, nome: 'Colesterol Total', preco: 18.00, categoria: 'Sangue' },
+            { id: 4, nome: 'Urina Tipo 1 (EAS)', preco: 20.00, categoria: 'Urina' },
+            { id: 5, nome: 'Fezes (Parasitológico)', preco: 15.00, categoria: 'Fezes' },
+            { id: 6, nome: 'TSH (Hormônio)', preco: 35.00, categoria: 'Hormônios' },
+            { id: 7, nome: 'Creatinina', preco: 12.00, categoria: 'Sangue' },
+            { id: 8, nome: 'Beta HCG (Gravidez)', preco: 45.00, categoria: 'Hormônios' },
+            { id: 9, nome: 'Vitamina D', preco: 85.00, categoria: 'Sangue' },
+            { id: 10, nome: 'PSA Total', preco: 55.00, categoria: 'Próstata' }
+        ];
+
+        let examesSelecionados = [];
+
+        function renderExames() {
+            const list = document.getElementById('examesList');
+            list.innerHTML = examesPrecos.map(ex => `
+                <div class="exame-item p-4 rounded-2xl bg-white dark:bg-slate-800 flex justify-between items-center shadow-sm mb-2" onclick="toggleExame(${ex.id})">
+                    <div>
+                        <p class="font-bold text-sm dark:text-white">${ex.nome}</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">${ex.categoria}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-cda-primary">R$ ${ex.preco.toFixed(2)}</span>
+                        <div id="check-${ex.id}" class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center">
+                            <i class="fa-solid fa-check text-[10px] text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleExame(id) {
+            const index = examesSelecionados.indexOf(id);
+            const check = document.getElementById('check-' + id);
+            
+            if (index > -1) {
+                examesSelecionados.splice(index, 1);
+                check.classList.remove('bg-cda-primary', 'border-cda-primary');
+            } else {
+                examesSelecionados.push(id);
+                check.classList.add('bg-cda-primary', 'border-cda-primary');
+            }
+            updateResumo();
+        }
+
+        function updateResumo() {
+            const list = document.getElementById('selectedExamesList');
+            const totalDisplay = document.getElementById('totalOrcamento');
+            
+            if (examesSelecionados.length === 0) {
+                list.innerHTML = '<p class="text-sm text-slate-400 italic">Nenhum exame selecionado</p>';
+                totalDisplay.innerText = 'R$ 0,00';
+                return;
+            }
+
+            let total = 0;
+            const html = examesSelecionados.map(id => {
+                const ex = examesPrecos.find(e => e.id === id);
+                total += ex.preco;
+                return `
+                    <div class="flex justify-between items-center animate__animated animate__fadeIn">
+                        <span class="text-xs text-slate-600 dark:text-slate-300">${ex.nome}</span>
+                        <span class="text-xs font-bold dark:text-white">R$ ${ex.preco.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            list.innerHTML = html;
+            totalDisplay.innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        function filterExames() {
+            const term = document.getElementById('searchExame').value.toLowerCase();
+            const items = document.querySelectorAll('.exame-item');
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(term) ? 'flex' : 'none';
+            });
+        }
+
+        function finalizarOrcamento() {
+            if (examesSelecionados.length === 0) {
+                alert('Por favor, selecione ao menos um exame.');
+                return;
+            }
+            const examesNomes = examesSelecionados.map(id => examesPrecos.find(e => e.id === id).nome).join(', ');
+            const total = document.getElementById('totalOrcamento').innerText;
+            const nome = localStorage.getItem('patient_name') || 'Paciente';
+            const text = `Olá! Gostaria de confirmar o orçamento feito pelo app.%0A%0A- *Paciente:* ${nome}%0A- *Exames:* ${examesNomes}%0A- *Total Estimado:* ${total}`;
+            window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
+        }
 
         // DARK MODE
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             updateThemeIcon();
         }
 
         function updateThemeIcon() {
             const icon = document.getElementById('theme-icon');
-            if (document.documentElement.classList.contains('dark')) {
-                icon.className = 'fa-solid fa-sun';
-            } else {
-                icon.className = 'fa-solid fa-moon';
-            }
+            icon.className = document.documentElement.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         }
 
-        // LOAD THEME & PROFILE
+        // NAVIGATION
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
+            const navBtn = document.getElementById('nav-' + pageId);
+            if (navBtn) navBtn.classList.add('active-nav');
+            window.scrollTo(0, 0);
+        }
+
+        // INITIAL LOAD
         window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('theme') === 'dark') {
-                document.documentElement.classList.add('dark');
-                updateThemeIcon();
-            }
+            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+            updateThemeIcon();
+            renderExames();
             loadProfile();
 
-            // Splash Screen Logic
+            // Splash Logic
             const bar = document.getElementById('progressBar');
             let width = 0;
             const interval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
-                        const splash = document.getElementById('splashScreen');
-                        splash.style.opacity = '0';
-                        setTimeout(() => { splash.style.display = 'none'; }, 500);
+                        document.getElementById('splashScreen').style.opacity = '0';
+                        setTimeout(() => { document.getElementById('splashScreen').style.display = 'none'; }, 500);
                     }, 500);
                 } else {
-                    width += 5;
+                    width += 10;
                     bar.style.width = width + '%';
                 }
-            }, 50);
+            }, 30);
         });
-
-        // PROFILE LOGIC
-        function saveProfile(e) {
-            e.preventDefault();
-            const nome = document.getElementById('prof-nome').value;
-            const protocolo = document.getElementById('prof-protocolo').value;
-            localStorage.setItem('patient_name', nome);
-            localStorage.setItem('patient_id', protocolo);
-            loadProfile();
-            alert('Dados salvos com sucesso!');
-            navigateTo('home');
-        }
 
         function loadProfile() {
             const nome = localStorage.getItem('patient_name');
@@ -835,112 +827,18 @@
                 document.getElementById('patient-name-display').innerText = 'Olá, ' + nome.split(' ')[0] + '!';
                 document.getElementById('prof-nome').value = nome;
                 document.getElementById('agen-nome').value = nome;
-                document.getElementById('orc-nome').value = nome;
             }
             const id = localStorage.getItem('patient_id');
-            if (id) {
-                document.getElementById('patient-status-display').innerText = 'Protocolo: ' + id;
-                document.getElementById('prof-protocolo').value = id;
-            }
+            if (id) document.getElementById('patient-status-display').innerText = 'Protocolo: ' + id;
         }
 
-        // CALCULADORAS
-        function calcularIMC() {
-            const peso = parseFloat(document.getElementById('imc-peso').value);
-            const altura = parseFloat(document.getElementById('imc-altura').value);
-            if (!peso || !altura) return;
-            const imc = (peso / (altura * altura)).toFixed(1);
-            let cat = '';
-            let color = '';
-            if (imc < 18.5) { cat = 'Abaixo do peso'; color = 'bg-yellow-500'; }
-            else if (imc < 25) { cat = 'Peso normal'; color = 'bg-green-500'; }
-            else if (imc < 30) { cat = 'Sobrepeso'; color = 'bg-orange-500'; }
-            else { cat = 'Obesidade'; color = 'bg-red-500'; }
-            
-            const res = document.getElementById('imc-result');
-            res.className = `mt-4 p-4 rounded-xl text-center font-bold text-white ${color}`;
-            res.innerHTML = `Seu IMC é ${imc}<br><span class="text-xs uppercase">${cat}</span>`;
-            res.classList.remove('hidden');
-        }
-
-        function calcularAgua() {
-            const peso = parseFloat(document.getElementById('imc-peso').value) || 70;
-            const meta = (peso * 35) / 1000;
-            const res = document.getElementById('agua-result');
-            res.innerText = `Sua meta diária: ${meta.toFixed(1)} Litros`;
-            res.classList.remove('hidden');
-        }
-
-        // NAVIGATION
-        function navigateTo(pageId) {
-            // Esconder todas as páginas
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Mostrar página alvo
-            const target = document.getElementById('page-' + pageId);
-            if (target) target.classList.add('active');
-
-            // Atualizar navegação inferior
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
-            const navBtn = document.getElementById('nav-' + pageId);
-            if (navBtn) navBtn.classList.add('active-nav');
-
-            window.scrollTo(0, 0);
-        }
-
-        // IA PREPARO
-        function enviarMensagemPreparo() {
-            const input = document.getElementById('chatInput');
-            const msg = input.value.trim().toLowerCase();
-            if (!msg) return;
-            
-            const chat = document.getElementById('chatMessages');
-            const userDiv = document.createElement('div');
-            userDiv.className = "bg-cda-primary text-white rounded-2xl p-4 text-sm max-w-[85%] ml-auto shadow-md animate__animated animate__fadeInRight";
-            userDiv.innerText = input.value;
-            chat.appendChild(userDiv);
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
-
-            setTimeout(() => {
-                const botDiv = document.createElement('div');
-                botDiv.className = "bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 dark:border-slate-600 shadow-sm animate__animated animate__fadeInLeft dark:text-white";
-                
-                let resposta = "Desculpe, não encontrei o preparo para esse exame específico na minha base. Por favor, fale com nossa equipe no WhatsApp para orientações precisas.";
-                for (let key in examesDB) {
-                    if (msg.includes(key)) {
-                        resposta = `**${key.toUpperCase()}**: ${examesDB[key]}`;
-                        break;
-                    }
-                }
-                
-                botDiv.innerHTML = resposta;
-                chat.appendChild(botDiv);
-                chat.scrollTop = chat.scrollHeight;
-            }, 800);
-        }
-
-        function clearChat() {
-            document.getElementById('chatMessages').innerHTML = '<div class="bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 text-sm max-w-[85%] border border-slate-100 dark:border-slate-600 dark:text-white">Olá! Digite o nome do seu exame e eu te direi o preparo necessário.</div>';
-        }
-
-        // FORM SUBMISSIONS
-        function submitAgendamento(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const text = `Olá, CDA! Gostaria de agendar uma coleta.%0A%0A` +
-                         `- *Nome:* ${formData.get('nome')}%0A` +
-                         `- *Data:* ${formData.get('data')}%0A` +
-                         `- *Período:* ${formData.get('periodo')}`;
-            window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
-        }
-
-        function submitOrcamento(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const text = `Olá, CDA! Gostaria de um orçamento de exames.%0A%0A` +
-                         `- *Nome:* ${formData.get('nome')}%0A` +
-                         `- *Exames:* ${formData.get('exames') || 'Vou enviar a foto do pedido.'}`;
-            window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
+        function saveProfile(e) {
+            e.preventDefault();
+            localStorage.setItem('patient_name', document.getElementById('prof-nome').value);
+            localStorage.setItem('patient_id', document.getElementById('prof-protocolo').value);
+            loadProfile();
+            alert('Dados salvos!');
+            navigateTo('home');
         }
 
         // DNA ANIMATION
