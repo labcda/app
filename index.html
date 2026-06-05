@@ -574,7 +574,16 @@
                             <input type="text" id="searchExame" oninput="filterExames()" placeholder="Buscar por exame ou código" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                         </div>
                         <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 mb-4 border border-slate-100 dark:border-slate-700">
-                            <label for="pedidoTexto" class="text-xs font-bold text-slate-400 uppercase ml-1">Texto do pedido médico</label>
+                            <label for="pedidoArquivo" class="text-xs font-bold text-slate-400 uppercase ml-1">Pedido médico em PDF ou foto</label>
+                            <div class="mt-2 grid md:grid-cols-[1fr_auto] gap-3 items-center">
+                                <input type="file" id="pedidoArquivo" accept="image/*,.pdf,application/pdf" onchange="prepararArquivoPedido()" class="w-full bg-white dark:bg-slate-800 rounded-xl px-4 py-3 text-sm text-slate-500 dark:text-slate-300 file:mr-4 file:border-0 file:bg-cda-light file:text-cda-primary file:font-bold file:rounded-lg file:px-3 file:py-2">
+                                <button onclick="lerArquivoPedido()" class="btn-cda-primary px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-file-import"></i> Ler arquivo
+                                </button>
+                            </div>
+                            <div id="pedidoPreview" class="hidden mt-3 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800"></div>
+
+                            <label for="pedidoTexto" class="text-xs font-bold text-slate-400 uppercase ml-1 block mt-4">Texto do pedido médico</label>
                             <textarea id="pedidoTexto" rows="4" placeholder="Cole aqui o texto lido do PDF ou foto. Ex: Hemograma, TSH, Glicemia..." class="w-full mt-2 bg-white dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"></textarea>
                             <div class="flex flex-wrap gap-2 mt-3">
                                 <button onclick="analisarPedidoTexto()" class="btn-cda-primary px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2">
@@ -584,7 +593,7 @@
                                     Limpar seleção
                                 </button>
                             </div>
-                            <p id="pedidoStatus" class="text-xs text-slate-400 mt-3">Para foto/PDF, o ideal é usar uma IA/OCR no servidor e trazer o texto para esta análise.</p>
+                            <p id="pedidoStatus" class="text-xs text-slate-400 mt-3">Escolha um PDF/foto ou cole o texto do pedido. Confira os exames antes de enviar.</p>
                         </div>
                         <div id="examesList" class="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                             <!-- Inserido via JS -->
@@ -707,6 +716,10 @@
         // BASE DE DADOS DE EXAMES COM PREÇOS
         let examesPrecos = [];
         let examesSelecionados = [];
+        let ocrWorker = null;
+        let pdfJsReady = null;
+        let tesseractReady = null;
+
 
         function normalizarTexto(texto) {
             let normalizado = (texto || '')
@@ -839,6 +852,159 @@
 
         function filterExames() {
             renderExames();
+        }
+
+        function setPedidoStatus(message) {
+            const status = document.getElementById('pedidoStatus');
+            if (status) status.innerText = message;
+        }
+
+        function prepararArquivoPedido() {
+            const file = document.getElementById('pedidoArquivo')?.files?.[0];
+            const preview = document.getElementById('pedidoPreview');
+            if (!preview) return;
+            preview.innerHTML = '';
+            preview.classList.add('hidden');
+
+            if (!file) {
+                setPedidoStatus('Escolha um PDF/foto ou cole o texto do pedido. Confira os exames antes de enviar.');
+                return;
+            }
+
+            if (file.type.startsWith('image/')) {
+                const image = document.createElement('img');
+                image.src = URL.createObjectURL(file);
+                image.alt = 'Prévia do pedido médico';
+                image.className = 'w-full max-h-64 object-contain bg-white';
+                image.onload = () => URL.revokeObjectURL(image.src);
+                preview.appendChild(image);
+                preview.classList.remove('hidden');
+                setPedidoStatus(`Foto selecionada: ${file.name}. Toque em Ler arquivo para iniciar o OCR.`);
+                return;
+            }
+
+            if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                preview.innerHTML = `<div class="p-4 flex items-center gap-3 text-sm text-slate-500 dark:text-slate-300"><i class="fa-solid fa-file-pdf text-2xl text-cda-primary"></i><span>${file.name}</span></div>`;
+                preview.classList.remove('hidden');
+                setPedidoStatus(`PDF selecionado: ${file.name}. Toque em Ler arquivo para extrair o texto.`);
+            }
+        }
+
+        function carregarScriptExterno(src) {
+            return new Promise((resolve, reject) => {
+                const existente = document.querySelector(`script[src="${src}"]`);
+                if (existente) {
+                    existente.addEventListener('load', resolve, { once: true });
+                    if (existente.dataset.loaded === 'true') resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.onload = () => {
+                    script.dataset.loaded = 'true';
+                    resolve();
+                };
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function garantirTesseract() {
+            if (!tesseractReady) {
+                setPedidoStatus('Carregando leitor de imagem...');
+                tesseractReady = carregarScriptExterno('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+            }
+            await tesseractReady;
+            if (!window.Tesseract) throw new Error('Leitor de imagem indisponível');
+        }
+
+        async function garantirPdfJs() {
+            if (!pdfJsReady) {
+                setPedidoStatus('Carregando leitor de PDF...');
+                pdfJsReady = carregarScriptExterno('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js').then(() => {
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                });
+            }
+            await pdfJsReady;
+            if (!window.pdfjsLib) throw new Error('Leitor de PDF indisponível');
+        }
+
+        async function reconhecerImagem(imageSource) {
+            await garantirTesseract();
+            const result = await window.Tesseract.recognize(imageSource, 'por', {
+                logger: (progress) => {
+                    if (progress.status === 'recognizing text') {
+                        const percent = Math.round((progress.progress || 0) * 100);
+                        setPedidoStatus(`Lendo imagem por OCR... ${percent}%`);
+                    }
+                }
+            });
+            return result?.data?.text || '';
+        }
+
+        async function extrairTextoPdf(file) {
+            await garantirPdfJs();
+            const data = await file.arrayBuffer();
+            const pdf = await window.pdfjsLib.getDocument({ data }).promise;
+            const maxPages = Math.min(pdf.numPages, 4);
+            const textParts = [];
+
+            for (let pageNumber = 1; pageNumber <= maxPages; pageNumber++) {
+                setPedidoStatus(`Lendo texto do PDF... página ${pageNumber}/${maxPages}`);
+                const page = await pdf.getPage(pageNumber);
+                const content = await page.getTextContent();
+                const pageText = content.items.map(item => item.str).join(' ').trim();
+                if (pageText) textParts.push(pageText);
+            }
+
+            if (textParts.join(' ').trim().length > 20) return textParts.join('\n');
+
+            await garantirTesseract();
+            const ocrParts = [];
+            for (let pageNumber = 1; pageNumber <= maxPages; pageNumber++) {
+                setPedidoStatus(`PDF escaneado. Fazendo OCR da página ${pageNumber}/${maxPages}...`);
+                const page = await pdf.getPage(pageNumber);
+                const viewport = page.getViewport({ scale: 1.8 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await page.render({ canvasContext: context, viewport }).promise;
+                ocrParts.push(await reconhecerImagem(canvas));
+            }
+            return ocrParts.join('\n');
+        }
+
+        async function lerArquivoPedido() {
+            const file = document.getElementById('pedidoArquivo')?.files?.[0];
+            if (!file) {
+                setPedidoStatus('Escolha uma foto ou PDF do pedido médico primeiro.');
+                return;
+            }
+
+            try {
+                let texto = '';
+                if (file.type.startsWith('image/')) {
+                    texto = await reconhecerImagem(file);
+                } else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                    texto = await extrairTextoPdf(file);
+                } else {
+                    setPedidoStatus('Formato não reconhecido. Use PDF, JPG ou PNG.');
+                    return;
+                }
+
+                const campo = document.getElementById('pedidoTexto');
+                if (campo) campo.value = texto.trim();
+                if (texto.trim()) {
+                    setPedidoStatus('Texto extraído. Procurando exames na tabela...');
+                    analisarPedidoTexto();
+                } else {
+                    setPedidoStatus('Não consegui ler texto suficiente. Tente uma foto mais nítida ou cole o texto manualmente.');
+                }
+            } catch (error) {
+                setPedidoStatus('Não foi possível ler este arquivo. Tente outra imagem/PDF ou cole o texto manualmente.');
+            }
         }
 
         function analisarPedidoTexto() {
