@@ -28,7 +28,7 @@
             --cda-text: #1E293B;
             --cda-text-light: #64748B;
             --cda-white: #FFFFFF;
-            --cda-background: #F8FAFB;
+            --cda-background: #F0F6F7;
         }
 
         body { 
@@ -38,17 +38,15 @@
             overflow-x: hidden;
         }
 
-        /* Scrollbar refinada */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: var(--cda-primary); border-radius: 10px; }
         
-        /* Transições de página */
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.5s ease-out; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
@@ -63,9 +61,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            transition: opacity 0.5s ease;
         }
 
-        /* Animação de DNA na Splash */
         .dna-container {
             position: absolute;
             width: 100%; height: 100%;
@@ -95,7 +93,245 @@
             transition: width 0.5s ease;
         }
 
-        /* Cards modernizados */
+        /* ===== HERO MODERNO ===== */
+        .hero-modern {
+            background: linear-gradient(135deg, #0F4C5C 0%, #1a7a7c 40%, #49BCBE 100%);
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            min-height: 340px;
+        }
+        .hero-modern::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 70% 50%, rgba(73,188,190,0.35) 0%, transparent 60%),
+                        radial-gradient(ellipse at 20% 80%, rgba(255,255,255,0.06) 0%, transparent 50%);
+        }
+        .hero-circles {
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 420px;
+            height: 420px;
+            opacity: 0.08;
+        }
+        .hero-circles circle {
+            fill: none;
+            stroke: white;
+            stroke-width: 1.5;
+        }
+        .hero-blob {
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 350px;
+            height: 350px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.9);
+            backdrop-filter: blur(8px);
+            margin-bottom: 20px;
+        }
+        .hero-tag span.dot {
+            width: 6px; height: 6px;
+            background: #7EFDE0;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        .hero-title {
+            font-size: clamp(28px, 5vw, 44px);
+            font-weight: 800;
+            line-height: 1.15;
+            color: white;
+            margin-bottom: 14px;
+        }
+        .hero-title em {
+            font-style: normal;
+            color: #7EFDE0;
+        }
+        .hero-subtitle {
+            font-size: 15px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.6;
+            max-width: 380px;
+            margin-bottom: 28px;
+        }
+        .hero-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 26px;
+            background: white;
+            color: #0F4C5C;
+            font-weight: 800;
+            font-size: 14px;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .hero-btn-primary:hover {
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 14px 32px rgba(0,0,0,0.2);
+        }
+        .hero-btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 22px;
+            background: rgba(255,255,255,0.12);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        .hero-btn-secondary:hover {
+            background: rgba(255,255,255,0.22);
+            transform: translateY(-2px);
+        }
+
+        /* Stats no hero */
+        .hero-stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+        .hero-stat-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+        }
+        .hero-stat-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        /* Ilustração hero */
+        .hero-illustration {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding-right: 30px;
+            pointer-events: none;
+        }
+        @keyframes float-hero {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-14px) rotate(2deg); }
+        }
+        .float-illus {
+            animation: float-hero 4s ease-in-out infinite;
+        }
+
+        /* ===== QUICK ACTION CARDS ===== */
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        @media (min-width: 768px) {
+            .qa-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        .qa-card {
+            background: white;
+            border-radius: 22px;
+            padding: 22px 18px;
+            cursor: pointer;
+            border: 1.5px solid rgba(73,188,190,0.08);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .qa-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(73,188,190,0.05) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .qa-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--cda-primary);
+            box-shadow: 0 20px 40px rgba(73,188,190,0.14);
+        }
+        .qa-card:hover::after { opacity: 1; }
+        .qa-icon {
+            width: 50px; height: 50px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 14px;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .qa-card:hover .qa-icon { transform: scale(1.15) rotate(-5deg); }
+        .qa-card h3 { font-size: 14px; font-weight: 700; color: #1E293B; margin: 0 0 5px; }
+        .qa-card p { font-size: 11px; color: #94A3B8; margin: 0; line-height: 1.4; }
+
+        /* ===== UNIDADES ===== */
+        .unit-card {
+            background: white;
+            border-radius: 24px;
+            padding: 26px;
+            border: 1.5px solid rgba(73,188,190,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .unit-card:hover {
+            border-color: var(--cda-primary);
+            box-shadow: 0 8px 30px rgba(73,188,190,0.1);
+        }
+        .unit-accent {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #49BCBE, #37A7AA);
+        }
+        .unit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: #E8F8F8;
+            color: #1a7a7c;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* Cards padrão */
         .card-cda {
             background: #fff;
             border-radius: 20px;
@@ -109,7 +345,6 @@
             border-color: var(--cda-primary);
         }
 
-        /* Botões */
         .btn-cda-primary {
             background: var(--cda-primary);
             color: white;
@@ -122,32 +357,7 @@
             box-shadow: 0 6px 16px rgba(73,188,190,0.3);
         }
 
-        /* Hero Modernizado */
-        .hero-cda {
-            background: linear-gradient(135deg, #49BCBE 0%, #37A7AA 100%);
-            border-radius: 28px;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-pattern {
-            position: absolute;
-            inset: 0;
-            opacity: 0.1;
-            background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
-            background-size: 24px 24px;
-        }
-
-        /* Floating Animation */
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        .animate-floating {
-            animation: floating 3s ease-in-out infinite;
-        }
-
-        /* Bottom Nav */
+        /* ===== BOTTOM NAV ===== */
         .nav-item {
             transition: all 0.3s ease;
             color: #94A3B8;
@@ -160,13 +370,13 @@
             filter: drop-shadow(0 0 8px rgba(73,188,190,0.4));
         }
 
-        /* Modal de Instalação */
+        /* ===== INSTALL MODAL ===== */
         #installModal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(6px);
             z-index: 10000;
             align-items: center;
             justify-content: center;
@@ -174,11 +384,27 @@
         }
         #installModal.active {
             display: flex;
-            animation: zoomIn 0.3s ease-out;
+            animation: zoomIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.95); }
+            from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
+        }
+        .modal-close-btn {
+            width: 38px; height: 38px;
+            background: rgba(255,255,255,0.18);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1) rotate(90deg);
         }
 
         .tab-btn {
@@ -191,17 +417,34 @@
         }
 
         .step-number {
-            width: 24px;
-            height: 24px;
-            background: var(--cda-primary-light);
-            color: var(--cda-primary);
+            width: 26px; height: 26px;
+            background: #E8F8F8;
+            color: #1a7a7c;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 12px;
             flex-shrink: 0;
+        }
+
+        /* Floating Animation */
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-floating { animation: floating 3s ease-in-out infinite; }
+
+        /* Animações escalonadas entrada */
+        .anim-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+        }
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -249,108 +492,183 @@
     <main class="max-w-6xl mx-auto px-4 py-6 mb-20 md:mb-6">
         
         <!-- HOME PAGE -->
-        <section id="page-home" class="page active space-y-8">
-            <!-- Hero Section -->
-            <div class="hero-cda p-8 md:p-12 text-white shadow-2xl animate__animated animate__fadeIn">
-                <div class="hero-pattern"></div>
+        <section id="page-home" class="page active space-y-6">
+
+            <!-- ===== HERO MODERNO ===== -->
+            <div class="hero-modern p-7 md:p-12 anim-in" style="animation-delay:0.05s">
+                <!-- Elementos decorativos -->
+                <svg class="hero-circles" viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="210" cy="210" r="200"/>
+                    <circle cx="210" cy="210" r="160"/>
+                    <circle cx="210" cy="210" r="120"/>
+                    <circle cx="210" cy="210" r="80"/>
+                    <circle cx="210" cy="210" r="40"/>
+                </svg>
+                <div class="hero-blob"></div>
+
                 <div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
-                    <div class="space-y-6">
-                        <span class="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold tracking-wider uppercase border border-white/30">
+                    <div>
+                        <div class="hero-tag">
+                            <span class="dot"></span>
                             Diagnóstico de Confiança
-                        </span>
-                        <h2 class="text-3xl md:text-5xl font-extrabold leading-tight">
-                            Cuidar de você é a nossa <span class="text-white/80">missão.</span>
+                        </div>
+                        <h2 class="hero-title">
+                            Cuidar de você é a nossa <em>missão.</em>
                         </h2>
-                        <p class="text-lg text-white/90 font-medium leading-relaxed">
-                            Tecnologia de ponta e atendimento humanizado para Afonso Cláudio e região.
+                        <p class="hero-subtitle">
+                            Tecnologia de ponta e atendimento humanizado para Afonso Cláudio e toda a região.
                         </p>
-                        <div class="flex flex-wrap gap-4 pt-4">
-                            <button onclick="navigateTo('resultados')" class="bg-white text-cda-primary font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition flex items-center gap-3">
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="navigateTo('resultados')" class="hero-btn-primary">
                                 <i class="fa-solid fa-file-medical"></i> Ver Resultados
                             </button>
-                            <button onclick="navigateTo('agendar')" class="bg-cda-primary-dark/40 backdrop-blur-md border border-white/30 text-white font-bold px-8 py-4 rounded-2xl hover:bg-cda-primary-dark/60 transition flex items-center gap-3">
+                            <button onclick="navigateTo('agendar')" class="hero-btn-secondary">
                                 <i class="fa-solid fa-calendar-check"></i> Agendar Coleta
                             </button>
                         </div>
+                        <div class="hero-stats">
+                            <div>
+                                <div class="hero-stat-num">+15 anos</div>
+                                <div class="hero-stat-label">de experiência</div>
+                            </div>
+                            <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
+                            <div>
+                                <div class="hero-stat-num">2 unidades</div>
+                                <div class="hero-stat-label">na região</div>
+                            </div>
+                            <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
+                            <div>
+                                <div class="hero-stat-num">Coleta</div>
+                                <div class="hero-stat-label">domiciliar</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="hidden md:block animate-floating">
-                        <div class="relative">
-                            <div class="absolute -inset-4 bg-white/10 rounded-full blur-3xl"></div>
-                            <img src="https://img.icons8.com/bubbles/200/medical-doctor.png" alt="Doctor" class="relative z-10 mx-auto">
+                    <div class="hidden md:flex items-center justify-center">
+                        <div class="float-illus relative">
+                            <!-- Anel decorativo atrás -->
+                            <div style="position:absolute;inset:-20px;border-radius:50%;border:2px dashed rgba(255,255,255,0.2);animation:spin 18s linear infinite;"></div>
+                            <div style="position:absolute;inset:-50px;border-radius:50%;border:1px dashed rgba(255,255,255,0.1);animation:spin 30s linear infinite reverse;"></div>
+                            <!-- Ícone central -->
+                            <div style="width:180px;height:180px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
+                                <i class="fa-solid fa-flask-vial" style="font-size:70px;color:white;opacity:0.9;"></i>
+                            </div>
+                            <!-- Chips flutuantes -->
+                            <div style="position:absolute;top:-10px;right:-50px;background:white;border-radius:14px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+                                <div style="width:8px;height:8px;background:#22C55E;border-radius:50%;"></div>
+                                <span style="font-size:12px;font-weight:700;color:#1E293B;">Resultado pronto</span>
+                            </div>
+                            <div style="position:absolute;bottom:0px;left:-60px;background:white;border-radius:14px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+                                <i class="fa-solid fa-shield-halved" style="color:#49BCBE;font-size:14px;"></i>
+                                <span style="font-size:12px;font-weight:700;color:#1E293B;">100% seguro</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                <div onclick="navigateTo('resultados')" class="card-cda p-6 cursor-pointer group">
-                    <div class="w-14 h-14 bg-cda-primary-light text-cda-primary rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+            @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+            <!-- ===== QUICK ACTIONS ===== -->
+            <div class="qa-grid anim-in" style="animation-delay:0.15s">
+                <div onclick="navigateTo('resultados')" class="qa-card">
+                    <div class="qa-icon" style="background:#E8F8F8;color:#1a7a7c;">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <h3 class="font-bold text-slate-800">Laudo Online</h3>
-                    <p class="text-xs text-slate-400 mt-2">Acesse seus exames com segurança</p>
+                    <h3>Laudo Online</h3>
+                    <p>Acesse seus exames com total segurança</p>
                 </div>
-                <div onclick="navigateTo('agendar')" class="card-cda p-6 cursor-pointer group">
-                    <div class="w-14 h-14 bg-cda-primary-light text-cda-primary rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                <div onclick="navigateTo('agendar')" class="qa-card">
+                    <div class="qa-icon" style="background:#E8F8F8;color:#1a7a7c;">
                         <i class="fa-solid fa-house-chimney-medical"></i>
                     </div>
-                    <h3 class="font-bold text-slate-800">Domiciliar</h3>
-                    <p class="text-xs text-slate-400 mt-2">Coleta no conforto do seu lar</p>
+                    <h3>Coleta Domiciliar</h3>
+                    <p>Conforto do seu lar, qualidade do laboratório</p>
                 </div>
-                <div onclick="navigateTo('preparo')" class="card-cda p-6 cursor-pointer group">
-                    <div class="w-14 h-14 bg-cda-primary-light text-cda-primary rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
-                        <i class="fa-solid fa-clipboard-list"></i>
+                <div onclick="navigateTo('preparo')" class="qa-card">
+                    <div class="qa-icon" style="background:#EFF6FF;color:#1D4ED8;">
+                        <i class="fa-solid fa-robot"></i>
                     </div>
-                    <h3 class="font-bold text-slate-800">Guia Preparo</h3>
-                    <p class="text-xs text-slate-400 mt-2">Orientações para seus exames</p>
+                    <h3>IA Preparo</h3>
+                    <p>Orientações inteligentes para seus exames</p>
                 </div>
-                <div onclick="navigateTo('orcamento')" class="card-cda p-6 cursor-pointer group border-emerald-100">
-                    <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                <div onclick="navigateTo('orcamento')" class="qa-card">
+                    <div class="qa-icon" style="background:#F0FDF4;color:#15803D;">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
-                    <h3 class="font-bold text-slate-800">Orçamento</h3>
-                    <p class="text-xs text-slate-400 mt-2">Envie seu pedido médico</p>
+                    <h3>Orçamento</h3>
+                    <p>Envie seu pedido médico e receba retorno</p>
                 </div>
             </div>
 
-            <!-- Units Info -->
-            <div class="card-cda p-8">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-cda-primary-light text-cda-primary rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-clock"></i>
+            <!-- ===== UNIDADES ===== -->
+            <div class="anim-in" style="animation-delay:0.25s">
+                <div class="flex items-center gap-3 mb-4">
+                    <div style="width:36px;height:36px;background:#E8F8F8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#1a7a7c;">
+                        <i class="fa-solid fa-location-dot"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800">Unidades e Horários</h3>
+                    <h3 class="text-lg font-bold text-slate-800">Nossas Unidades</h3>
                 </div>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="relative p-6 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-cda-primary opacity-5 rounded-full -mr-12 -mt-12"></div>
-                        <h4 class="font-bold text-lg text-slate-800 mb-2">Matriz Centro</h4>
-                        <p class="text-sm text-slate-500 mb-4">Rua José Giestas, nº 46, Centro</p>
-                        <div class="flex items-center gap-2 text-cda-primary font-bold">
-                            <i class="fa-solid fa-calendar-check"></i>
-                            <span class="text-sm">Seg. a Sex. das 07:00 às 17:00h</span>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="unit-card">
+                        <div class="unit-accent"></div>
+                        <div class="unit-badge">
+                            <i class="fa-solid fa-circle-check" style="font-size:10px;"></i> Aberta agora
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 text-base mb-1">Matriz — Centro</h4>
+                        <p class="text-sm text-slate-400 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-map-pin" style="color:#49BCBE;font-size:12px;"></i>
+                            Rua José Giestas, nº 46, Centro
+                        </p>
+                        <div class="flex items-center gap-2 text-sm font-semibold" style="color:#1a7a7c;">
+                            <i class="fa-regular fa-clock"></i>
+                            Seg. a Sex. — 07h às 17h
                         </div>
                     </div>
-                    <div class="relative p-6 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-cda-primary opacity-5 rounded-full -mr-12 -mt-12"></div>
-                        <h4 class="font-bold text-lg text-slate-800 mb-2">Mata Fria (Filial)</h4>
-                        <p class="text-sm text-slate-500 mb-4">Córrego Francisco Correia, Zona Rural</p>
-                        <div class="flex items-center gap-2 text-cda-primary font-bold">
-                            <i class="fa-solid fa-calendar-days"></i>
-                            <span class="text-sm">Ter, Qua e Qui das 06:00 às 09:00h</span>
+                    <div class="unit-card">
+                        <div class="unit-accent"></div>
+                        <div class="unit-badge" style="background:#FFF7ED;color:#C2410C;">
+                            <i class="fa-solid fa-calendar-days" style="font-size:10px;"></i> Dias específicos
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 text-base mb-1">Mata Fria — Filial</h4>
+                        <p class="text-sm text-slate-400 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-map-pin" style="color:#49BCBE;font-size:12px;"></i>
+                            Cór. Francisco Correia, Zona Rural
+                        </p>
+                        <div class="flex items-center gap-2 text-sm font-semibold" style="color:#1a7a7c;">
+                            <i class="fa-regular fa-clock"></i>
+                            Ter, Qua e Qui — 06h às 09h
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Health Button -->
-            <div class="md:hidden">
-                <button onclick="showInstallInstructions()" class="w-full bg-white border-2 border-cda-primary text-cda-primary font-extrabold py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg">
-                    <i class="fa-solid fa-mobile-screen-button animate-bounce"></i>
+            <!-- WhatsApp CTA -->
+            <div class="anim-in" style="animation-delay:0.35s">
+                <a href="https://wa.me/5527998980658" target="_blank"
+                   style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#075E54,#128C7E);border-radius:22px;padding:20px 24px;text-decoration:none;transition:transform 0.3s ease,box-shadow 0.3s ease;box-shadow:0 8px 24px rgba(7,94,84,0.25);"
+                   onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 36px rgba(7,94,84,0.3)'"
+                   onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 24px rgba(7,94,84,0.25)'">
+                    <div>
+                        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">Fale conosco agora</p>
+                        <p style="font-size:16px;font-weight:800;color:white;margin:0;">Atendimento via WhatsApp</p>
+                    </div>
+                    <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fa-brands fa-whatsapp" style="font-size:26px;color:white;"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Instalar App mobile -->
+            <div class="md:hidden anim-in" style="animation-delay:0.4s">
+                <button onclick="showInstallInstructions()"
+                        style="width:100%;background:white;border:2px solid #49BCBE;color:#1a7a7c;font-weight:800;padding:16px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(73,188,190,0.1);transition:all 0.3s ease;"
+                        onmouseover="this.style.background='#E8F8F8'"
+                        onmouseout="this.style.background='white'">
+                    <i class="fa-solid fa-mobile-screen-button" style="animation:bounce 1s infinite;"></i>
                     INSTALAR APLICATIVO NO CELULAR
                 </button>
             </div>
+
         </section>
 
         <!-- PREPARO PAGE -->
