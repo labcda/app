@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratório CDA - Diagnóstico de Confiança</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.webmanifest">
     <!-- Icones PWA: PNG oficial para evitar icone generico no iPhone -->
-    <link rel="icon" type="image/png" sizes="192x192" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=512,fit=contain/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
-    <link rel="apple-touch-icon" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=512,fit=contain/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=512,fit=contain/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
     <!-- Configuração para o ícone não ficar esticado e ter fundo branco no iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -240,6 +240,23 @@
             transform: scale(1.12) rotate(-5deg);
         }
 
+        @keyframes actionIconLoop {
+            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+            45% { transform: translateY(-5px) scale(1.08) rotate(-4deg); }
+            70% { transform: translateY(1px) scale(0.98) rotate(2deg); }
+        }
+
+        .action-item i {
+            animation: actionIconLoop 2.8s ease-in-out infinite;
+            will-change: transform;
+        }
+        .action-item:nth-child(2) i { animation-delay: 0.35s; }
+        .action-item:nth-child(3) i { animation-delay: 0.7s; }
+        .action-item:nth-child(4) i { animation-delay: 1.05s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .action-item i { animation: none; }
+        }
         .section-title {
             font-size: 20px;
             font-weight: 800;
@@ -1010,22 +1027,12 @@
                 <div class="info-carousel anim-in" id="importantCarousel" style="animation-delay: 0.5s" aria-label="Avisos importantes">
                     <article class="info-slide">
                         <div class="flex-1">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">Você sabe o que é a LGPD?</h3>
                             <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                O Lab CDA nunca entra em contato para oferecer entrega de resultados mediante pagamento ao entregador.
-                            </p>
-                        </div>
-                        <div class="info-icon">
-                            <i class="fa-solid fa-circle-exclamation text-cda-primary text-2xl"></i>
-                        </div>
-                    </article>
-                    <article class="info-slide">
-                        <div class="flex-1">
-                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">Voce sabe o que e a LGPD?</h3>
-                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                A Lei Geral de Protecao de Dados (LGPD) foi criada para proteger a privacidade e a seguranca dos seus dados pessoais.
+                                A Lei Geral de Proteção de Dados (LGPD) foi criada para proteger a privacidade e a segurança dos seus dados pessoais.
                             </p>
                             <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mt-2">
-                                Quer saber mais sobre como o Laboratorio CDA protege suas informacoes? <a href="https://wa.me/5527998980658" target="_blank">Clique aqui e fale conosco</a>.
+                                Quer saber mais sobre como o Laboratório CDA protege suas informações? <a href="https://wa.me/5527998980658" target="_blank">Clique aqui e fale conosco</a>.
                             </p>
                         </div>
                         <div class="info-icon">
@@ -1034,9 +1041,9 @@
                     </article>
                     <article class="info-slide">
                         <div class="flex-1">
-                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">Atencao, por gentileza!</h3>
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">Atenção, por gentileza!</h3>
                             <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                Para garantir a seguranca e a privacidade dos seus dados, conforme determina a Lei Geral de Protecao de Dados (LGPD), o Laboratorio CDA somente pode realizar atendimentos mediante a apresentacao de um documento oficial com foto.
+                                Para garantir a segurança e a privacidade dos seus dados, conforme determina a Lei Geral de Proteção de Dados (LGPD), o Laboratório CDA somente pode realizar atendimentos mediante a apresentação de um documento oficial com foto.
                             </p>
                         </div>
                         <div class="info-icon">
@@ -1048,7 +1055,6 @@
                 <div class="carousel-dots anim-in" id="importantDots" style="animation-delay: 0.6s" aria-label="Navegar avisos">
                     <button type="button" class="carousel-dot active" aria-label="Aviso 1"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 2"></button>
-                    <button type="button" class="carousel-dot" aria-label="Aviso 3"></button>
                 </div>
                 <!-- BOTÃO INSTALAR APP (REPOSICIONADO) -->
                 <div class="mt-8 anim-in" style="animation-delay:0.7s">
@@ -1088,7 +1094,7 @@
                 <!-- Ícone preview -->
                 <div class="flex flex-col items-center py-6 bg-slate-50 dark:bg-slate-800/50">
                     <div class="instalar-preview-icon shadow-xl mb-3">
-                        <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png" alt="Lab CDA" class="w-20 h-20 object-contain">
+                        <img src="icons/icon-180.png" alt="Lab CDA" class="w-20 h-20 object-contain rounded-[20px]">
                     </div>
                     <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Lab CDA</p>
                     <p class="text-[11px] text-slate-400">Este ícone vai aparecer na tela do seu celular</p>
@@ -2089,6 +2095,7 @@
         }
     </script></body>
 </html>
+
 
 
 
