@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratório CDA - Diagnóstico de Confiança</title>
     <link rel="manifest" href="manifest.webmanifest">
-    <link rel="icon" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" type="image/png">
-    <link rel="apple-touch-icon" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png">
+    <!-- Ícones PWA - Melhorados com fundo Turquesa para iOS -->
+    <link rel="icon" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663654221666/zMBDhAnAoSURCgjL.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663654221666/zMBDhAnAoSURCgjL.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663654221666/zMBDhAnAoSURCgjL.png">
+    
+    <!-- Configuração para o ícone não ficar esticado e ter fundo turquesa no iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Lab CDA">
     
     <!-- Meta tags para PWA -->
     <meta name="theme-color" content="#49BCBE">
@@ -68,7 +72,7 @@
 
         /* Novo Estilo Fleury-like */
         .app-header {
-            background-color: #444444;
+            background-color: #49BCBE;
             color: white;
             padding: 15px 20px;
             border-bottom-left-radius: 25px;
@@ -76,7 +80,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(73,188,190,0.2);
         }
 
         .header-logo {
@@ -184,7 +188,7 @@
         .dot-active {
             width: 8px;
             height: 8px;
-            background: #E6007E;
+            background: #49BCBE;
             border-radius: 50%;
             transition: all 0.3s ease;
         }
@@ -231,7 +235,7 @@
         }
 
         .nav-btn-new.active {
-            color: #E6007E;
+            color: #49BCBE;
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -765,7 +769,7 @@
         <div id="dnaBackground" class="dna-container"></div>
         <div class="relative z-10 text-center px-6">
             <div class="mb-8 animate-floating" style="animation: floating 3s ease-in-out infinite;">
-                <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Laboratório CDA Logo" class="w-64 mx-auto">
+                <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663654221666/zMBDhAnAoSURCgjL.png" alt="Laboratório CDA Logo" class="w-64 mx-auto">
             </div>
             <p class="text-slate-400 text-sm font-medium mb-8 tracking-widest uppercase">Diagnóstico de Confiança</p>
             <div class="w-48 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
@@ -787,7 +791,7 @@
             <!-- HEADER ESTILO FLEURY -->
             <div class="app-header anim-in">
                 <div class="header-logo">
-                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-8 brightness-0 invert">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663654221666/zMBDhAnAoSURCgjL.png" alt="Lab CDA" class="h-10 object-contain">
                 </div>
                 <button onclick="navigateTo('perfil')" class="header-auth">
                     <i class="fa-regular fa-circle-user text-xl"></i>
@@ -811,7 +815,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <h3 class="text-slate-700 dark:text-slate-300 font-bold text-lg leading-tight">Acompanhe exames, resultados e mais</h3>
-                            <button onclick="navigateTo('perfil')" class="text-pink-600 font-bold mt-2 flex items-center gap-1">
+                            <button onclick="navigateTo('perfil')" class="text-cda-primary font-bold mt-2 flex items-center gap-1">
                                 Entrar <i class="fa-solid fa-chevron-right text-[10px]"></i>
                             </button>
                         </div>
@@ -826,19 +830,19 @@
                 <!-- GRID DE AÇÕES -->
                 <div class="grid-actions anim-in" style="animation-delay: 0.3s">
                     <div onclick="navigateTo('agendar')" class="action-item">
-                        <i class="fa-regular fa-calendar text-pink-600"></i>
+                        <i class="fa-regular fa-calendar text-cda-primary"></i>
                         <span class="font-bold text-slate-700 dark:text-slate-200">Agendar</span>
                     </div>
                     <div onclick="navigateTo('resultados')" class="action-item">
-                        <i class="fa-regular fa-file-lines text-purple-600"></i>
+                        <i class="fa-regular fa-file-lines text-cda-primary"></i>
                         <span class="font-bold text-slate-700 dark:text-slate-200">Resultados</span>
                     </div>
                     <div onclick="navigateTo('exames')" class="action-item">
-                        <i class="fa-solid fa-clipboard-list text-pink-500"></i>
+                        <i class="fa-solid fa-clipboard-list text-cda-primary"></i>
                         <span class="font-bold text-slate-700 dark:text-slate-200">Exames</span>
                     </div>
                     <div onclick="navigateTo('unidades')" class="action-item">
-                        <i class="fa-solid fa-list-ul text-purple-500"></i>
+                        <i class="fa-solid fa-list-ul text-cda-primary"></i>
                         <span class="font-bold text-slate-700 dark:text-slate-200">Unidades</span>
                     </div>
                 </div>
@@ -853,7 +857,7 @@
                         </p>
                     </div>
                     <div class="w-16">
-                        <i class="fa-solid fa-circle-exclamation text-pink-600 text-4xl"></i>
+                        <i class="fa-solid fa-circle-exclamation text-cda-primary text-4xl"></i>
                     </div>
                 </div>
                 
@@ -886,7 +890,7 @@
                 <!-- Header do modal -->
                 <div class="px-6 pt-3 pb-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-9 object-contain">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663654221666/zMBDhAnAoSURCgjL.png" alt="Lab CDA" class="h-9 object-contain">
                         <div>
                             <p class="font-extrabold text-slate-800 dark:text-white text-base leading-tight">Instalar Lab CDA</p>
                             <p class="text-xs text-slate-400">no seu celular, de graça</p>
@@ -900,7 +904,7 @@
                 <!-- Ícone preview -->
                 <div class="flex flex-col items-center py-6 bg-slate-50 dark:bg-slate-800/50">
                     <div class="instalar-preview-icon shadow-xl mb-3">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="w-16 h-16 object-contain">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663654221666/zMBDhAnAoSURCgjL.png" alt="Lab CDA" class="w-16 h-16 object-contain">
                     </div>
                     <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Lab CDA</p>
                     <p class="text-[11px] text-slate-400">Este ícone vai aparecer na tela do seu celular</p>
