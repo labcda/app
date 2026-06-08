@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratório CDA - Diagnóstico de Confiança</title>
     <link rel="manifest" href="manifest.webmanifest">
-    <!-- Ícones PWA - Fundo branco com logo centralizada e com padding -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='white'/><image href='https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png' x='24' y='44' width='144' height='104'/></svg>" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='white'/><image href='https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png' x='20' y='40' width='140' height='100'/></svg>">
-    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='white'/><image href='https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png' x='20' y='40' width='140' height='100'/></svg>">
-    
+    <!-- Icones PWA: PNG oficial para evitar icone generico no iPhone -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=512,fit=contain/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
+    <link rel="apple-touch-icon" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=512,fit=contain/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=512,fit=contain/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
     <!-- Configuração para o ícone não ficar esticado e ter fundo branco no iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -87,21 +86,43 @@
 
         /* Novo Estilo Fleury-like */
         .app-header {
-            background-color: #49BCBE;
+            background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 54%, #49BCBE 100%);
             color: white;
-            padding: 15px 20px;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
+            padding: 16px 18px;
+            border-bottom-left-radius: 28px;
+            border-bottom-right-radius: 28px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 12px rgba(73,188,190,0.2);
+            gap: 10px;
+            box-shadow: 0 14px 34px rgba(15,76,92,0.22);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            inset: -40% auto auto 34%;
+            width: 260px;
+            height: 260px;
+            background: rgba(255,255,255,0.14);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
         .header-logo {
-            font-size: 24px;
-            font-weight: 300;
-            font-style: italic;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo img {
+            background: white;
+            border-radius: 18px;
+            padding: 7px 10px;
+            box-shadow: 0 10px 22px rgba(15,76,92,0.20);
         }
 
         .header-auth {
@@ -149,24 +170,51 @@
         }
 
         .action-item {
-            background: #F8F8F8;
-            border-radius: 15px;
-            padding: 20px;
+            background: #FFFFFF;
+            border-radius: 18px;
+            padding: 18px;
+            min-height: 78px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border: 1px solid #EEEEEE;
-            transition: all 0.2s ease;
+            border: 1px solid rgba(73,188,190,0.14);
+            box-shadow: 0 8px 22px rgba(15,76,92,0.06);
+            transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 20%, rgba(73,188,190,0.10) 50%, transparent 80%);
+            transform: translateX(-120%);
+            transition: transform 0.55s ease;
+        }
+
+        .action-item:hover,
+        .action-item:focus-visible {
+            transform: translateY(-5px);
+            border-color: rgba(73,188,190,0.55);
+            box-shadow: 0 16px 32px rgba(15,76,92,0.12);
+        }
+
+        .action-item:hover::after,
+        .action-item:focus-visible::after {
+            transform: translateX(120%);
         }
 
         .dark .action-item {
             background: #1E293B;
             border-color: #334155;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.18);
         }
 
         .action-item:active {
-            transform: scale(0.98);
-            background: #F0F0F0;
+            transform: scale(0.96);
+            background: #F0FBFB;
         }
 
         .dark .action-item:active {
@@ -174,7 +222,22 @@
         }
 
         .action-item i {
-            font-size: 20px;
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: #E8F8F8;
+            font-size: 18px;
+            transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease;
+        }
+
+        .action-item:hover i,
+        .action-item:focus-visible i {
+            background: #D9F4F4;
+            transform: scale(1.12) rotate(-5deg);
         }
 
         .section-title {
@@ -190,49 +253,89 @@
         }
 
         .info-carousel {
-            background: #F8F8F8;
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 2px 2px 16px;
+            margin-bottom: 8px;
+            scrollbar-width: none;
+        }
+
+        .info-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .info-slide {
+            min-width: 100%;
+            background: #FFFFFF;
             border-radius: 20px;
             padding: 20px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            border: 1px solid #EEEEEE;
-            margin-bottom: 20px;
-            min-height: 120px;
-            transition: all 0.3s ease;
+            gap: 16px;
+            border: 1px solid rgba(73,188,190,0.14);
+            box-shadow: 0 10px 28px rgba(15,76,92,0.07);
+            min-height: 136px;
+            scroll-snap-align: start;
+            transition: transform 0.28s ease, box-shadow 0.28s ease;
         }
 
-        .dark .info-carousel {
+        .info-slide:active {
+            transform: scale(0.985);
+        }
+
+        .info-slide a {
+            color: var(--cda-primary-dark);
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+        .info-icon {
+            width: 52px;
+            min-width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            background: #E8F8F8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark .info-slide {
             background: #1E293B;
             border-color: #334155;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+        }
+
+        .dark .info-icon {
+            background: #164E63;
         }
 
         .carousel-dots {
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 2px;
         }
 
-        .dot-active {
-            width: 8px;
-            height: 8px;
-            background: #49BCBE;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .dot-inactive {
+        .carousel-dot {
             width: 8px;
             height: 8px;
             background: #CCCCCC;
-            border-radius: 50%;
+            border-radius: 999px;
+            border: 0;
+            padding: 0;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: width 0.25s ease, background 0.25s ease;
         }
 
-        .dot-inactive:hover {
-            background: #999999;
+        .carousel-dot.active {
+            width: 22px;
+            background: #49BCBE;
         }
 
         .bottom-nav-new {
@@ -579,22 +682,29 @@
         /* Floating Action Button */
         .fab {
             position: fixed;
-            bottom: 80px;
+            bottom: 82px;
             right: 20px;
-            width: 56px;
-            height: 56px;
+            width: 58px;
+            height: 58px;
             background: #25D366;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+            font-size: 30px;
+            line-height: 1;
+            overflow: visible;
+            box-shadow: 0 8px 22px rgba(37, 211, 102, 0.40);
             z-index: 40;
-            transition: all 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
-        .fab:hover { transform: scale(1.1) rotate(10deg); }
+        .fab i {
+            display: block;
+            line-height: 1;
+            transform: translateY(-1px);
+        }
+        .fab:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 12px 28px rgba(37, 211, 102, 0.48); }
 
         /* Estilo para a lista de exames do simulador */
         .exame-item {
@@ -773,13 +883,28 @@
 
         /* Preview icon */
         .instalar-preview-icon {
-            width: 88px; height: 88px;
-            background: white;
-            border-radius: 22px;
+            width: 92px; height: 92px;
+            background: linear-gradient(145deg, #FFFFFF 0%, #F4FFFF 100%);
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(73,188,190,0.2);
+            border: 1px solid rgba(73,188,190,0.20);
+            box-shadow: 0 16px 34px rgba(15,76,92,0.16);
+        }
+
+        .home-install-btn {
+            transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+            box-shadow: 0 8px 20px rgba(15,76,92,0.06);
+        }
+        .home-install-btn:hover,
+        .home-install-btn:focus-visible {
+            transform: translateY(-4px);
+            border-color: rgba(73,188,190,0.45);
+            box-shadow: 0 14px 30px rgba(15,76,92,0.12);
+        }
+        .home-install-btn:active {
+            transform: scale(0.97);
         }
         .dark .instalar-preview-icon {
             background: #1E293B;
@@ -881,27 +1006,53 @@
                 </div>
 
                 <h2 class="section-title anim-in" style="animation-delay: 0.4s">Importante</h2>
-
-                <!-- ÁREA DE INFORMATIVOS -->
-                <div class="info-carousel anim-in" style="animation-delay: 0.5s">
-                    <div class="flex-1 pr-4">
-                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                            O Lab CDA nunca entra em contato para oferecer entrega de resultados mediante pagamento ao entregador.
-                        </p>
-                    </div>
-                    <div class="w-16">
-                        <i class="fa-solid fa-circle-exclamation text-cda-primary text-4xl"></i>
-                    </div>
+                <!-- AREA DE INFORMATIVOS -->
+                <div class="info-carousel anim-in" id="importantCarousel" style="animation-delay: 0.5s" aria-label="Avisos importantes">
+                    <article class="info-slide">
+                        <div class="flex-1">
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                O Lab CDA nunca entra em contato para oferecer entrega de resultados mediante pagamento ao entregador.
+                            </p>
+                        </div>
+                        <div class="info-icon">
+                            <i class="fa-solid fa-circle-exclamation text-cda-primary text-2xl"></i>
+                        </div>
+                    </article>
+                    <article class="info-slide">
+                        <div class="flex-1">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">Voce sabe o que e a LGPD?</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                A Lei Geral de Protecao de Dados (LGPD) foi criada para proteger a privacidade e a seguranca dos seus dados pessoais.
+                            </p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mt-2">
+                                Quer saber mais sobre como o Laboratorio CDA protege suas informacoes? <a href="https://wa.me/5527998980658" target="_blank">Clique aqui e fale conosco</a>.
+                            </p>
+                        </div>
+                        <div class="info-icon">
+                            <i class="fa-solid fa-lock text-cda-primary text-2xl"></i>
+                        </div>
+                    </article>
+                    <article class="info-slide">
+                        <div class="flex-1">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">Atencao, por gentileza!</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Para garantir a seguranca e a privacidade dos seus dados, conforme determina a Lei Geral de Protecao de Dados (LGPD), o Laboratorio CDA somente pode realizar atendimentos mediante a apresentacao de um documento oficial com foto.
+                            </p>
+                        </div>
+                        <div class="info-icon">
+                            <i class="fa-solid fa-id-card text-cda-primary text-2xl"></i>
+                        </div>
+                    </article>
                 </div>
                 
-                <div class="carousel-dots anim-in" style="animation-delay: 0.6s">
-                    <div class="dot-active"></div>
-                    <div class="dot-inactive"></div>
+                <div class="carousel-dots anim-in" id="importantDots" style="animation-delay: 0.6s" aria-label="Navegar avisos">
+                    <button type="button" class="carousel-dot active" aria-label="Aviso 1"></button>
+                    <button type="button" class="carousel-dot" aria-label="Aviso 2"></button>
+                    <button type="button" class="carousel-dot" aria-label="Aviso 3"></button>
                 </div>
-
                 <!-- BOTÃO INSTALAR APP (REPOSICIONADO) -->
                 <div class="mt-8 anim-in" style="animation-delay:0.7s">
-                    <button onclick="abrirModalInstalar()" class="bg-slate-100 dark:bg-slate-800 w-full flex items-center justify-between gap-4 px-6 py-4 rounded-2xl text-left border border-slate-200 dark:border-slate-700">
+                    <button onclick="abrirModalInstalar()" class="home-install-btn bg-slate-100 dark:bg-slate-800 w-full flex items-center justify-between gap-4 px-6 py-4 rounded-2xl text-left border border-slate-200 dark:border-slate-700">
                         <div class="flex items-center gap-3">
                             <i class="fa-solid fa-mobile-screen-button text-slate-400"></i>
                             <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Instalar aplicativo</p>
@@ -937,7 +1088,7 @@
                 <!-- Ícone preview -->
                 <div class="flex flex-col items-center py-6 bg-slate-50 dark:bg-slate-800/50">
                     <div class="instalar-preview-icon shadow-xl mb-3">
-                        <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png" alt="Lab CDA" class="w-16 h-16 object-contain">
+                        <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png" alt="Lab CDA" class="w-20 h-20 object-contain">
                     </div>
                     <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Lab CDA</p>
                     <p class="text-[11px] text-slate-400">Este ícone vai aparecer na tela do seu celular</p>
@@ -1773,6 +1924,28 @@
             }
         }
 
+
+        function setupImportantCarousel() {
+            const carousel = document.getElementById('importantCarousel');
+            const dots = Array.from(document.querySelectorAll('#importantDots .carousel-dot'));
+            if (!carousel || !dots.length || carousel.dataset.ready) return;
+            carousel.dataset.ready = 'true';
+
+            const updateDots = () => {
+                const index = Math.round(carousel.scrollLeft / Math.max(carousel.clientWidth, 1));
+                dots.forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === index));
+            };
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    carousel.scrollTo({ left: index * carousel.clientWidth, behavior: 'smooth' });
+                });
+            });
+
+            carousel.addEventListener('scroll', () => requestAnimationFrame(updateDots), { passive: true });
+            window.addEventListener('resize', updateDots);
+            updateDots();
+        }
         // DARK MODE
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
@@ -1815,6 +1988,7 @@
             // Re-inicializa a home ao voltar para ela
             if (pageId === 'home') {
                 loadProfile();
+                setupImportantCarousel();
                 // Re-dispara animações dos elementos anim-in
                 const animItems = target.querySelectorAll('.anim-in');
                 animItems.forEach(el => {
@@ -1842,6 +2016,7 @@
             carregarTabelaPrecos();
             iniciarChatPreparo();
             loadProfile();
+            setupImportantCarousel();
 
             // Splash Logic - Duração de 3 segundos
             const bar = document.getElementById('progressBar');
@@ -1914,3 +2089,6 @@
         }
     </script></body>
 </html>
+
+
+
