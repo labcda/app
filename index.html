@@ -411,6 +411,180 @@
             background-color: #334155;
             border-color: #49BCBE;
         }
+
+        /* ===== BOTÃO INSTALAR APP ===== */
+        .instalar-btn {
+            background: linear-gradient(135deg, #0F4C5C 0%, #1a7a7c 50%, #49BCBE 100%);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 28px rgba(73,188,190,0.30);
+            position: relative;
+            overflow: hidden;
+        }
+        .instalar-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.12) 0%, transparent 60%);
+        }
+        .instalar-btn:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 14px 36px rgba(73,188,190,0.40);
+        }
+        .instalar-btn:active { transform: scale(0.98); }
+        .instalar-icon-wrap {
+            width: 52px; height: 52px;
+            background: rgba(255,255,255,0.18);
+            border: 1.5px solid rgba(255,255,255,0.30);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(6px);
+            flex-shrink: 0;
+        }
+        .instalar-arrow {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 9000;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.open {
+            display: flex;
+            animation: overlayIn 0.25s ease;
+        }
+        @keyframes overlayIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-sheet {
+            background: white;
+            border-radius: 28px 28px 0 0;
+            width: 100%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: sheetUp 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+        }
+        .dark .modal-sheet {
+            background: #1E293B;
+        }
+        @keyframes sheetUp {
+            from { transform: translateY(100%); opacity: 0.4; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes sheetDown {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(100%); opacity: 0; }
+        }
+
+        /* Tabs */
+        .instalar-tab {
+            color: #64748B;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .instalar-tab-active {
+            background: white !important;
+            color: #0F4C5C !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+        .dark .instalar-tab-active {
+            background: #0F172A !important;
+            color: #49BCBE !important;
+        }
+
+        /* Steps */
+        .instalar-step {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .instalar-step-num {
+            width: 32px; height: 32px;
+            min-width: 32px;
+            background: linear-gradient(135deg, #49BCBE, #37A7AA);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 3px 10px rgba(73,188,190,0.3);
+        }
+        .instalar-step-content { flex: 1; padding-top: 4px; }
+        .instalar-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #1E293B;
+            color: white;
+            border-radius: 6px;
+            padding: 1px 6px;
+            font-size: 13px;
+            font-weight: 900;
+            vertical-align: middle;
+        }
+        .dark .instalar-badge {
+            background: #475569;
+        }
+        .instalar-highlight {
+            background: #E8F8F8;
+            color: #0F4C5C;
+            border-radius: 6px;
+            padding: 1px 7px;
+            font-weight: 800;
+        }
+        .dark .instalar-highlight {
+            background: #164E63;
+            color: #7EE8EA;
+        }
+        .instalar-done-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #F0FDF4;
+            border: 1.5px solid #BBF7D0;
+            border-radius: 18px;
+            padding: 16px;
+            margin-top: 8px;
+        }
+        .dark .instalar-done-card {
+            background: #052e16;
+            border-color: #166534;
+        }
+
+        /* Preview icon */
+        .instalar-preview-icon {
+            width: 88px; height: 88px;
+            background: white;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(73,188,190,0.2);
+        }
+        .dark .instalar-preview-icon {
+            background: #1E293B;
+        }
     </style>
 </head>
 <body class="antialiased bg-cda-bg dark:bg-slate-900">
@@ -550,7 +724,148 @@
                     <p>Simulador de preços imediato</p>
                 </div>
             </div>
+
+            <!-- BOTÃO INSTALAR APP -->
+            <div class="anim-in" style="animation-delay:0.6s">
+                <button onclick="abrirModalInstalar()" class="instalar-btn w-full flex items-center justify-between gap-4 px-6 py-5 rounded-3xl text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="instalar-icon-wrap">
+                            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="w-10 h-10 object-contain">
+                        </div>
+                        <div>
+                            <p class="font-extrabold text-white text-base leading-tight">Instalar App no seu celular</p>
+                            <p class="text-[12px] text-white/70 mt-0.5">Acesso rápido como qualquer outro app</p>
+                        </div>
+                    </div>
+                    <div class="instalar-arrow">
+                        <i class="fa-solid fa-chevron-right text-white/80 text-sm"></i>
+                    </div>
+                </button>
+            </div>
         </section>
+
+        <!-- MODAL INSTALAR APP -->
+        <div id="modalInstalar" class="modal-overlay" onclick="fecharModalInstalar(event)">
+            <div class="modal-sheet" id="modalSheet">
+                <!-- Handle bar -->
+                <div class="flex justify-center pt-3 pb-1">
+                    <div class="w-10 h-1 bg-slate-200 dark:bg-slate-600 rounded-full"></div>
+                </div>
+
+                <!-- Header do modal -->
+                <div class="px-6 pt-3 pb-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-9 object-contain">
+                        <div>
+                            <p class="font-extrabold text-slate-800 dark:text-white text-base leading-tight">Instalar Lab CDA</p>
+                            <p class="text-xs text-slate-400">no seu celular, de graça</p>
+                        </div>
+                    </div>
+                    <button onclick="fecharModalInstalarBtn()" class="w-9 h-9 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center text-slate-400">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Ícone preview -->
+                <div class="flex flex-col items-center py-6 bg-slate-50 dark:bg-slate-800/50">
+                    <div class="instalar-preview-icon shadow-xl mb-3">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="w-16 h-16 object-contain">
+                    </div>
+                    <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Lab CDA</p>
+                    <p class="text-[11px] text-slate-400">Este ícone vai aparecer na tela do seu celular</p>
+                </div>
+
+                <!-- Tabs Android / iOS -->
+                <div class="px-6 pt-5">
+                    <div class="flex bg-slate-100 dark:bg-slate-700 rounded-2xl p-1 mb-6 gap-1">
+                        <button id="tab-android" onclick="mostrarTab('android')" class="instalar-tab instalar-tab-active flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all">
+                            <i class="fa-brands fa-android text-base"></i> Android
+                        </button>
+                        <button id="tab-ios" onclick="mostrarTab('ios')" class="instalar-tab flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all">
+                            <i class="fa-brands fa-apple text-base"></i> iPhone (iOS)
+                        </button>
+                    </div>
+
+                    <!-- ANDROID STEPS -->
+                    <div id="steps-android" class="instalar-steps space-y-4 pb-8">
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">1</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Abra este site no Chrome</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Use o navegador <strong>Google Chrome</strong> no seu Android. Se estiver em outro navegador, copie o link e cole no Chrome.</p>
+                            </div>
+                        </div>
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">2</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Toque nos 3 pontinhos <span class="instalar-badge">⋮</span></p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">No canto superior direito da tela do Chrome, toque nos <strong>três pontinhos</strong> para abrir o menu.</p>
+                            </div>
+                        </div>
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">3</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Toque em <span class="instalar-highlight">"Adicionar à tela inicial"</span></p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Role o menu para baixo até encontrar essa opção. Às vezes aparece como <em>"Instalar app"</em> — é a mesma coisa!</p>
+                            </div>
+                        </div>
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">4</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Confirme tocando em <span class="instalar-highlight">"Adicionar"</span></p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Uma janelinha vai aparecer pedindo confirmação. Toque em <strong>Adicionar</strong> e pronto! O ícone do Lab CDA vai aparecer na sua tela inicial.</p>
+                            </div>
+                        </div>
+                        <div class="instalar-done-card">
+                            <i class="fa-solid fa-circle-check text-green-500 text-2xl"></i>
+                            <div>
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Tudo certo! 🎉</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Agora é só procurar o ícone do Lab CDA na tela do celular e abrir como qualquer app.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- iOS STEPS -->
+                    <div id="steps-ios" class="instalar-steps hidden space-y-4 pb-8">
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">1</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Abra este site no Safari</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">No iPhone, use o <strong>Safari</strong> (o navegador padrão da Apple, com ícone de bússola azul). Só funciona no Safari!</p>
+                            </div>
+                        </div>
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">2</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Toque no botão de compartilhar <span class="instalar-badge">⬆</span></p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Na parte de baixo da tela, toque no ícone de <strong>uma caixinha com uma seta para cima</strong>. É o botão de compartilhar do Safari.</p>
+                            </div>
+                        </div>
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">3</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Toque em <span class="instalar-highlight">"Adicionar à Tela de Início"</span></p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Role a lista de opções para baixo até achar <strong>"Adicionar à Tela de Início"</strong> (tem um ícone de mais <strong>+</strong> ao lado).</p>
+                            </div>
+                        </div>
+                        <div class="instalar-step">
+                            <div class="instalar-step-num">4</div>
+                            <div class="instalar-step-content">
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Toque em <span class="instalar-highlight">"Adicionar"</span> no canto superior direito</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Uma nova tela vai aparecer com o nome do app. Toque em <strong>Adicionar</strong> no canto superior direito para confirmar.</p>
+                            </div>
+                        </div>
+                        <div class="instalar-done-card">
+                            <i class="fa-solid fa-circle-check text-green-500 text-2xl"></i>
+                            <div>
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Tudo certo! 🎉</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">O ícone do Lab CDA vai aparecer na tela inicial do seu iPhone. Abra como qualquer outro app!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- ORÇAMENTO PAGE (SIMULADOR IMEDIATO) -->
         <section id="page-orcamento" class="page space-y-6">
@@ -1148,6 +1463,52 @@
                         enviarMensagemPreparo();
                     }
                 });
+            }
+        }
+
+        // MODAL INSTALAR APP
+        function abrirModalInstalar() {
+            const modal = document.getElementById('modalInstalar');
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            // Detecta automaticamente Android ou iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            mostrarTab(isIOS ? 'ios' : 'android');
+        }
+
+        function fecharModalInstalarBtn() {
+            const modal = document.getElementById('modalInstalar');
+            const sheet = document.getElementById('modalSheet');
+            sheet.style.animation = 'sheetDown 0.25s ease forwards';
+            setTimeout(() => {
+                modal.classList.remove('open');
+                sheet.style.animation = '';
+                document.body.style.overflow = '';
+            }, 220);
+        }
+
+        function fecharModalInstalar(e) {
+            if (e.target === document.getElementById('modalInstalar')) {
+                fecharModalInstalarBtn();
+            }
+        }
+
+        function mostrarTab(tab) {
+            const androidSteps = document.getElementById('steps-android');
+            const iosSteps = document.getElementById('steps-ios');
+            const tabAndroid = document.getElementById('tab-android');
+            const tabIOS = document.getElementById('tab-ios');
+
+            if (tab === 'android') {
+                androidSteps.classList.remove('hidden');
+                iosSteps.classList.add('hidden');
+                tabAndroid.classList.add('instalar-tab-active');
+                tabIOS.classList.remove('instalar-tab-active');
+            } else {
+                iosSteps.classList.remove('hidden');
+                androidSteps.classList.add('hidden');
+                tabIOS.classList.add('instalar-tab-active');
+                tabAndroid.classList.remove('instalar-tab-active');
             }
         }
 
