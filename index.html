@@ -66,6 +66,174 @@
             color: #F8FAFC;
         }
 
+        /* Novo Estilo Fleury-like */
+        .app-header {
+            background-color: #444444;
+            color: white;
+            padding: 15px 20px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-logo {
+            font-size: 24px;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .header-auth {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .main-card-promo {
+            background: #F8F8F8;
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            margin-top: 20px;
+            border: 1px solid #EEEEEE;
+        }
+
+        .main-card-promo .badge {
+            background: #666666;
+            color: white;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            position: absolute;
+            top: -10px;
+            left: 20px;
+        }
+
+        .grid-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-item {
+            background: #F8F8F8;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #EEEEEE;
+            transition: all 0.2s ease;
+        }
+
+        .action-item:active {
+            transform: scale(0.98);
+            background: #F0F0F0;
+        }
+
+        .action-item i {
+            font-size: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #333333;
+            margin-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        .dark .section-title {
+            color: white;
+        }
+
+        .info-carousel {
+            background: #F8F8F8;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #EEEEEE;
+            margin-bottom: 20px;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .dark .info-carousel {
+            background: #1E293B;
+            border-color: #334155;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .dot-active {
+            width: 8px;
+            height: 8px;
+            background: #E6007E;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .dot-inactive {
+            width: 8px;
+            height: 8px;
+            background: #CCCCCC;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot-inactive:hover {
+            background: #999999;
+        }
+
+        .bottom-nav-new {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #EEEEEE;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 25px;
+            z-index: 50;
+        }
+
+        .dark .bottom-nav-new {
+            background: #1E293B;
+            border-color: #334155;
+        }
+
+        .nav-btn-new {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #999999;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .nav-btn-new.active {
+            color: #E6007E;
+        }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: var(--cda-primary); border-radius: 10px; }
@@ -615,135 +783,95 @@
     <main class="max-w-4xl mx-auto px-4 pt-6 pb-24">
         
         <!-- HOME PAGE -->
-        <section id="page-home" class="page active space-y-8">
-            <!-- HEADER -->
-            <header class="flex items-center justify-between anim-in">
-                <div class="flex items-center gap-3">
-                    <div class="h-12 flex items-center">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-10 object-contain dark:brightness-200">
-                    </div>
-                    <div class="border-l border-slate-200 dark:border-slate-700 pl-3">
-                        <h1 class="font-extrabold text-sm text-slate-800 dark:text-white leading-none">Lab CDA</h1>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Afonso Cláudio - ES</p>
-                    </div>
+        <section id="page-home" class="page active">
+            <!-- HEADER ESTILO FLEURY -->
+            <div class="app-header anim-in">
+                <div class="header-logo">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="h-8 brightness-0 invert">
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="toggleDarkMode()" class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 dark:border-slate-700">
+                <button onclick="navigateTo('perfil')" class="header-auth">
+                    <i class="fa-regular fa-circle-user text-xl"></i>
+                    <span>Entrar</span>
+                </button>
+                <div class="relative flex items-center gap-3">
+                    <button onclick="toggleDarkMode()" class="text-white/80">
                         <i id="theme-icon" class="fa-solid fa-moon"></i>
                     </button>
-                    <button onclick="navigateTo('perfil')" class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 dark:border-slate-700">
-                        <i class="fa-solid fa-user"></i>
+                    <div class="relative">
+                        <i class="fa-regular fa-bell text-2xl"></i>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-2 pb-10">
+                <!-- CARD ACESSE A CONTA -->
+                <div class="main-card-promo anim-in" style="animation-delay: 0.1s">
+                    <span class="badge">Acesse a conta</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h3 class="text-slate-700 dark:text-slate-300 font-bold text-lg leading-tight">Acompanhe exames, resultados e mais</h3>
+                            <button onclick="navigateTo('perfil')" class="text-pink-600 font-bold mt-2 flex items-center gap-1">
+                                Entrar <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
+                        <div class="w-24">
+                            <img src="https://img.freepik.com/free-vector/doctor-character-background_1270-84.jpg" alt="Doctor" class="w-full mix-blend-multiply">
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title anim-in" style="animation-delay: 0.2s">Cuide da saúde</h2>
+
+                <!-- GRID DE AÇÕES -->
+                <div class="grid-actions anim-in" style="animation-delay: 0.3s">
+                    <div onclick="navigateTo('agendar')" class="action-item">
+                        <i class="fa-regular fa-calendar text-pink-600"></i>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">Agendar</span>
+                    </div>
+                    <div onclick="navigateTo('resultados')" class="action-item">
+                        <i class="fa-regular fa-file-lines text-purple-600"></i>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">Resultados</span>
+                    </div>
+                    <div onclick="navigateTo('exames')" class="action-item">
+                        <i class="fa-solid fa-clipboard-list text-pink-500"></i>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">Exames</span>
+                    </div>
+                    <div onclick="navigateTo('unidades')" class="action-item">
+                        <i class="fa-solid fa-list-ul text-purple-500"></i>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">Unidades</span>
+                    </div>
+                </div>
+
+                <h2 class="section-title anim-in" style="animation-delay: 0.4s">Importante</h2>
+
+                <!-- ÁREA DE INFORMATIVOS -->
+                <div class="info-carousel anim-in" style="animation-delay: 0.5s">
+                    <div class="flex-1 pr-4">
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                            O Lab CDA nunca entra em contato para oferecer entrega de resultados mediante pagamento ao entregador.
+                        </p>
+                    </div>
+                    <div class="w-16">
+                        <i class="fa-solid fa-circle-exclamation text-pink-600 text-4xl"></i>
+                    </div>
+                </div>
+                
+                <div class="carousel-dots anim-in" style="animation-delay: 0.6s">
+                    <div class="dot-active"></div>
+                    <div class="dot-inactive"></div>
+                </div>
+
+                <!-- BOTÃO INSTALAR APP (REPOSICIONADO) -->
+                <div class="mt-8 anim-in" style="animation-delay:0.7s">
+                    <button onclick="abrirModalInstalar()" class="bg-slate-100 dark:bg-slate-800 w-full flex items-center justify-between gap-4 px-6 py-4 rounded-2xl text-left border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-mobile-screen-button text-slate-400"></i>
+                            <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Instalar aplicativo</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
                     </button>
                 </div>
-            </header>
-
-            <!-- ÁREA DO PACIENTE RÁPIDA -->
-            <div id="quick-patient-area" class="anim-in" style="animation-delay: 0.05s">
-                <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-cda-light dark:bg-slate-700 rounded-2xl flex items-center justify-center text-cda-primary">
-                            <i class="fa-solid fa-id-card-clip text-xl"></i>
-                        </div>
-                        <div>
-                            <p id="patient-name-display" class="font-bold text-slate-800 dark:text-white">Olá, Paciente!</p>
-                            <p id="patient-status-display" class="text-xs text-slate-400">Acesse seus dados rapidamente</p>
-                        </div>
-                    </div>
-                    <button onclick="navigateTo('perfil')" class="text-cda-primary font-bold text-xs uppercase tracking-wider">Editar</button>
-                </div>
-            </div>
-
-            <!-- HERO -->
-            <div class="hero-modern p-8 md:p-12 anim-in" style="animation-delay: 0.1s">
-                <svg class="hero-circles" viewBox="0 0 420 420">
-                    <circle cx="210" cy="210" r="200"/>
-                    <circle cx="210" cy="210" r="160"/>
-                    <circle cx="210" cy="210" r="120"/>
-                    <circle cx="210" cy="210" r="80"/>
-                    <circle cx="210" cy="210" r="40"/>
-                </svg>
-                <div class="hero-blob"></div>
-
-                <div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
-                    <div>
-                        <div class="hero-tag">
-                            <span class="dot"></span>
-                            Diagnóstico de Confiança
-                        </div>
-                        <h2 class="hero-title">
-                            Cuidar de você é a nossa <em>missão.</em>
-                        </h2>
-                        <p class="hero-subtitle">
-                            Tecnologia de ponta e atendimento humanizado para Afonso Cláudio e toda a região.
-                        </p>
-                        <div class="flex flex-wrap gap-3">
-                            <button onclick="navigateTo('resultados')" class="hero-btn-primary">
-                                <i class="fa-solid fa-file-medical"></i> Ver Resultados
-                            </button>
-                            <button onclick="navigateTo('agendar')" class="hero-btn-secondary">
-                                <i class="fa-solid fa-calendar-check"></i> Agendar Coleta
-                            </button>
-                        </div>
-                    </div>
-                    <div class="hidden md:flex items-center justify-center">
-                        <div class="float-illus relative" style="animation: float-hero 4s ease-in-out infinite;">
-                            <div style="position:absolute;inset:-20px;border-radius:50%;border:2px dashed rgba(255,255,255,0.2);animation:spin 18s linear infinite;"></div>
-                            <div style="width:180px;height:180px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
-                                <i class="fa-solid fa-flask-vial" style="font-size:70px;color:white;opacity:0.9;"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- QUICK ACTIONS -->
-            <div class="qa-grid">
-                <div onclick="navigateTo('resultados')" class="qa-card anim-in" style="animation-delay:0.2s">
-                    <div class="qa-icon" style="background:#E8F8F8;color:#1a7a7c;">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h3>Laudo Online</h3>
-                    <p>Acesse seus exames com total segurança</p>
-                </div>
-                <div onclick="navigateTo('preparo')" class="qa-card anim-in" style="animation-delay:0.3s">
-                    <div class="qa-icon" style="background:#EFF6FF;color:#1D4ED8;">
-                        <i class="fa-solid fa-robot"></i>
-                    </div>
-                    <h3>IA Preparo</h3>
-                    <p>Orientações inteligentes para seus exames</p>
-                </div>
-                <div onclick="navigateTo('saude')" class="qa-card anim-in" style="animation-delay:0.4s">
-                    <div class="qa-icon" style="background:#FFF1F2;color:#E11D48;">
-                        <i class="fa-solid fa-heart-pulse"></i>
-                    </div>
-                    <h3>Minha Saúde</h3>
-                    <p>Calculadoras e ferramentas de bem-estar</p>
-                </div>
-                <div onclick="navigateTo('orcamento')" class="qa-card anim-in" style="animation-delay:0.5s">
-                    <div class="qa-icon" style="background:#F0FDF4;color:#15803D;">
-                        <i class="fa-solid fa-receipt"></i>
-                    </div>
-                    <h3>Orçamento</h3>
-                    <p>Simulador de preços imediato</p>
-                </div>
-            </div>
-
-            <!-- BOTÃO INSTALAR APP -->
-            <div class="anim-in" style="animation-delay:0.6s">
-                <button onclick="abrirModalInstalar()" class="instalar-btn w-full flex items-center justify-between gap-4 px-6 py-5 rounded-3xl text-left">
-                    <div class="flex items-center gap-4">
-                        <div class="instalar-icon-wrap">
-                            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663724724077/vZNBijnUyToiuArg.png" alt="Lab CDA" class="w-10 h-10 object-contain">
-                        </div>
-                        <div>
-                            <p class="font-extrabold text-white text-base leading-tight">Instalar App no seu celular</p>
-                            <p class="text-[12px] text-white/70 mt-0.5">Acesso rápido como qualquer outro app</p>
-                        </div>
-                    </div>
-                    <div class="instalar-arrow">
-                        <i class="fa-solid fa-chevron-right text-white/80 text-sm"></i>
-                    </div>
-                </button>
             </div>
         </section>
 
@@ -1021,13 +1149,19 @@
     </main>
 
     <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 px-6 py-3 md:hidden z-50">
-        <div class="flex items-center justify-between max-w-lg mx-auto">
-            <button onclick="navigateTo('home')" id="nav-home" class="nav-item active-nav flex flex-col items-center gap-1"><i class="fa-solid fa-house text-xl"></i><span class="text-[10px] font-bold">Início</span></button>
-            <button onclick="navigateTo('resultados')" id="nav-resultados" class="nav-item flex flex-col items-center gap-1"><i class="fa-solid fa-file-medical text-xl"></i><span class="text-[10px] font-bold">Laudos</span></button>
-            <button onclick="navigateTo('agendar')" id="nav-agendar" class="nav-item flex flex-col items-center gap-1"><i class="fa-solid fa-calendar-plus text-xl"></i><span class="text-[10px] font-bold">Agendar</span></button>
-            <button onclick="navigateTo('orcamento')" id="nav-orcamento" class="nav-item flex flex-col items-center gap-1"><i class="fa-solid fa-receipt text-xl"></i><span class="text-[10px] font-bold">Orçamento</span></button>
-        </div>
+    <nav class="bottom-nav-new md:hidden">
+        <button onclick="navigateTo('home')" id="nav-home" class="nav-btn-new active">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span>Início</span>
+        </button>
+        <button onclick="navigateTo('agendar')" id="nav-agendar" class="nav-btn-new">
+            <i class="fa-regular fa-calendar-check text-xl"></i>
+            <span>Agendamentos</span>
+        </button>
+        <button onclick="navigateTo('resultados')" id="nav-resultados" class="nav-btn-new">
+            <i class="fa-regular fa-file-lines text-xl"></i>
+            <span>Resultados</span>
+        </button>
     </nav>
 
     <script>
@@ -1535,9 +1669,15 @@
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             target.classList.add('active');
 
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active-nav'));
+            document.querySelectorAll('.nav-item, .nav-btn-new').forEach(item => {
+                item.classList.remove('active-nav');
+                item.classList.remove('active');
+            });
             const navBtn = document.getElementById('nav-' + pageId);
-            if (navBtn) navBtn.classList.add('active-nav');
+            if (navBtn) {
+                navBtn.classList.add('active-nav');
+                navBtn.classList.add('active');
+            }
 
             const resetScroll = () => {
                 document.documentElement.scrollTop = 0;
@@ -1579,9 +1719,13 @@
             iniciarChatPreparo();
             loadProfile();
 
-            // Splash Logic
+            // Splash Logic - Duração de 3 segundos
             const bar = document.getElementById('progressBar');
             let width = 0;
+            const duration = 3000; // 3 segundos
+            const stepTime = 30;
+            const increment = (100 / (duration / stepTime));
+            
             const interval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(interval);
@@ -1590,10 +1734,10 @@
                         setTimeout(() => { document.getElementById('splashScreen').style.display = 'none'; }, 500);
                     }, 500);
                 } else {
-                    width += 10;
-                    bar.style.width = width + '%';
+                    width += increment;
+                    bar.style.width = Math.min(width, 100) + '%';
                 }
-            }, 30);
+            }, stepTime);
         });
 
         function loadProfile() {
