@@ -738,6 +738,82 @@
             border-color: #49BCBE;
         }
 
+
+        /* Guia de Exames CDA */
+        .guia-hero {
+            background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 62%, #49BCBE 100%);
+            border-radius: 26px;
+            padding: 22px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 14px 34px rgba(15,76,92,0.20);
+        }
+        .guia-hero::after {
+            content: '';
+            position: absolute;
+            right: -70px;
+            top: -80px;
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.16);
+        }
+        .guia-filter {
+            white-space: nowrap;
+            border: 1px solid rgba(73,188,190,0.18);
+            background: #FFFFFF;
+            color: #475569;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        .guia-filter.active {
+            background: #49BCBE;
+            color: white;
+            box-shadow: 0 8px 18px rgba(73,188,190,0.28);
+        }
+        .guia-filter:active { transform: scale(0.96); }
+        .dark .guia-filter {
+            background: #1E293B;
+            color: #CBD5E1;
+            border-color: #334155;
+        }
+        .dark .guia-filter.active { background: #49BCBE; color: white; }
+        .guia-card {
+            background: white;
+            border: 1px solid rgba(73,188,190,0.12);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(15,76,92,0.06);
+        }
+        .dark .guia-card {
+            background: #1E293B;
+            border-color: #334155;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+        }
+        .guia-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 5px 9px;
+            font-size: 11px;
+            font-weight: 800;
+            background: #E8F8F8;
+            color: #0F4C5C;
+        }
+        .dark .guia-chip { background: #164E63; color: #BFF9FA; }
+        .guia-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        @media (max-width: 430px) {
+            .guia-meta { grid-template-columns: 1fr; }
+        }
         /* ===== BOTÃO INSTALAR APP ===== */
         .instalar-btn {
             background: linear-gradient(135deg, #0F4C5C 0%, #1a7a7c 50%, #49BCBE 100%);
@@ -1192,6 +1268,50 @@
             </div>
         </div>
 
+        <!-- GUIA DE EXAMES PAGE -->
+        <section id="page-exames" class="page space-y-6">
+            <div class="guia-hero">
+                <div class="relative z-10">
+                    <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                        <i class="fa-solid fa-book-medical"></i> Guia CDA
+                    </span>
+                    <h2 class="text-2xl font-extrabold leading-tight mb-2">Exames e preparos</h2>
+                    <p class="text-sm text-white/82 leading-relaxed max-w-xl">Consulte orientações gerais dos exames mais realizados no Laboratório CDA. Em caso de dúvida, confirme com nossa equipe antes da coleta.</p>
+                    <div class="flex flex-wrap gap-3 mt-5">
+                        <button onclick="navigateTo('orcamento')" class="bg-white text-[#0F4C5C] px-4 py-3 rounded-2xl font-extrabold text-sm shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> Simular orçamento
+                        </button>
+                        <a href="https://wa.me/5527998980658?text=Olá! Gostaria de confirmar o preparo de um exame." target="_blank" class="bg-white/15 border border-white/25 text-white px-4 py-3 rounded-2xl font-extrabold text-sm flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp"></i> Confirmar preparo
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-cda p-5 space-y-4">
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="guiaSearchExame" oninput="renderGuiaExames()" placeholder="Buscar exame, material ou preparo" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-2xl pl-11 pr-4 py-4 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-1" id="guiaFiltros">
+                    <button type="button" class="guia-filter active" data-filter="todos" onclick="setGuiaFiltro('todos')">Todos</button>
+                    <button type="button" class="guia-filter" data-filter="Jejum" onclick="setGuiaFiltro('Jejum')">Jejum</button>
+                    <button type="button" class="guia-filter" data-filter="Sem jejum" onclick="setGuiaFiltro('Sem jejum')">Sem jejum</button>
+                    <button type="button" class="guia-filter" data-filter="Sangue" onclick="setGuiaFiltro('Sangue')">Sangue</button>
+                    <button type="button" class="guia-filter" data-filter="Urina" onclick="setGuiaFiltro('Urina')">Urina</button>
+                    <button type="button" class="guia-filter" data-filter="Fezes" onclick="setGuiaFiltro('Fezes')">Fezes</button>
+                    <button type="button" class="guia-filter" data-filter="Coleta especial" onclick="setGuiaFiltro('Coleta especial')">Coleta especial</button>
+                </div>
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex gap-3">
+                    <i class="fa-solid fa-circle-info text-amber-500 mt-0.5"></i>
+                    <p class="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">As orientações são gerais e podem mudar conforme pedido médico, combinação de exames, idade, gestação ou uso de medicamentos.</p>
+                </div>
+                <p id="guiaResultadoCount" class="text-xs text-slate-400 font-bold uppercase tracking-wider"></p>
+            </div>
+
+            <div id="guiaExamesList" class="space-y-3"></div>
+        </section>
+
         <!-- ORÇAMENTO PAGE (SIMULADOR IMEDIATO) -->
         <section id="page-orcamento" class="page space-y-6">
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Simulador de Orçamento</h2>
@@ -1446,6 +1566,2035 @@
     </nav>
 
     <script>
+        const guiaExamesData = [
+  {
+    "id": 1,
+    "nome": "HEMOGRAMA COMPLETO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve pedido médico e documento com foto. Evite exercícios intensos antes da coleta.",
+    "obs": "Se houver febre, sangramentos ou uso de anticoagulantes, informe na recepção.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HEMOGRAMA COMPLETO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 2,
+    "nome": "GLICOSE JEJUM",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Geralmente 8 horas",
+    "preparo": "Manter jejum conforme orientação recebida. Beber água é permitido em pequena quantidade.",
+    "obs": "Não altere medicamentos sem orientação médica. Confirme se o pedido inclui outros exames.",
+    "tags": [
+      "Sangue",
+      "Jejum"
+    ],
+    "busca": "GLICOSE JEJUM SANGUE SANGUE SANGUE JEJUM"
+  },
+  {
+    "id": 3,
+    "nome": "COLESTEROL TOTAL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Jejum pode ser solicitado",
+    "preparo": "Para perfil lipídico, muitos pedidos aceitam coleta sem jejum, mas alguns médicos ainda solicitam jejum de 8 a 12 horas.",
+    "obs": "Confirme o preparo conforme pedido médico e orientação do laboratório.",
+    "tags": [
+      "Sangue",
+      "Jejum variável"
+    ],
+    "busca": "COLESTEROL TOTAL SANGUE SANGUE SANGUE JEJUM VARIAVEL"
+  },
+  {
+    "id": 4,
+    "nome": "TRIGLICERÍDEOS",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Jejum pode ser solicitado",
+    "preparo": "Para perfil lipídico, muitos pedidos aceitam coleta sem jejum, mas alguns médicos ainda solicitam jejum de 8 a 12 horas.",
+    "obs": "Confirme o preparo conforme pedido médico e orientação do laboratório.",
+    "tags": [
+      "Sangue",
+      "Jejum variável"
+    ],
+    "busca": "TRIGLICERIDEOS SANGUE SANGUE SANGUE JEJUM VARIAVEL"
+  },
+  {
+    "id": 5,
+    "nome": "VITAMINA D - 25 HIDROXI",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "VITAMINA D - 25 HIDROXI VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 6,
+    "nome": "VITAMINA B12",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "VITAMINA B12 VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 7,
+    "nome": "TSH - HORMÔNIO TIREOESTIMULANTE - Ultrassensível",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Informe uso de medicamentos para tireoide. Em geral, a coleta pode ser feita sem jejum.",
+    "obs": "Se usa levotiroxina, confirme se deve coletar antes ou depois do medicamento.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Sem jejum"
+    ],
+    "busca": "TSH - HORMONIO TIREOESTIMULANTE - ULTRASSENSIVEL HORMONIOS SANGUE SANGUE HORMONAL SEM JEJUM"
+  },
+  {
+    "id": 8,
+    "nome": "CREATININA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CREATININA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 9,
+    "nome": "HEMOGLOBINA GLICOSILADA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HEMOGLOBINA GLICOSILADA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 10,
+    "nome": "TRANSAMINASE OXALÁCETICA (TGO/AST)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TRANSAMINASE OXALACETICA (TGO/AST) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 11,
+    "nome": "T4 LIVRE",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Informe uso de medicamentos para tireoide. Em geral, a coleta pode ser feita sem jejum.",
+    "obs": "Se usa levotiroxina, confirme se deve coletar antes ou depois do medicamento.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Sem jejum"
+    ],
+    "busca": "T4 LIVRE HORMONIOS SANGUE SANGUE HORMONAL SEM JEJUM"
+  },
+  {
+    "id": 12,
+    "nome": "TRANSAMINASE PIRÚVICA (TGP/ALT)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TRANSAMINASE PIRUVICA (TGP/ALT) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 13,
+    "nome": "FERRITINA",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "FERRITINA VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 14,
+    "nome": "COLESTEROL HDL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Jejum pode ser solicitado",
+    "preparo": "Para perfil lipídico, muitos pedidos aceitam coleta sem jejum, mas alguns médicos ainda solicitam jejum de 8 a 12 horas.",
+    "obs": "Confirme o preparo conforme pedido médico e orientação do laboratório.",
+    "tags": [
+      "Sangue",
+      "Jejum variável"
+    ],
+    "busca": "COLESTEROL HDL SANGUE SANGUE SANGUE JEJUM VARIAVEL"
+  },
+  {
+    "id": 15,
+    "nome": "URÉIA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "UREIA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 16,
+    "nome": "URINA TIPO I",
+    "categoria": "Urina",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coletar em frasco adequado, após higiene íntima. Preferir jato médio quando solicitado.",
+    "obs": "Confirme se a coleta deve ser primeira urina da manhã ou amostra isolada. Use sempre frasco adequado.",
+    "tags": [
+      "Urina",
+      "Sem jejum"
+    ],
+    "busca": "URINA TIPO I URINA URINA URINA SEM JEJUM"
+  },
+  {
+    "id": 17,
+    "nome": "COLESTEROL LDL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Jejum pode ser solicitado",
+    "preparo": "Para perfil lipídico, muitos pedidos aceitam coleta sem jejum, mas alguns médicos ainda solicitam jejum de 8 a 12 horas.",
+    "obs": "Confirme o preparo conforme pedido médico e orientação do laboratório.",
+    "tags": [
+      "Sangue",
+      "Jejum variável"
+    ],
+    "busca": "COLESTEROL LDL SANGUE SANGUE SANGUE JEJUM VARIAVEL"
+  },
+  {
+    "id": 18,
+    "nome": "PARASITOLÓGICO DE FEZES",
+    "categoria": "Fezes",
+    "material": "Fezes",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coletar em frasco próprio, evitando contato com urina ou água do vaso sanitário.",
+    "obs": "Alguns exames podem exigir frasco específico ou restrições. Confirme antes da coleta.",
+    "tags": [
+      "Fezes",
+      "Sem jejum"
+    ],
+    "busca": "PARASITOLOGICO DE FEZES FEZES FEZES FEZES SEM JEJUM"
+  },
+  {
+    "id": 19,
+    "nome": "ÁCIDO ÚRICO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ACIDO URICO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 20,
+    "nome": "GAMA-GLUTAMILTRANSFERASE - GGT",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "GAMA-GLUTAMILTRANSFERASE - GGT SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 21,
+    "nome": "POTÁSSIO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "POTASSIO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 22,
+    "nome": "FERRO Sérico",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "FERRO SERICO VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 23,
+    "nome": "SÓDIO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "SODIO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 24,
+    "nome": "PROTEÍNA C REATIVA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PROTEINA C REATIVA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 25,
+    "nome": "TEMPO DE PROTROMBINA",
+    "categoria": "Coagulação",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Informe uso de anticoagulantes, AAS, anti-inflamatórios ou outros medicamentos.",
+    "obs": "Alguns exames exigem coleta e transporte específicos. Confirme antes de ir ao laboratório.",
+    "tags": [
+      "Sangue",
+      "Coleta especial",
+      "Sem jejum"
+    ],
+    "busca": "TEMPO DE PROTROMBINA COAGULACAO SANGUE SANGUE COLETA ESPECIAL SEM JEJUM"
+  },
+  {
+    "id": 26,
+    "nome": "INSULINA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Geralmente 8 horas",
+    "preparo": "Manter jejum conforme orientação recebida. Beber água é permitido em pequena quantidade.",
+    "obs": "Não altere medicamentos sem orientação médica. Confirme se o pedido inclui outros exames.",
+    "tags": [
+      "Sangue",
+      "Jejum"
+    ],
+    "busca": "INSULINA SANGUE SANGUE SANGUE JEJUM"
+  },
+  {
+    "id": 27,
+    "nome": "FOSFATASE ALCALINA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "FOSFATASE ALCALINA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 28,
+    "nome": "TESTOSTERONA TOTAL",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "TESTOSTERONA TOTAL HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 29,
+    "nome": "TEMPO DE TROMBOPLASTINA P. ATIVADA",
+    "categoria": "Coagulação",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Informe uso de anticoagulantes, AAS, anti-inflamatórios ou outros medicamentos.",
+    "obs": "Alguns exames exigem coleta e transporte específicos. Confirme antes de ir ao laboratório.",
+    "tags": [
+      "Sangue",
+      "Coleta especial",
+      "Sem jejum"
+    ],
+    "busca": "TEMPO DE TROMBOPLASTINA P. ATIVADA COAGULACAO SANGUE SANGUE COLETA ESPECIAL SEM JEJUM"
+  },
+  {
+    "id": 30,
+    "nome": "UROCULTURA",
+    "categoria": "Urina",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Realizar higiene íntima e coletar jato médio em frasco estéril. Evite contaminar a parte interna do frasco.",
+    "obs": "Se estiver usando antibiótico, informe ao laboratório antes da coleta.",
+    "tags": [
+      "Urina",
+      "Coleta especial",
+      "Sem jejum"
+    ],
+    "busca": "UROCULTURA URINA URINA URINA COLETA ESPECIAL SEM JEJUM"
+  },
+  {
+    "id": 31,
+    "nome": "MAGNÉSIO",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "MAGNESIO VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 32,
+    "nome": "V.D.R.L. QUANTITATIVO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "V.D.R.L. QUANTITATIVO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 33,
+    "nome": "BILIRRUBINA TOTAL E FRAÇÕES",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "BILIRRUBINA TOTAL E FRACOES SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 34,
+    "nome": "CÁLCIO",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CALCIO VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 35,
+    "nome": "RETICULOCITOS",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve pedido médico e documento com foto. Evite exercícios intensos antes da coleta.",
+    "obs": "Se houver febre, sangramentos ou uso de anticoagulantes, informe na recepção.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "RETICULOCITOS SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 36,
+    "nome": "HBsAg",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HBSAG SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 37,
+    "nome": "HCV ANTI",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HCV ANTI SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 38,
+    "nome": "HIV 1 e 2 ANTÍGENO/ANTICORPOS",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HIV 1 E 2 ANTIGENO/ANTICORPOS SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 39,
+    "nome": "TESTOSTERONA LIVRE",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "TESTOSTERONA LIVRE HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 40,
+    "nome": "Ácido Fólico",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ACIDO FOLICO VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 41,
+    "nome": "Anti-HBs-Anticorpo contra antígeno de superfície do HBV",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ANTI-HBS-ANTICORPO CONTRA ANTIGENO DE SUPERFICIE DO HBV SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 42,
+    "nome": "PSA TOTAL ULTRA SENSIVEL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite ejaculação, atividade física intensa ou manipulação prostática antes da coleta, conforme orientação médica.",
+    "obs": "Informe procedimentos urológicos recentes e medicamentos em uso.",
+    "tags": [
+      "Sangue",
+      "Coleta especial"
+    ],
+    "busca": "PSA TOTAL ULTRA SENSIVEL SANGUE SANGUE SANGUE COLETA ESPECIAL"
+  },
+  {
+    "id": 43,
+    "nome": "HORMÔNIO Folículo ESTIMULANTE - FSH",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "HORMONIO FOLICULO ESTIMULANTE - FSH HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 44,
+    "nome": "HEMOSSEDIMENTACAO - VHS",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve pedido médico e documento com foto. Evite exercícios intensos antes da coleta.",
+    "obs": "Se houver febre, sangramentos ou uso de anticoagulantes, informe na recepção.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HEMOSSEDIMENTACAO - VHS SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 45,
+    "nome": "ESTRADIOL",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "ESTRADIOL HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 46,
+    "nome": "HORMONIO LUTEINIZANTE - LH",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "HORMONIO LUTEINIZANTE - LH HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 47,
+    "nome": "HOMOCISTEINA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Geralmente 8 horas",
+    "preparo": "Manter jejum conforme orientação recebida. Beber água é permitido em pequena quantidade.",
+    "obs": "Não altere medicamentos sem orientação médica. Confirme se o pedido inclui outros exames.",
+    "tags": [
+      "Sangue",
+      "Jejum"
+    ],
+    "busca": "HOMOCISTEINA SANGUE SANGUE SANGUE JEJUM"
+  },
+  {
+    "id": 48,
+    "nome": "MICROALBUMINÚRIA(amostra isolada)",
+    "categoria": "Urina",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coletar em frasco adequado, após higiene íntima. Preferir jato médio quando solicitado.",
+    "obs": "Confirme se a coleta deve ser primeira urina da manhã ou amostra isolada. Use sempre frasco adequado.",
+    "tags": [
+      "Urina",
+      "Sem jejum"
+    ],
+    "busca": "MICROALBUMINURIA(AMOSTRA ISOLADA) URINA URINA URINA SEM JEJUM"
+  },
+  {
+    "id": 49,
+    "nome": "TOXOPLASMOSE IGG ANTICORPOS",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TOXOPLASMOSE IGG ANTICORPOS SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 50,
+    "nome": "TOXOPLASMOSE IGM ANTICORPOS",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TOXOPLASMOSE IGM ANTICORPOS SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 51,
+    "nome": "ZINCO",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ZINCO VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 52,
+    "nome": "SANGUE OCULTO NAS FEZES",
+    "categoria": "Fezes",
+    "material": "Fezes",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coletar em frasco próprio. Evite misturar a amostra com urina ou água.",
+    "obs": "Alguns métodos podem ter orientações específicas. Confirme com o CDA antes da coleta.",
+    "tags": [
+      "Fezes",
+      "Coleta especial",
+      "Sem jejum"
+    ],
+    "busca": "SANGUE OCULTO NAS FEZES FEZES FEZES FEZES COLETA ESPECIAL SEM JEJUM"
+  },
+  {
+    "id": 53,
+    "nome": "CREATINO FOSFOQUINASE-CPK",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CREATINO FOSFOQUINASE-CPK SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 54,
+    "nome": "ÁCIDO HIPÚRICO URINÁRIO - PRÉ JORNADA",
+    "categoria": "Ocupacional",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coleta urinária ocupacional. Respeite o momento indicado no pedido, como pré-jornada ou pós-jornada.",
+    "obs": "Trazer documento com foto e informar local/horário de trabalho quando solicitado.",
+    "tags": [
+      "Urina",
+      "Coleta especial"
+    ],
+    "busca": "ACIDO HIPURICO URINARIO - PRE JORNADA OCUPACIONAL URINA URINA COLETA ESPECIAL"
+  },
+  {
+    "id": 55,
+    "nome": "ÁCIDO METIL HIPÚRICO URINÁRIO PRÉ JORNADA",
+    "categoria": "Ocupacional",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coleta urinária ocupacional. Respeite o momento indicado no pedido, como pré-jornada ou pós-jornada.",
+    "obs": "Trazer documento com foto e informar local/horário de trabalho quando solicitado.",
+    "tags": [
+      "Urina",
+      "Coleta especial"
+    ],
+    "busca": "ACIDO METIL HIPURICO URINARIO PRE JORNADA OCUPACIONAL URINA URINA COLETA ESPECIAL"
+  },
+  {
+    "id": 56,
+    "nome": "ÁCIDO TRANS-TRANS MUCÔNICO PRÉ JORNADA",
+    "categoria": "Ocupacional",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coleta urinária ocupacional. Respeite o momento indicado no pedido, como pré-jornada ou pós-jornada.",
+    "obs": "Trazer documento com foto e informar local/horário de trabalho quando solicitado.",
+    "tags": [
+      "Urina",
+      "Coleta especial"
+    ],
+    "busca": "ACIDO TRANS-TRANS MUCONICO PRE JORNADA OCUPACIONAL URINA URINA COLETA ESPECIAL"
+  },
+  {
+    "id": 57,
+    "nome": "T3 LIVRE",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Informe uso de medicamentos para tireoide. Em geral, a coleta pode ser feita sem jejum.",
+    "obs": "Se usa levotiroxina, confirme se deve coletar antes ou depois do medicamento.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Sem jejum"
+    ],
+    "busca": "T3 LIVRE HORMONIOS SANGUE SANGUE HORMONAL SEM JEJUM"
+  },
+  {
+    "id": 58,
+    "nome": "CÁLCIO IONIZADO",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CALCIO IONIZADO VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 59,
+    "nome": "PROLACTINA",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "PROLACTINA HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 60,
+    "nome": "PARATORMONIO - PTH INTACTO",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "PARATORMONIO - PTH INTACTO HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 61,
+    "nome": "CORTISOL",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "CORTISOL HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 62,
+    "nome": "ANTI-PEROXIDASE (ANTI TPO)",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Informe uso de medicamentos para tireoide. Em geral, a coleta pode ser feita sem jejum.",
+    "obs": "Se usa levotiroxina, confirme se deve coletar antes ou depois do medicamento.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Sem jejum"
+    ],
+    "busca": "ANTI-PEROXIDASE (ANTI TPO) HORMONIOS SANGUE SANGUE HORMONAL SEM JEJUM"
+  },
+  {
+    "id": 63,
+    "nome": "COLESTEROL VLDL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Jejum pode ser solicitado",
+    "preparo": "Para perfil lipídico, muitos pedidos aceitam coleta sem jejum, mas alguns médicos ainda solicitam jejum de 8 a 12 horas.",
+    "obs": "Confirme o preparo conforme pedido médico e orientação do laboratório.",
+    "tags": [
+      "Sangue",
+      "Jejum variável"
+    ],
+    "busca": "COLESTEROL VLDL SANGUE SANGUE SANGUE JEJUM VARIAVEL"
+  },
+  {
+    "id": 64,
+    "nome": "BETA HCG (Qualitativo)",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coleta simples de sangue. Informe atraso menstrual, gestação suspeita ou uso de medicamentos se aplicável.",
+    "obs": "Para dúvidas sobre melhor data de coleta, confirme com o laboratório.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "BETA HCG (QUALITATIVO) HORMONIOS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 65,
+    "nome": "GRUPO Sanguíneo ABO/RH",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coleta simples de sangue. Leve documento com foto.",
+    "obs": "Se houver histórico de transfusão recente, informe ao laboratório.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "GRUPO SANGUINEO ABO/RH SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 66,
+    "nome": "PSA LIVRE/TOTAL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite ejaculação, atividade física intensa ou manipulação prostática antes da coleta, conforme orientação médica.",
+    "obs": "Informe procedimentos urológicos recentes e medicamentos em uso.",
+    "tags": [
+      "Sangue",
+      "Coleta especial"
+    ],
+    "busca": "PSA LIVRE/TOTAL SANGUE SANGUE SANGUE COLETA ESPECIAL"
+  },
+  {
+    "id": 67,
+    "nome": "VITAMINA C",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "VITAMINA C VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 68,
+    "nome": "TEMPO DE COAGULAÇÃO",
+    "categoria": "Coagulação",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Informe uso de anticoagulantes, AAS, anti-inflamatórios ou outros medicamentos.",
+    "obs": "Alguns exames exigem coleta e transporte específicos. Confirme antes de ir ao laboratório.",
+    "tags": [
+      "Sangue",
+      "Coleta especial",
+      "Sem jejum"
+    ],
+    "busca": "TEMPO DE COAGULACAO COAGULACAO SANGUE SANGUE COLETA ESPECIAL SEM JEJUM"
+  },
+  {
+    "id": 69,
+    "nome": "HTLV I/II - ANTICORPOS",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HTLV I/II - ANTICORPOS SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 70,
+    "nome": "TEMPO DE SANGRAMENTO",
+    "categoria": "Coagulação",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Informe uso de anticoagulantes, AAS, anti-inflamatórios ou outros medicamentos.",
+    "obs": "Alguns exames exigem coleta e transporte específicos. Confirme antes de ir ao laboratório.",
+    "tags": [
+      "Sangue",
+      "Coleta especial",
+      "Sem jejum"
+    ],
+    "busca": "TEMPO DE SANGRAMENTO COAGULACAO SANGUE SANGUE COLETA ESPECIAL SEM JEJUM"
+  },
+  {
+    "id": 71,
+    "nome": "CITOMEGALOVIRUS IgG",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CITOMEGALOVIRUS IGG SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 72,
+    "nome": "CITOMEGALOVIRUS IgM",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CITOMEGALOVIRUS IGM SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 73,
+    "nome": "AMILASE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "AMILASE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 74,
+    "nome": "GLICOSE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "GLICOSE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 75,
+    "nome": "FATOR REUMATÓIDE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "FATOR REUMATOIDE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 76,
+    "nome": "TIROXINA - T3",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Informe uso de medicamentos para tireoide. Em geral, a coleta pode ser feita sem jejum.",
+    "obs": "Se usa levotiroxina, confirme se deve coletar antes ou depois do medicamento.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Sem jejum"
+    ],
+    "busca": "TIROXINA - T3 HORMONIOS SANGUE SANGUE HORMONAL SEM JEJUM"
+  },
+  {
+    "id": 77,
+    "nome": "BETA HCG (Quantitativo)",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coleta simples de sangue. Informe atraso menstrual, gestação suspeita ou uso de medicamentos se aplicável.",
+    "obs": "Para dúvidas sobre melhor data de coleta, confirme com o laboratório.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "BETA HCG (QUANTITATIVO) HORMONIOS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 78,
+    "nome": "RUBEOLA IgG",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "RUBEOLA IGG SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 79,
+    "nome": "LIPASE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "LIPASE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 80,
+    "nome": "RUBEOLA IgM",
+    "categoria": "Sorologias",
+    "material": "Sangue",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Leve documento com foto e pedido médico. Informe vacinação recente, gestação ou suspeita clínica quando relevante.",
+    "obs": "Resultados e interpretação devem ser avaliados por profissional de saúde.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "RUBEOLA IGM SOROLOGIAS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 81,
+    "nome": "PROGESTERONA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PROGESTERONA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 82,
+    "nome": "FÓSFORO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "FOSFORO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 83,
+    "nome": "COLINESTERASE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "COLINESTERASE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 84,
+    "nome": "INDICE DE SATURACAO DA TRANSFERRINA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "INDICE DE SATURACAO DA TRANSFERRINA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 85,
+    "nome": "TRANSFERRINA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TRANSFERRINA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 86,
+    "nome": "PESQUISA DE AUTO-ANTICORPOS ANTICÉLULA - FAN",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PESQUISA DE AUTO-ANTICORPOS ANTICELULA - FAN SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 87,
+    "nome": "LIPOPROTEINA A - Lp(a)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "LIPOPROTEINA A - LP(A) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 88,
+    "nome": "TRIGLICÉRIDES",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Jejum pode ser solicitado",
+    "preparo": "Para perfil lipídico, muitos pedidos aceitam coleta sem jejum, mas alguns médicos ainda solicitam jejum de 8 a 12 horas.",
+    "obs": "Confirme o preparo conforme pedido médico e orientação do laboratório.",
+    "tags": [
+      "Sangue",
+      "Jejum variável"
+    ],
+    "busca": "TRIGLICERIDES SANGUE SANGUE SANGUE JEJUM VARIAVEL"
+  },
+  {
+    "id": 89,
+    "nome": "PAPANICOLAOU - CITOPATOLÓGICO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PAPANICOLAOU - CITOPATOLOGICO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 90,
+    "nome": "ALBUMINA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ALBUMINA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 91,
+    "nome": "PROTEÍNAS TOTAIS E FRAÇÕES",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PROTEINAS TOTAIS E FRACOES SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 92,
+    "nome": "PARASITOLÓGICO DE FEZES - MIF",
+    "categoria": "Fezes",
+    "material": "Fezes",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coletar em frasco próprio, evitando contato com urina ou água do vaso sanitário.",
+    "obs": "Alguns exames podem exigir frasco específico ou restrições. Confirme antes da coleta.",
+    "tags": [
+      "Fezes",
+      "Sem jejum"
+    ],
+    "busca": "PARASITOLOGICO DE FEZES - MIF FEZES FEZES FEZES SEM JEJUM"
+  },
+  {
+    "id": 93,
+    "nome": "SHBG-Globulina Ligadora de Hormônios Sexuais",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "SHBG-GLOBULINA LIGADORA DE HORMONIOS SEXUAIS SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 94,
+    "nome": "ELETROFORESE PROTEINAS",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ELETROFORESE PROTEINAS SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 95,
+    "nome": "TIROXINA - T4",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Informe uso de medicamentos para tireoide. Em geral, a coleta pode ser feita sem jejum.",
+    "obs": "Se usa levotiroxina, confirme se deve coletar antes ou depois do medicamento.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Sem jejum"
+    ],
+    "busca": "TIROXINA - T4 HORMONIOS SANGUE SANGUE HORMONAL SEM JEJUM"
+  },
+  {
+    "id": 96,
+    "nome": "TOXICOLOGICO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TOXICOLOGICO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 97,
+    "nome": "UROCULTURA E ANTIBIOGRAMA",
+    "categoria": "Urina",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Realizar higiene íntima e coletar jato médio em frasco estéril. Evite contaminar a parte interna do frasco.",
+    "obs": "Se estiver usando antibiótico, informe ao laboratório antes da coleta.",
+    "tags": [
+      "Urina",
+      "Coleta especial",
+      "Sem jejum"
+    ],
+    "busca": "UROCULTURA E ANTIBIOGRAMA URINA URINA URINA COLETA ESPECIAL SEM JEJUM"
+  },
+  {
+    "id": 98,
+    "nome": "TESTE DE TOLERÂNCIA À GLICOSE PARA GESTANTE - 2H",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TESTE DE TOLERANCIA A GLICOSE PARA GESTANTE - 2H SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 99,
+    "nome": "APOLIPOPROTEINA B - Apo(B)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "APOLIPOPROTEINA B - APO(B) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 100,
+    "nome": "Transaminase Oxalacética - TGO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TRANSAMINASE OXALACETICA - TGO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 101,
+    "nome": "Transaminase Pirúvica - TGP",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TRANSAMINASE PIRUVICA - TGP SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 102,
+    "nome": "TESTE DE TOLERÂNCIA À GLICOSE PARA GESTANTE - Basal",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TESTE DE TOLERANCIA A GLICOSE PARA GESTANTE - BASAL SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 103,
+    "nome": "ANTIGENO CARCINOEMBRIONARIO - CEA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ANTIGENO CARCINOEMBRIONARIO - CEA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 104,
+    "nome": "FIBRINOGENIO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "FIBRINOGENIO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 105,
+    "nome": "IGE TOTAL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "IGE TOTAL SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 106,
+    "nome": "DEHIDROTESTOSTERONA - DHT",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Alguns hormônios dependem de horário, repouso ou fase do ciclo menstrual. Confirme antes da coleta.",
+    "obs": "Informe medicamentos em uso e, quando aplicável, data da última menstruação.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Coleta especial"
+    ],
+    "busca": "DEHIDROTESTOSTERONA - DHT HORMONIOS SANGUE SANGUE HORMONAL COLETA ESPECIAL"
+  },
+  {
+    "id": 107,
+    "nome": "DESIDROGENASE LÁCTICA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "DESIDROGENASE LACTICA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 108,
+    "nome": "COOMBS INDIRETO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "COOMBS INDIRETO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 109,
+    "nome": "TESTE DE TOLERÂNCIA À GLICOSE PARA GESTANTE - 1H",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TESTE DE TOLERANCIA A GLICOSE PARA GESTANTE - 1H SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 110,
+    "nome": "Painel Respiratório Viral (Covid+Influenza+VSR)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PAINEL RESPIRATORIO VIRAL (COVID+INFLUENZA+VSR) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 111,
+    "nome": "SEXAGEM FETAL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "SEXAGEM FETAL SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 112,
+    "nome": "GAMA GLUTAMIL TRANSFERASE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "GAMA GLUTAMIL TRANSFERASE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 113,
+    "nome": "ANTI - TIREOGLOBULINA",
+    "categoria": "Hormônios",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Informe uso de medicamentos para tireoide. Em geral, a coleta pode ser feita sem jejum.",
+    "obs": "Se usa levotiroxina, confirme se deve coletar antes ou depois do medicamento.",
+    "tags": [
+      "Sangue",
+      "Hormonal",
+      "Sem jejum"
+    ],
+    "busca": "ANTI - TIREOGLOBULINA HORMONIOS SANGUE SANGUE HORMONAL SEM JEJUM"
+  },
+  {
+    "id": 114,
+    "nome": "COBRE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "COBRE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 115,
+    "nome": "VITAMINA A",
+    "categoria": "Vitaminas e minerais",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Evite suplementos no dia da coleta, salvo orientação médica. Informe vitaminas e medicamentos em uso.",
+    "obs": "Alguns minerais podem exigir tubo ou condição especial. Confirme se houver outros exames juntos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "VITAMINA A VITAMINAS E MINERAIS SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 116,
+    "nome": "DENGUE, NS1",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "DENGUE, NS1 SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 117,
+    "nome": "ANTIESTREPTOLISINA O (ASO)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ANTIESTREPTOLISINA O (ASO) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 118,
+    "nome": "BIOPSIA (PEÇA PEQUENA)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "BIOPSIA (PECA PEQUENA) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 119,
+    "nome": "CLORO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CLORO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 120,
+    "nome": "CA 19-9",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CA 19-9 SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 121,
+    "nome": "CAPACIDADE TOTAL DE LIGAÇÃO DO FERR",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CAPACIDADE TOTAL DE LIGACAO DO FERR SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 122,
+    "nome": "SULFATO DE DEHIDROEPIANDROSTERONA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "SULFATO DE DEHIDROEPIANDROSTERONA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 123,
+    "nome": "RETRAÇÃO DO COÁGULO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "RETRACAO DO COAGULO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 124,
+    "nome": "PROTEÍNA C REATIVA ULTRASENSIVEL",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PROTEINA C REATIVA ULTRASENSIVEL SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 125,
+    "nome": "ALFA FETOPROTEINA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ALFA FETOPROTEINA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 126,
+    "nome": "ESQUISTOSSOMOSE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ESQUISTOSSOMOSE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 127,
+    "nome": "COMPLEMENTO C3",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "COMPLEMENTO C3 SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 128,
+    "nome": "COMPLEMENTO C4",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "COMPLEMENTO C4 SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 129,
+    "nome": "PROVA DO LAÇO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "PROVA DO LACO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 130,
+    "nome": "COPROCULTURA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "COPROCULTURA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 131,
+    "nome": "CA 125",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "CA 125 SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 132,
+    "nome": "D-DÍMERO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "D-DIMERO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 133,
+    "nome": "WAALER-ROSE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "WAALER-ROSE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 134,
+    "nome": "TESTE GENÉTICO DE INTOLERÂNCIA A LACTOSE",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "TESTE GENETICO DE INTOLERANCIA A LACTOSE SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 135,
+    "nome": "IMUNOGLOBULINAS IGA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "IMUNOGLOBULINAS IGA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 136,
+    "nome": "ANTI HBC IgG",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ANTI HBC IGG SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 137,
+    "nome": "COLETOR DE URINA 24H",
+    "categoria": "Urina",
+    "material": "Urina",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Coletar em frasco adequado, após higiene íntima. Preferir jato médio quando solicitado.",
+    "obs": "Confirme se a coleta deve ser primeira urina da manhã ou amostra isolada. Use sempre frasco adequado.",
+    "tags": [
+      "Urina",
+      "Sem jejum"
+    ],
+    "busca": "COLETOR DE URINA 24H URINA URINA URINA SEM JEJUM"
+  },
+  {
+    "id": 138,
+    "nome": "HOMA IR",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "HOMA IR SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 139,
+    "nome": "ANTI HBC IgM",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "ANTI HBC IGM SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 140,
+    "nome": "APOLIPOPROTEINA A - Apo(A1)",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "APOLIPOPROTEINA A - APO(A1) SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 141,
+    "nome": "SELENIO Sérico",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "SELENIO SERICO SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 142,
+    "nome": "DEHIDROEPIANDROSTERONA DHEA",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "DEHIDROEPIANDROSTERONA DHEA SANGUE SANGUE SANGUE SEM JEJUM"
+  },
+  {
+    "id": 143,
+    "nome": "LITIO",
+    "categoria": "Sangue",
+    "material": "Sangue",
+    "jejum": "Não obrigatório na maioria dos casos",
+    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
+    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "tags": [
+      "Sangue",
+      "Sem jejum"
+    ],
+    "busca": "LITIO SANGUE SANGUE SANGUE SEM JEJUM"
+  }
+];
+        let guiaFiltroAtual = 'todos';
+
         // BASE DE DADOS DE EXAMES COM PREÇOS
         let examesPrecos = [];
         let examesSelecionados = [];
@@ -1884,6 +4033,62 @@
             }
         }
 
+
+        function setGuiaFiltro(filtro) {
+            guiaFiltroAtual = filtro;
+            document.querySelectorAll('#guiaFiltros .guia-filter').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filtro);
+            });
+            renderGuiaExames();
+        }
+
+        function renderGuiaExames() {
+            const list = document.getElementById('guiaExamesList');
+            const count = document.getElementById('guiaResultadoCount');
+            const input = document.getElementById('guiaSearchExame');
+            if (!list) return;
+
+            const termo = normalizarTexto(input?.value || '');
+            const filtrados = guiaExamesData.filter(exame => {
+                const passaTexto = !termo || exame.busca.includes(termo);
+                const passaFiltro = guiaFiltroAtual === 'todos' || exame.tags.includes(guiaFiltroAtual) || exame.categoria === guiaFiltroAtual || exame.material === guiaFiltroAtual;
+                return passaTexto && passaFiltro;
+            });
+
+            if (count) count.innerText = `${filtrados.length} exame${filtrados.length === 1 ? '' : 's'} encontrado${filtrados.length === 1 ? '' : 's'}`;
+
+            if (!filtrados.length) {
+                list.innerHTML = '<div class="card-cda p-6 text-center"><p class="text-sm text-slate-500 dark:text-slate-300">Nenhum exame encontrado. Tente outro nome ou confirme pelo WhatsApp.</p></div>';
+                return;
+            }
+
+            list.innerHTML = filtrados.map(exame => `
+                <article class="guia-card">
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div>
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-base leading-tight">${exame.nome}</h3>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="guia-chip"><i class="fa-solid fa-vial"></i>${exame.material}</span>
+                                <span class="guia-chip"><i class="fa-solid fa-utensils"></i>${exame.jejum}</span>
+                            </div>
+                        </div>
+                        <button onclick="window.open('https://wa.me/5527998980658?text=${encodeURIComponent('Olá! Gostaria de confirmar o preparo do exame: ' + exame.nome)}', '_blank')" class="w-10 h-10 rounded-2xl bg-green-500 text-white flex items-center justify-center shrink-0 shadow-sm" aria-label="Confirmar pelo WhatsApp">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </button>
+                    </div>
+                    <div class="guia-meta">
+                        <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Preparo básico</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">${exame.preparo}</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Observação</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">${exame.obs}</p>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
         // MODAL INSTALAR APP
         function abrirModalInstalar() {
             const modal = document.getElementById('modalInstalar');
@@ -2013,6 +4218,10 @@
             if (pageId === 'preparo') {
                 iniciarChatPreparo();
             }
+
+            if (pageId === 'exames') {
+                renderGuiaExames();
+            }
         }
 
         // INITIAL LOAD
@@ -2023,6 +4232,7 @@
             iniciarChatPreparo();
             loadProfile();
             setupImportantCarousel();
+            renderGuiaExames();
 
             // Splash Logic - Duração de 3 segundos
             const bar = document.getElementById('progressBar');
@@ -2095,6 +4305,10 @@
         }
     </script></body>
 </html>
+
+
+
+
 
 
 
