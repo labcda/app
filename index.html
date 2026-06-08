@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratório CDA - Diagnóstico de Confiança</title>
     <link rel="manifest" href="manifest.webmanifest">
-    <!-- Ícones PWA - Fundo branco -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='white'/><image href='https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png' x='16' y='36' width='160' height='120'/></svg>" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png">
+    <!-- Ícones PWA - Fundo branco com logo centralizada e com padding -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='white'/><image href='https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png' x='24' y='44' width='144' height='104'/></svg>" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='white'/><image href='https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png' x='20' y='40' width='140' height='100'/></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='white'/><image href='https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png' x='20' y='40' width='140' height='100'/></svg>">
     
     <!-- Configuração para o ícone não ficar esticado e ter fundo branco no iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -70,6 +70,21 @@
             color: #F8FAFC;
         }
 
+        .dark {
+            color-scheme: dark;
+        }
+
+        /* Garante fundo escuro no html e body */
+        html.dark,
+        html.dark body {
+            background-color: #0F172A !important;
+        }
+
+        /* Splash escuro quando dark mode já estava salvo */
+        html.dark #splashScreen {
+            background: #0F172A !important;
+        }
+
         /* Novo Estilo Fleury-like */
         .app-header {
             background-color: #49BCBE;
@@ -110,6 +125,11 @@
             border: 1px solid #EEEEEE;
         }
 
+        .dark .main-card-promo {
+            background: #1E293B;
+            border-color: #334155;
+        }
+
         .main-card-promo .badge {
             background: #666666;
             color: white;
@@ -139,9 +159,18 @@
             transition: all 0.2s ease;
         }
 
+        .dark .action-item {
+            background: #1E293B;
+            border-color: #334155;
+        }
+
         .action-item:active {
             transform: scale(0.98);
             background: #F0F0F0;
+        }
+
+        .dark .action-item:active {
+            background: #273549;
         }
 
         .action-item i {
@@ -157,7 +186,7 @@
         }
 
         .dark .section-title {
-            color: white;
+            color: #F1F5F9;
         }
 
         .info-carousel {
@@ -217,6 +246,7 @@
             justify-content: space-around;
             padding: 10px 0 25px;
             z-index: 50;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .dark .bottom-nav-new {
@@ -232,6 +262,11 @@
             color: #999999;
             font-size: 11px;
             font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .dark .nav-btn-new {
+            color: #64748B;
         }
 
         .nav-btn-new.active {
@@ -240,6 +275,7 @@
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
+        .dark ::-webkit-scrollbar-track { background: #1E293B; }
         ::-webkit-scrollbar-thumb { background: var(--cda-primary); border-radius: 10px; }
         
         .page { display: none; }
@@ -262,6 +298,10 @@
             align-items: center;
             justify-content: center;
             transition: opacity 0.5s ease;
+        }
+
+        .dark #splashScreen {
+            background: #0F172A;
         }
 
         .splash-progress-bar {
@@ -467,6 +507,11 @@
             font-size: 11px;
             font-weight: 700;
             margin-bottom: 10px;
+        }
+
+        .dark .unit-badge {
+            background: #164E63;
+            color: #7EE8EA;
         }
 
         /* Cards padrÃ£o */
@@ -755,6 +800,16 @@
             </div>
         </div>
     </div>
+    <script>
+        // Aplica dark mode imediatamente antes do DOMContentLoaded para evitar flash
+        (function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+                var splash = document.getElementById('splashScreen');
+                if (splash) splash.style.background = '#0F172A';
+            }
+        })();
+    </script>
 
     <!-- FLOATING WHATSAPP -->
     <a href="https://wa.me/5527998980658" target="_blank" class="fab md:hidden">
