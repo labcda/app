@@ -1183,6 +1183,28 @@
             resetScroll();
             requestAnimationFrame(resetScroll);
             setTimeout(resetScroll, 80);
+
+            // Re-inicializa a home ao voltar para ela
+            if (pageId === 'home') {
+                loadProfile();
+                // Re-dispara animações dos elementos anim-in
+                const animItems = target.querySelectorAll('.anim-in');
+                animItems.forEach(el => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(30px)';
+                    el.style.animation = 'none';
+                    // Força reflow para o browser "esquecer" o estado anterior
+                    void el.offsetWidth;
+                    el.style.animation = '';
+                    el.style.opacity = '';
+                    el.style.transform = '';
+                });
+            }
+
+            // Inicializa o chat de preparo ao entrar na aba
+            if (pageId === 'preparo') {
+                iniciarChatPreparo();
+            }
         }
 
         // INITIAL LOAD
@@ -1260,6 +1282,3 @@
         }
     </script></body>
 </html>
-
-
-
