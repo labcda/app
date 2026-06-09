@@ -147,14 +147,18 @@
         }
 
         .main-card-promo .badge {
-            background: #666666;
+            background: linear-gradient(135deg, #0F4C5C, #49BCBE);
             color: white;
             font-size: 10px;
-            padding: 2px 10px;
-            border-radius: 4px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 100px;
             position: absolute;
-            top: -10px;
+            top: -12px;
             left: 20px;
+            box-shadow: 0 4px 12px rgba(73,188,190,0.30);
         }
 
         .grid-actions {
@@ -168,10 +172,11 @@
             background: #FFFFFF;
             border-radius: 18px;
             padding: 18px;
-            min-height: 78px;
+            min-height: 90px;
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
             border: 1px solid rgba(73,188,190,0.14);
             box-shadow: 0 8px 22px rgba(15,76,92,0.06);
             transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease;
@@ -215,6 +220,21 @@
         .dark .action-item:active {
             background: #273549;
         }
+
+        .action-item-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1E293B;
+            line-height: 1.2;
+        }
+        .dark .action-item-title { color: #F1F5F9; }
+        .action-item-sub {
+            font-size: 11px;
+            color: #94A3B8;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+        .dark .action-item-sub { color: #64748B; }
 
         .action-item i {
             width: 38px;
@@ -373,11 +393,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             color: #999999;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
             transition: color 0.2s ease;
+            flex: 1;
         }
 
         .dark .nav-btn-new {
@@ -1129,19 +1150,31 @@
                 <div class="grid-actions anim-in" style="animation-delay: 0.3s">
                     <div onclick="navigateTo('agendar')" class="action-item">
                         <i class="fa-regular fa-calendar text-cda-primary"></i>
-                        <span class="font-bold text-slate-700 dark:text-slate-200">Agendar</span>
+                        <div>
+                            <p class="action-item-title">Agendar</p>
+                            <p class="action-item-sub">Marque sua coleta</p>
+                        </div>
                     </div>
                     <div onclick="navigateTo('resultados')" class="action-item">
                         <i class="fa-regular fa-file-lines text-cda-primary"></i>
-                        <span class="font-bold text-slate-700 dark:text-slate-200">Resultados</span>
+                        <div>
+                            <p class="action-item-title">Resultados</p>
+                            <p class="action-item-sub">Acesse seu laudo</p>
+                        </div>
                     </div>
                     <div onclick="navigateTo('exames')" class="action-item">
                         <i class="fa-solid fa-clipboard-list text-cda-primary"></i>
-                        <span class="font-bold text-slate-700 dark:text-slate-200">Exames</span>
+                        <div>
+                            <p class="action-item-title">Exames</p>
+                            <p class="action-item-sub">Preparo e orientações</p>
+                        </div>
                     </div>
                     <div onclick="navigateTo('unidades')" class="action-item">
                         <i class="fa-solid fa-location-dot text-cda-primary"></i>
-                        <span class="font-bold text-slate-700 dark:text-slate-200">Unidades</span>
+                        <div>
+                            <p class="action-item-title">Unidades</p>
+                            <p class="action-item-sub">Endereços e horários</p>
+                        </div>
                     </div>
                 </div>
 
@@ -1181,12 +1214,17 @@
                 </div>
                 <!-- BOTÃO INSTALAR APP (REPOSICIONADO) -->
                 <div class="mt-8 anim-in" style="animation-delay:0.7s">
-                    <button onclick="abrirModalInstalar()" class="home-install-btn bg-slate-100 dark:bg-slate-800 w-full flex items-center justify-between gap-4 px-6 py-4 rounded-2xl text-left border border-slate-200 dark:border-slate-700">
+                    <button onclick="abrirModalInstalar()" class="home-install-btn w-full flex items-center justify-between gap-4 px-6 py-4 rounded-2xl text-left border border-cda-primary/20 dark:border-slate-700 bg-gradient-to-r from-cda-light to-white dark:from-slate-800 dark:to-slate-800">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-mobile-screen-button text-slate-400"></i>
-                            <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Instalar aplicativo</p>
+                            <div class="w-10 h-10 rounded-xl bg-cda-primary/10 flex items-center justify-center">
+                                <i class="fa-solid fa-mobile-screen-button text-cda-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Instalar aplicativo</p>
+                                <p class="text-xs text-slate-400 dark:text-slate-500 font-medium">Acesse direto da tela inicial</p>
+                            </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-cda-primary text-xs"></i>
                     </button>
                 </div>
             </div>
@@ -1361,7 +1399,17 @@
 
         <!-- ORÇAMENTO PAGE (SIMULADOR IMEDIATO) -->
         <section id="page-orcamento" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Simulador de Orçamento</h2>
+            <!-- HERO ORÇAMENTO -->
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+                <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
+                <div class="relative z-10">
+                    <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                        <i class="fa-solid fa-calculator"></i> Simulador
+                    </span>
+                    <h2 class="text-2xl font-extrabold leading-tight mb-1">Orçamento de Exames</h2>
+                    <p class="text-sm text-white/80 leading-relaxed">Selecione os exames do pedido médico e veja o total estimado na tabela particular.</p>
+                </div>
+            </div>
             
             <div class="grid md:grid-cols-3 gap-6">
                 <!-- LISTA DE EXAMES -->
@@ -1413,7 +1461,13 @@
                     <div class="card-cda p-6 sticky top-6">
                         <h3 class="font-bold text-lg mb-4">Resumo</h3>
                         <div id="selectedExamesList" class="space-y-3 mb-6">
-                            <p class="text-sm text-slate-400 italic">Nenhum exame selecionado</p>
+                            <div class="flex flex-col items-center py-6 text-center">
+                                <div class="w-14 h-14 rounded-2xl bg-cda-light dark:bg-slate-700 flex items-center justify-center mb-3">
+                                    <i class="fa-solid fa-clipboard-list text-cda-primary text-2xl"></i>
+                                </div>
+                                <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Nenhum exame selecionado</p>
+                                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Busque e selecione os exames ao lado</p>
+                            </div>
                         </div>
                         <div class="border-t dark:border-slate-700 pt-4 mb-6">
                             <div class="flex justify-between items-center mb-1">
@@ -1446,18 +1500,38 @@
 
         <!-- OUTRAS PÁGINAS (Mantidas as correções anteriores) -->
         <section id="page-perfil" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Meus Dados</h2>
+            <!-- HERO PERFIL -->
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+                <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-regular fa-circle-user text-4xl text-white/90"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-white/70 mb-0.5">Meu Perfil</p>
+                        <h2 id="hero-perfil-nome" class="text-xl font-extrabold leading-tight">Olá, paciente!</h2>
+                        <p class="text-xs text-white/70 mt-0.5">Seus dados são armazenados localmente</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-cda p-6 space-y-6">
-                <form id="profileForm" onsubmit="saveProfile(event)" class="space-y-4">
+                <form id="profileForm" onsubmit="saveProfile(event)" class="space-y-5">
                     <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Nome Completo</label>
-                        <input type="text" id="prof-nome" placeholder="Seu nome" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome Completo
+                        </label>
+                        <input type="text" id="prof-nome" placeholder="Digite seu nome" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Protocolo / CPF</label>
-                        <input type="text" id="prof-protocolo" placeholder="Dados para resultados" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-solid fa-hashtag text-cda-primary mr-1"></i> Protocolo / CPF
+                        </label>
+                        <input type="text" id="prof-protocolo" placeholder="Número de protocolo ou CPF" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
-                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold">Salvar Dados</button>
+                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Salvar Dados
+                    </button>
                 </form>
             </div>
         </section>
@@ -1476,11 +1550,21 @@
         </section>
 
         <section id="page-preparo" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">IA Preparo</h2>
+            <!-- HERO PREPARO -->
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+                <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
+                <div class="relative z-10">
+                    <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                        <i class="fa-solid fa-comment-medical"></i> Assistente CDA
+                    </span>
+                    <h2 class="text-2xl font-extrabold leading-tight mb-1">Preparo para Exames</h2>
+                    <p class="text-sm text-white/80 leading-relaxed">Digite o nome do exame e receba orientações de preparo e jejum de forma rápida.</p>
+                </div>
+            </div>
             <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden h-[500px] flex flex-col">
                 <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
                 <div class="p-4 border-t dark:border-slate-700 bg-white dark:bg-slate-800 flex gap-2">
-                    <input type="text" id="chatInput" placeholder="Qual o exame?" class="flex-1 bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    <input type="text" id="chatInput" placeholder="Digite o nome do exame..." class="flex-1 bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     <button onclick="enviarMensagemPreparo()" class="w-12 h-12 bg-cda-primary text-white rounded-xl flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -1491,18 +1575,46 @@
         </section>
 
         <section id="page-agendar" class="page space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Agendamento</h2>
+            <!-- HERO AGENDAMENTO -->
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+                <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
+                <div class="relative z-10">
+                    <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                        <i class="fa-regular fa-calendar-check"></i> Agendamento
+                    </span>
+                    <h2 class="text-2xl font-extrabold leading-tight mb-1">Agende sua coleta</h2>
+                    <p class="text-sm text-white/80 leading-relaxed">Solicite seu horário com praticidade. Nossa equipe confirmará em breve pelo WhatsApp.</p>
+                </div>
+            </div>
+
             <div class="card-cda p-6">
-                <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="space-y-4">
-                    <input type="text" name="nome" id="agen-nome" placeholder="Nome Completo" required class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
-                    <div class="grid grid-cols-2 gap-4">
-                        <select name="periodo" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
-                            <option value="Manhã">Manhã</option>
-                            <option value="Tarde">Tarde</option>
-                        </select>
-                        <input type="date" name="data" class="bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                <form id="agendamentoForm" onsubmit="submitAgendamento(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome Completo
+                        </label>
+                        <input type="text" name="nome" id="agen-nome" placeholder="Digite seu nome completo" required class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
-                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold">Solicitar Agendamento</button>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                                <i class="fa-regular fa-sun text-cda-primary mr-1"></i> Período
+                            </label>
+                            <select name="periodo" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                                <option value="Manhã">Manhã</option>
+                                <option value="Tarde">Tarde</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                                <i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data
+                            </label>
+                            <input type="date" name="data" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Solicitar Agendamento
+                    </button>
                 </form>
             </div>
         </section>
@@ -1604,11 +1716,19 @@
         </button>
         <button onclick="navigateTo('agendar')" id="nav-agendar" class="nav-btn-new">
             <i class="fa-regular fa-calendar-check text-xl"></i>
-            <span>Agendamentos</span>
+            <span>Agendar</span>
         </button>
         <button onclick="navigateTo('resultados')" id="nav-resultados" class="nav-btn-new">
             <i class="fa-regular fa-file-lines text-xl"></i>
             <span>Resultados</span>
+        </button>
+        <button onclick="navigateTo('exames')" id="nav-exames" class="nav-btn-new">
+            <i class="fa-solid fa-clipboard-list text-xl"></i>
+            <span>Exames</span>
+        </button>
+        <button onclick="navigateTo('preparo')" id="nav-preparo" class="nav-btn-new">
+            <i class="fa-solid fa-comment-medical text-xl"></i>
+            <span>Preparo</span>
         </button>
     </nav>
 
@@ -4067,7 +4187,7 @@
             const input = document.getElementById('chatInput');
             if (messages && !messages.dataset.ready) {
                 messages.dataset.ready = 'true';
-                adicionarMensagemChat('bot', 'Digite o nome do exame para ver uma orientação inicial de preparo.');
+                adicionarMensagemChat('bot', 'Olá! 👋 Sou o assistente de preparo do Laboratório CDA.\n\nDigite o nome do exame (ex: Hemograma, TSH, Glicemia) e te explico o preparo necessário antes da coleta.');
             }
             if (input && !input.dataset.ready) {
                 input.dataset.ready = 'true';
@@ -4095,6 +4215,20 @@
             const input = document.getElementById('guiaSearchExame');
             if (!list) return;
 
+            // Ícone por categoria/material
+            function iconeCategoria(exame) {
+                const cat = (exame.categoria || '').toLowerCase();
+                const mat = (exame.material || '').toLowerCase();
+                if (mat.includes('urina')) return { icon: 'fa-solid fa-droplet', color: '#F59E0B' };
+                if (mat.includes('fezes')) return { icon: 'fa-solid fa-circle-dot', color: '#92400E' };
+                if (cat.includes('hormônio') || cat.includes('hormonio')) return { icon: 'fa-solid fa-dna', color: '#8B5CF6' };
+                if (cat.includes('sorologia')) return { icon: 'fa-solid fa-shield-virus', color: '#EF4444' };
+                if (cat.includes('vitamina') || cat.includes('mineral')) return { icon: 'fa-solid fa-capsules', color: '#10B981' };
+                if (cat.includes('ocupacional')) return { icon: 'fa-solid fa-hard-hat', color: '#F97316' };
+                if (cat.includes('coleta especial') || mat.includes('cervical')) return { icon: 'fa-solid fa-star-of-life', color: '#EC4899' };
+                return { icon: 'fa-solid fa-tint', color: '#49BCBE' }; // sangue padrão
+            }
+
             const termo = normalizarTexto(input?.value || '');
             const filtrados = guiaExamesData.filter(exame => {
                 const passaTexto = !termo || exame.busca.includes(termo);
@@ -4109,14 +4243,21 @@
                 return;
             }
 
-            list.innerHTML = filtrados.map(exame => `
+            list.innerHTML = filtrados.map(exame => {
+                const { icon, color } = iconeCategoria(exame);
+                return `
                 <article class="guia-card">
                     <div class="flex items-start justify-between gap-3 mb-3">
-                        <div>
-                            <h3 class="font-extrabold text-slate-800 dark:text-white text-base leading-tight">${exame.nome}</h3>
-                            <div class="flex flex-wrap gap-2 mt-2">
-                                <span class="guia-chip"><i class="fa-solid fa-vial"></i>${exame.material}</span>
-                                <span class="guia-chip"><i class="fa-solid fa-utensils"></i>${exame.jejum}</span>
+                        <div class="flex items-start gap-3 flex-1">
+                            <div style="width:40px;height:40px;min-width:40px;border-radius:14px;background:${color}18;display:flex;align-items:center;justify-content:center;margin-top:2px;">
+                                <i class="${icon}" style="color:${color};font-size:17px;"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-slate-800 dark:text-white text-base leading-tight">${exame.nome}</h3>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span class="guia-chip"><i class="fa-solid fa-vial"></i>${exame.material}</span>
+                                    <span class="guia-chip"><i class="fa-solid fa-utensils"></i>${exame.jejum}</span>
+                                </div>
                             </div>
                         </div>
                         <button onclick="window.open('https://wa.me/5527998980658?text=${encodeURIComponent('Olá! Gostaria de confirmar o preparo do exame: ' + exame.nome)}', '_blank')" class="w-10 h-10 rounded-2xl bg-green-500 text-white flex items-center justify-center shrink-0 shadow-sm" aria-label="Confirmar pelo WhatsApp">
@@ -4134,7 +4275,7 @@
                         </div>
                     </div>
                 </article>
-            `).join('');
+            `}).join('');
         }
         // MODAL INSTALAR APP
         function abrirModalInstalar() {
@@ -4325,9 +4466,16 @@
                 document.getElementById('patient-name-display').innerText = 'Olá, ' + nome.split(' ')[0] + '!';
                 document.getElementById('prof-nome').value = nome;
                 document.getElementById('agen-nome').value = nome;
+                // Atualiza hero do perfil
+                const heroPerfil = document.getElementById('hero-perfil-nome');
+                if (heroPerfil) heroPerfil.innerText = 'Olá, ' + nome.split(' ')[0] + '!';
             }
             const id = localStorage.getItem('patient_id');
-            if (id) document.getElementById('patient-status-display').innerText = 'Protocolo: ' + id;
+            if (id) {
+                document.getElementById('patient-status-display').innerText = 'Protocolo: ' + id;
+                const proto = document.getElementById('prof-protocolo');
+                if (proto) proto.value = id;
+            }
         }
 
         function saveProfile(e) {
