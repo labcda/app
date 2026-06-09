@@ -9,12 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
     <link rel="apple-touch-icon" href="icons/icon-180.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-    <!-- Configuração para o ícone não ficar esticado e ter fundo branco no iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Lab CDA">
-    
-    <!-- Meta tags para PWA -->
+    <!-- Meta tags para PWA (sem duplicatas) -->
     <meta name="theme-color" content="#49BCBE">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -634,7 +629,7 @@
             color: #7EE8EA;
         }
 
-        /* Cards padrÃ£o */
+        /* Cards padrão */
         .card-cda {
             background: #fff;
             border-radius: 20px;
@@ -677,7 +672,7 @@
             filter: drop-shadow(0 0 8px rgba(73,188,190,0.4));
         }
 
-        /* AnimaÃ§Ãµes escalonadas entrada */
+        /* Animações escalonadas entrada */
         .anim-in {
             opacity: 0;
             transform: translateY(30px);
@@ -1002,6 +997,36 @@
         .dark .instalar-preview-icon {
             background: #1E293B;
         }
+        /* ===== TOAST / NOTIFICAÇÃO VISUAL ===== */
+        #cda-toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0F4C5C;
+            color: white;
+            padding: 12px 22px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 28px rgba(15,76,92,0.30);
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            white-space: nowrap;
+            max-width: calc(100vw - 40px);
+        }
+        #cda-toast.toast-show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        #cda-toast.toast-error { background: #991B1B; }
+        #cda-toast.toast-success { background: #065F46; }
+        #cda-toast.toast-info { background: #0F4C5C; }
     </style>
 </head>
 <body class="antialiased bg-cda-bg dark:bg-slate-900">
@@ -1070,8 +1095,30 @@
                                 Entrar <i class="fa-solid fa-chevron-right text-[10px]"></i>
                             </button>
                         </div>
-                        <div class="w-24">
-                            <img src="https://img.freepik.com/free-vector/doctor-character-background_1270-84.jpg" alt="Doctor" class="w-full mix-blend-multiply">
+                        <div class="w-24 flex items-center justify-center">
+                            <!-- Ilustração própria Lab CDA — microscópio vetorial -->
+                            <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" aria-hidden="true">
+                                <!-- base -->
+                                <ellipse cx="48" cy="82" rx="28" ry="6" fill="#D1F5F5" opacity="0.7"/>
+                                <!-- haste vertical -->
+                                <rect x="44" y="34" width="8" height="38" rx="4" fill="#37A7AA"/>
+                                <!-- braço horizontal -->
+                                <rect x="30" y="34" width="36" height="8" rx="4" fill="#49BCBE"/>
+                                <!-- ocular (topo) -->
+                                <rect x="44" y="16" width="8" height="22" rx="4" fill="#0F4C5C"/>
+                                <circle cx="48" cy="14" r="6" fill="#0F4C5C"/>
+                                <circle cx="48" cy="14" r="3" fill="#7EE8EA"/>
+                                <!-- lente objetiva -->
+                                <rect x="42" y="58" width="12" height="14" rx="4" fill="#0F4C5C"/>
+                                <circle cx="48" cy="74" r="5" fill="#49BCBE"/>
+                                <circle cx="48" cy="74" r="2.5" fill="#7EE8EA" opacity="0.7"/>
+                                <!-- platina / amostra -->
+                                <rect x="28" y="52" width="20" height="4" rx="2" fill="#37A7AA"/>
+                                <!-- brilhos decorativos -->
+                                <circle cx="70" cy="28" r="3" fill="#49BCBE" opacity="0.4"/>
+                                <circle cx="76" cy="42" r="2" fill="#49BCBE" opacity="0.25"/>
+                                <circle cx="22" cy="60" r="2" fill="#49BCBE" opacity="0.3"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
@@ -1093,7 +1140,7 @@
                         <span class="font-bold text-slate-700 dark:text-slate-200">Exames</span>
                     </div>
                     <div onclick="navigateTo('unidades')" class="action-item">
-                        <i class="fa-solid fa-list-ul text-cda-primary"></i>
+                        <i class="fa-solid fa-location-dot text-cda-primary"></i>
                         <span class="font-bold text-slate-700 dark:text-slate-200">Unidades</span>
                     </div>
                 </div>
@@ -1397,7 +1444,7 @@
             </div>
         </section>
 
-        <!-- OUTRAS PÁGINAS (Mantidas as correÃ§Ãµes anteriores) -->
+        <!-- OUTRAS PÁGINAS (Mantidas as correções anteriores) -->
         <section id="page-perfil" class="page space-y-6">
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Meus Dados</h2>
             <div class="card-cda p-6 space-y-6">
@@ -2821,16 +2868,16 @@
   {
     "id": 89,
     "nome": "PAPANICOLAOU - CITOPATOLÓGICO",
-    "categoria": "Sangue",
-    "material": "Sangue",
-    "jejum": "Não obrigatório na maioria dos casos",
-    "preparo": "Leve documento com foto e pedido médico. Evite exercícios intensos antes da coleta, salvo orientação médica.",
-    "obs": "Orientação geral. Confirme com o Laboratório CDA se houver exames combinados, crianças, gestantes ou uso de medicamentos.",
+    "categoria": "Coleta especial",
+    "material": "Secreção cervical",
+    "jejum": "Não é necessário jejum",
+    "preparo": "Evite relações sexuais, duchas vaginais, cremes ou medicamentos vaginais por 48h antes. Não realize o exame durante o período menstrual.",
+    "obs": "Agende preferencialmente entre o 10º e 20º dia do ciclo menstrual. Informe data da última menstruação e uso de DIU ou hormônios.",
     "tags": [
-      "Sangue",
+      "Coleta especial",
       "Sem jejum"
     ],
-    "busca": "PAPANICOLAOU - CITOPATOLOGICO SANGUE SANGUE SANGUE SEM JEJUM"
+    "busca": "PAPANICOLAOU CITOPATOLOGICO COLETA ESPECIAL SECRECAO CERVICAL SEM JEJUM"
   },
   {
     "id": 90,
@@ -3687,7 +3734,7 @@
                 <div class="exame-item ${checked ? 'selected' : ''} p-4 rounded-2xl bg-white dark:bg-slate-800 flex justify-between items-center shadow-sm mb-2" onclick="toggleExame(${ex.id})">
                     <div>
                         <p class="font-bold text-sm dark:text-white">${ex.nome}</p>
-                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">${ex.codigo || 'SEM CÓDIGO'} â€¢ ${ex.categoria}</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">${ex.codigo || 'SEM CÓDIGO'} &bull; ${ex.categoria}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="font-bold text-cda-primary">${formatCurrency(ex.preco)}</span>
@@ -3938,7 +3985,7 @@
 
         function finalizarOrcamento() {
             if (examesSelecionados.length === 0) {
-                alert('Por favor, selecione ao menos um exame.');
+                showToast('Selecione ao menos um exame para continuar.', 'error');
                 return;
             }
             const selecionados = examesSelecionados.map(id => examesPrecos.find(e => e.id === id)).filter(Boolean);
@@ -4234,25 +4281,42 @@
             setupImportantCarousel();
             renderGuiaExames();
 
-            // Splash Logic - Duração de 3 segundos
+            // Splash Logic — mínimo visual de 1.5s, fecha assim que o app estiver pronto
             const bar = document.getElementById('progressBar');
-            let width = 0;
-            const duration = 3000; // 3 segundos
-            const stepTime = 30;
-            const increment = (100 / (duration / stepTime));
-            
-            const interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
+            const splashStart = Date.now();
+            const minDuration = 1500; // mínimo 1.5s para leitores rápidos
+
+            function fecharSplash() {
+                const elapsed = Date.now() - splashStart;
+                const delay = Math.max(0, minDuration - elapsed);
+                setTimeout(() => {
+                    // Anima barra até 100% rapidamente antes de fechar
+                    bar.style.transition = 'width 0.3s ease';
+                    bar.style.width = '100%';
                     setTimeout(() => {
                         document.getElementById('splashScreen').style.opacity = '0';
                         setTimeout(() => { document.getElementById('splashScreen').style.display = 'none'; }, 500);
-                    }, 500);
-                } else {
-                    width += increment;
-                    bar.style.width = Math.min(width, 100) + '%';
+                    }, 350);
+                }, delay);
+            }
+
+            // Progresso visual suave enquanto carrega
+            let width = 0;
+            const fakeProgress = setInterval(() => {
+                // Vai até 85% simulando carga; os últimos 15% fecham com fecharSplash()
+                if (width < 85) {
+                    width += (85 - width) * 0.07;
+                    bar.style.width = width + '%';
                 }
-            }, stepTime);
+            }, 60);
+
+            // Aguarda todas as inicializações terminarem
+            Promise.allSettled([
+                new Promise(res => { carregarTabelaPrecos().then(res).catch(res); }),
+            ]).then(() => {
+                clearInterval(fakeProgress);
+                fecharSplash();
+            });
         });
 
         function loadProfile() {
@@ -4271,7 +4335,7 @@
             localStorage.setItem('patient_name', document.getElementById('prof-nome').value);
             localStorage.setItem('patient_id', document.getElementById('prof-protocolo').value);
             loadProfile();
-            alert('Dados salvos!');
+            showToast('Dados salvos com sucesso!', 'success');
             navigateTo('home');
         }
 
@@ -4303,13 +4367,40 @@
                 } catch (error) {}
             });
         }
+    <!-- TOAST GLOBAL CDA -->
+    <div id="cda-toast" role="status" aria-live="polite">
+        <i id="cda-toast-icon" class="fa-solid fa-circle-check"></i>
+        <span id="cda-toast-msg"></span>
+    </div>
+
+    <script>
+        // Sistema de Toast — substitui alert() em todo o app
+        let _toastTimer = null;
+        function showToast(msg, tipo = 'success', duracao = 3000) {
+            const toast = document.getElementById('cda-toast');
+            const icon  = document.getElementById('cda-toast-icon');
+            const text  = document.getElementById('cda-toast-msg');
+
+            const icones = {
+                success: 'fa-solid fa-circle-check',
+                error:   'fa-solid fa-circle-xmark',
+                info:    'fa-solid fa-circle-info'
+            };
+
+            toast.className = `toast-${tipo}`;
+            icon.className  = icones[tipo] || icones.info;
+            text.textContent = msg;
+
+            // Força reflow para reiniciar animação
+            void toast.offsetWidth;
+            toast.classList.add('toast-show');
+
+            if (_toastTimer) clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => {
+                toast.classList.remove('toast-show');
+            }, duracao);
+        }
+    </script>
+
     </script></body>
 </html>
-
-
-
-
-
-
-
-
