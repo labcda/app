@@ -1460,7 +1460,7 @@
                     <input type="text" id="orc-search" autocomplete="off"
                         placeholder="Digite o nome ou código do exame..."
                         class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-2xl pl-5 pr-12 py-4 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
-                        oninput="orcAutoComplete()" onkeydown="orcKeyNav(event)" onblur="setTimeout(()=>document.getElementById('orc-dropdown').classList.add('hidden'),200)">
+                        oninput="orcAutoComplete()" onkeydown="orcKeyNav(event)">
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                         <i class="fa-solid fa-search"></i>
                     </div>
@@ -3986,7 +3986,8 @@
             dropdown.innerHTML = resultados.map((ex, i) => `
                 <div class="orc-dd-item flex justify-between items-center px-4 py-3 cursor-pointer hover:bg-cda-light dark:hover:bg-slate-700 transition-colors"
                      data-id="${ex.id}" data-idx="${i}"
-                     onclick="orcSelecionarDoDropdown(${ex.id})">
+                     onmousedown="event.preventDefault(); orcSelecionarDoDropdown(${ex.id})"
+                     ontouchend="event.preventDefault(); orcSelecionarDoDropdown(${ex.id})">
                     <div>
                         <p class="text-sm font-bold text-slate-800 dark:text-white leading-tight">${ex.nome}</p>
                         <p class="text-[11px] text-slate-400 font-medium mt-0.5">${ex.codigo || 'S/CÓD'}</p>
@@ -4023,6 +4024,12 @@
         }
 
         // dropdown fecha via onblur no input (com delay de 200ms)
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#orc-search') && !e.target.closest('#orc-dropdown')) {
+                const dd = document.getElementById('orc-dropdown');
+                if (dd) dd.classList.add('hidden');
+            }
+        });
 
         // =====================================================
         // LISTA DE SELECIONADOS + TOTAL
