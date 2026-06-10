@@ -1191,11 +1191,11 @@
 
                 <!-- GRID DE AÇÕES -->
                 <div class="grid-actions anim-in" style="animation-delay: 0.3s">
-                    <div onclick="navigateTo('agendar')" class="action-item">
-                        <i class="fa-regular fa-calendar text-cda-primary"></i>
+                    <div onclick="navigateTo('orcamento')" class="action-item">
+                        <i class="fa-regular fa-calendar-check text-cda-primary"></i>
                         <div>
-                            <p class="action-item-title">Agendar</p>
-                            <p class="action-item-sub">Marque sua coleta</p>
+                            <p class="action-item-title">Agendamento e Orçamento</p>
+                            <p class="action-item-sub">Agende e simule valores</p>
                         </div>
                     </div>
                     <div onclick="navigateTo('resultados')" class="action-item">
@@ -1217,13 +1217,6 @@
                         <div>
                             <p class="action-item-title">Unidades</p>
                             <p class="action-item-sub">Endereços e horários</p>
-                        </div>
-                    </div>
-                    <div onclick="navigateTo('orc')" class="action-item">
-                        <i class="fa-solid fa-calculator text-cda-primary"></i>
-                        <div>
-                            <p class="action-item-title">Orçamento</p>
-                            <p class="action-item-sub">Valores de exames</p>
                         </div>
                     </div>
                 </div>
@@ -1493,10 +1486,10 @@
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10">
                     <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
-                        <i class="fa-solid fa-calculator"></i> Simulador
+                        <i class="fa-solid fa-calendar-check"></i> Agendamento e Orçamento
                     </span>
-                    <h2 class="text-2xl font-extrabold leading-tight mb-1">Orçamento de Exames</h2>
-                    <p class="text-sm text-white/80 leading-relaxed">Selecione os exames do pedido médico e veja o total estimado na tabela particular.</p>
+                    <h2 class="text-2xl font-extrabold leading-tight mb-1">Agendamento e Orçamento de Exames</h2>
+                    <p class="text-sm text-white/80 leading-relaxed">Faça seu orçamento e agendamento em poucos minutos. Informe os exames manualmente ou envie uma foto/PDF do pedido médico para análise automática por IA.</p>
                     <p id="orc-tabela-status" class="text-xs text-white/60 mt-2 font-medium"></p>
                 </div>
             </div>
@@ -1645,14 +1638,14 @@
 
                 <!-- Ações finais -->
                 <div class="flex flex-col gap-3">
-                    <button onclick="orcIrParaAgendamento()" class="w-full bg-cda-primary/10 dark:bg-cda-primary/20 border border-cda-primary/30 text-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                    <button onclick="orcIrParaAgendamento()" id="orc-btn-agendar" class="w-full bg-cda-primary/10 dark:bg-cda-primary/20 border border-cda-primary/30 text-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2 opacity-40 pointer-events-none">
                         <i class="fa-regular fa-calendar-check text-lg"></i> Agendar coleta
                     </button>
-                    <button onclick="orcFinalizarWhatsApp()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar pelo WhatsApp
-                    </button>
-                    <button onclick="orcGerarPDF()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                    <button onclick="orcGerarPDF()" id="orc-btn-pdf" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 opacity-40 pointer-events-none">
                         <i class="fa-solid fa-file-pdf text-red-500"></i> Baixar orçamento em PDF
+                    </button>
+                    <button onclick="orcFinalizarWhatsApp()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar orçamento pelo WhatsApp
                     </button>
                 </div>
             </div>
@@ -1774,17 +1767,21 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
-                            <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo
+                            <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo <span class="text-red-400">*</span>
                         </label>
-                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo"
-                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo" required
+                            class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-transparent rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white transition"
+                            oninput="agenValidarCampos()">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
-                            <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp
+                            <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp <span class="text-red-400">*</span>
                         </label>
-                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999"
-                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" required
+                            maxlength="15"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-transparent rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white transition"
+                            oninput="agenMascaraTelefone(this); agenValidarCampos()">
+                        <p id="agen-tel-erro" class="text-xs text-red-400 mt-1 ml-1 hidden">Informe um número válido com DDD (ex: 27 99999-9999)</p>
                     </div>
                 </div>
             </div>
@@ -1800,9 +1797,39 @@
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data da coleta
                         </label>
-                        <input type="date" id="agen-data"
-                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
-                            onchange="agenOnDataChange()">
+                        <!-- Seletor de data customizado -->
+                        <div class="relative">
+                            <button type="button" id="agen-data-btn"
+                                onclick="agenToggleCalendario()"
+                                class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-transparent rounded-xl px-4 py-3 text-sm text-left flex items-center justify-between focus:ring-2 focus:ring-cda-primary dark:text-white transition">
+                                <span id="agen-data-label" class="text-slate-400 dark:text-slate-400">Toque para escolher a data</span>
+                                <i class="fa-regular fa-calendar text-cda-primary text-base"></i>
+                            </button>
+                            <input type="hidden" id="agen-data" onchange="agenOnDataChange()">
+                            <!-- Mini calendário -->
+                            <div id="agen-calendario" class="hidden absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 z-50 p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <button type="button" onclick="agenNavMes(-1)" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-cda-light transition">
+                                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    </button>
+                                    <span id="agen-mes-label" class="text-sm font-extrabold text-slate-800 dark:text-white"></span>
+                                    <button type="button" onclick="agenNavMes(1)" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-cda-light transition">
+                                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-7 gap-0.5 mb-1">
+                                    <span class="text-[10px] font-bold text-slate-400 text-center py-1">Dom</span>
+                                    <span class="text-[10px] font-bold text-slate-400 text-center py-1">Seg</span>
+                                    <span class="text-[10px] font-bold text-slate-400 text-center py-1">Ter</span>
+                                    <span class="text-[10px] font-bold text-slate-400 text-center py-1">Qua</span>
+                                    <span class="text-[10px] font-bold text-slate-400 text-center py-1">Qui</span>
+                                    <span class="text-[10px] font-bold text-slate-400 text-center py-1">Sex</span>
+                                    <span class="text-[10px] font-bold text-slate-400 text-center py-1">Sáb</span>
+                                </div>
+                                <div id="agen-dias-grid" class="grid grid-cols-7 gap-0.5"></div>
+                                <button type="button" onclick="agenFecharCalendario()" class="mt-3 w-full text-xs text-slate-400 font-bold py-1.5">Fechar</button>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
@@ -1988,7 +2015,7 @@
             <i class="fa-solid fa-house text-xl"></i>
             <span>Início</span>
         </button>
-        <button onclick="navigateTo('agendar')" id="nav-agendar" class="nav-btn-new">
+        <button onclick="navigateTo('orcamento')" id="nav-orcamento" class="nav-btn-new">
             <i class="fa-regular fa-calendar-check text-xl"></i>
             <span>Agendar</span>
         </button>
@@ -4189,6 +4216,8 @@
             const emptyState = document.getElementById('orc-empty-state');
             const totalEl    = document.getElementById('orc-total');
             const descontoCard = document.getElementById('orc-desconto-card');
+            const btnAgendar = document.getElementById('orc-btn-agendar');
+            const btnPdf     = document.getElementById('orc-btn-pdf');
             if (!container) return;
 
             container.querySelectorAll('.orc-item').forEach(el => el.remove());
@@ -4197,10 +4226,16 @@
                 if (emptyState) emptyState.classList.remove('hidden');
                 if (totalEl) totalEl.textContent = 'R$ 0,00';
                 if (descontoCard) descontoCard.classList.add('hidden');
+                // Desabilita botões quando sem exames
+                if (btnAgendar) { btnAgendar.classList.add('opacity-40','pointer-events-none'); }
+                if (btnPdf)     { btnPdf.classList.add('opacity-40','pointer-events-none'); }
                 return;
             }
 
             if (emptyState) emptyState.classList.add('hidden');
+            // Habilita botões quando há exames
+            if (btnAgendar) { btnAgendar.classList.remove('opacity-40','pointer-events-none'); }
+            if (btnPdf)     { btnPdf.classList.remove('opacity-40','pointer-events-none'); }
 
             let total = 0;
             orcSelecionados.forEach(ex => {
@@ -4453,10 +4488,47 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         // =====================================================
-        // GERAR PDF
+        // GERAR PDF — com opção de baixar ou compartilhar
         // =====================================================
         async function orcGerarPDF() {
-            if (!orcSelecionados.length) { showToast('Selecione ao menos um exame para gerar o PDF.', 'error'); return; }
+            if (!orcSelecionados.length) { showToast('Adicione ao menos um exame primeiro.', 'error'); return; }
+
+            // Modal de escolha
+            const modal = document.createElement('div');
+            modal.id = 'orc-pdf-modal';
+            modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);';
+            modal.innerHTML = `
+                <div style="width:100%;max-width:480px;background:var(--tw-bg, #fff);border-radius:28px 28px 0 0;padding:28px 20px 36px;box-shadow:0 -8px 40px rgba(0,0,0,0.18);" class="bg-white dark:bg-slate-800">
+                    <div class="w-10 h-1 bg-slate-200 dark:bg-slate-600 rounded-full mx-auto mb-6"></div>
+                    <p class="text-base font-extrabold text-slate-800 dark:text-white mb-1 text-center">Orçamento em PDF</p>
+                    <p class="text-xs text-slate-400 text-center mb-6">O que deseja fazer com o orçamento?</p>
+                    <div class="flex flex-col gap-3">
+                        <button id="orc-pdf-download" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 text-sm">
+                            <i class="fa-solid fa-file-arrow-down text-red-500 text-lg"></i> Baixar PDF no dispositivo
+                        </button>
+                        <button id="orc-pdf-whatsapp" class="w-full bg-green-500 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 text-sm">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Compartilhar via WhatsApp
+                        </button>
+                        <button id="orc-pdf-cancel" class="w-full text-slate-400 py-3 font-bold text-sm">Cancelar</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(modal);
+
+            const closeModal = () => modal.remove();
+            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+            document.getElementById('orc-pdf-cancel').onclick = closeModal;
+
+            document.getElementById('orc-pdf-download').onclick = async () => {
+                closeModal();
+                await _orcGerarPDFInterno(true);
+            };
+            document.getElementById('orc-pdf-whatsapp').onclick = async () => {
+                closeModal();
+                await _orcGerarPDFInterno(false);
+            };
+        }
+
+        async function _orcGerarPDFInterno(baixar) {
             showToast('Gerando PDF...', 'info', 3000);
             try {
                 await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
@@ -4570,8 +4642,25 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 doc.text('* Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', W/2, H-6, {align:'center'});
 
                 const safe = (nomePac||'orcamento').replace(/[^a-z0-9]/gi,'_').toLowerCase();
-                doc.save('orcamento_cda_'+safe+'.pdf');
-                showToast('PDF gerado com sucesso!', 'success');
+                const fileName = 'orcamento_cda_'+safe+'.pdf';
+
+                if (baixar) {
+                    doc.save(fileName);
+                    showToast('PDF gerado com sucesso!', 'success');
+                } else {
+                    // Compartilhar via WhatsApp: gera blob, abre link com mensagem
+                    const pdfBlob = doc.output('blob');
+                    const nome  = localStorage.getItem('patient_name') || 'Paciente';
+                    const lista = orcSelecionados.map(ex => `• ${ex.nome}: ${formatCurrency(ex.preco)}`).join('%0a');
+                    const totalStr = formatCurrency(orcSelecionados.reduce((s,e)=>s+e.preco,0));
+                    const msg = `Olá! Segue o orçamento gerado pelo app CDA.%0a%0a*Paciente:* ${encodeURIComponent(nome)}%0a*Total estimado:* ${encodeURIComponent(totalStr)}%0a%0a_Valores da tabela particular. Sujeito a confirmação._`;
+                    // Salva o PDF localmente e abre WhatsApp com a mensagem
+                    doc.save(fileName);
+                    setTimeout(() => {
+                        window.open('https://wa.me/5527998980658?text=' + msg, '_blank');
+                    }, 800);
+                    showToast('PDF salvo! Abrindo WhatsApp...', 'success');
+                }
             } catch (err) {
                 console.error('Erro PDF:', err);
                 showToast('Erro ao gerar PDF. Tente novamente.', 'error');
@@ -4966,6 +5055,130 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
         }
 
+        // =====================================================
+        // MÁSCARA TELEFONE
+        // =====================================================
+        function agenMascaraTelefone(input) {
+            let v = input.value.replace(/\D/g,'');
+            if (v.length > 11) v = v.slice(0,11);
+            if (v.length <= 10) {
+                v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else {
+                v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            }
+            input.value = v;
+        }
+
+        function agenTelefoneValido(tel) {
+            const digits = tel.replace(/\D/g,'');
+            return digits.length === 10 || digits.length === 11;
+        }
+
+        function agenValidarCampos() {
+            const nome = document.getElementById('agen-nome')?.value?.trim();
+            const tel  = document.getElementById('agen-telefone')?.value?.trim();
+            const telErro = document.getElementById('agen-tel-erro');
+            if (tel && !agenTelefoneValido(tel)) {
+                telErro?.classList.remove('hidden');
+            } else {
+                telErro?.classList.add('hidden');
+            }
+        }
+
+        // =====================================================
+        // CALENDÁRIO CUSTOMIZADO
+        // =====================================================
+        let _agenCalMes = new Date().getMonth();
+        let _agenCalAno = new Date().getFullYear();
+
+        function agenToggleCalendario() {
+            const cal = document.getElementById('agen-calendario');
+            if (cal.classList.contains('hidden')) {
+                agenRenderCalendario();
+                cal.classList.remove('hidden');
+            } else {
+                cal.classList.add('hidden');
+            }
+        }
+
+        function agenFecharCalendario() {
+            document.getElementById('agen-calendario')?.classList.add('hidden');
+        }
+
+        function agenNavMes(dir) {
+            _agenCalMes += dir;
+            if (_agenCalMes > 11) { _agenCalMes = 0; _agenCalAno++; }
+            if (_agenCalMes < 0)  { _agenCalMes = 11; _agenCalAno--; }
+            agenRenderCalendario();
+        }
+
+        function agenRenderCalendario() {
+            const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            document.getElementById('agen-mes-label').textContent = `${meses[_agenCalMes]} ${_agenCalAno}`;
+
+            const grid = document.getElementById('agen-dias-grid');
+            grid.innerHTML = '';
+
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            const primeiroDia = new Date(_agenCalAno, _agenCalMes, 1).getDay();
+            const diasNoMes  = new Date(_agenCalAno, _agenCalMes + 1, 0).getDate();
+            const valorAtual = document.getElementById('agen-data').value;
+
+            // Células vazias antes do primeiro dia
+            for (let i = 0; i < primeiroDia; i++) {
+                const vazio = document.createElement('div');
+                grid.appendChild(vazio);
+            }
+
+            for (let d = 1; d <= diasNoMes; d++) {
+                const data = new Date(_agenCalAno, _agenCalMes, d);
+                const diaSemana = data.getDay();
+                const passado   = data < hoje;
+                const domingo   = diaSemana === 0;
+                const str = `${_agenCalAno}-${String(_agenCalMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const selecionado = valorAtual === str;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = d;
+
+                if (passado || domingo) {
+                    btn.className = 'w-full aspect-square rounded-xl text-xs font-medium text-slate-300 dark:text-slate-600 cursor-not-allowed';
+                    btn.disabled = true;
+                } else if (selecionado) {
+                    btn.className = 'w-full aspect-square rounded-xl text-xs font-extrabold bg-cda-primary text-white shadow-md';
+                } else {
+                    btn.className = 'w-full aspect-square rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-cda-light dark:hover:bg-slate-700 transition';
+                    btn.onclick = () => agenSelecionarData(str, d);
+                }
+                grid.appendChild(btn);
+            }
+        }
+
+        function agenSelecionarData(str, dia) {
+            const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+            const [a,m,d] = str.split('-').map(Number);
+            const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+            const dataObj = new Date(a, m-1, d);
+            const label = `${diasSemana[dataObj.getDay()]}, ${d} de ${meses[m-1]} de ${a}`;
+
+            document.getElementById('agen-data').value = str;
+            document.getElementById('agen-data-label').textContent = label;
+            document.getElementById('agen-data-label').classList.remove('text-slate-400','dark:text-slate-400');
+            document.getElementById('agen-data-label').classList.add('text-slate-800','dark:text-white','font-bold');
+            agenFecharCalendario();
+            agenOnDataChange();
+        }
+
+        // Fecha calendário ao clicar fora
+        document.addEventListener('click', function(e) {
+            const cal  = document.getElementById('agen-calendario');
+            const btn  = document.getElementById('agen-data-btn');
+            if (cal && !cal.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
+                cal.classList.add('hidden');
+            }
+        });
+
         async function agenSalvar() {
             const { data, periodo, horario } = agenState;
             const nome     = document.getElementById('agen-nome')?.value?.trim();
@@ -4973,9 +5186,10 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const btnSalvar = document.getElementById('agen-btn-salvar');
             const statusEl  = document.getElementById('agen-status');
 
-            if (!nome)     { showToast('Informe seu nome.', 'error'); return; }
-            if (!telefone) { showToast('Informe seu telefone.', 'error'); return; }
-            if (!data)     { showToast('Selecione a data.', 'error'); return; }
+            if (!nome)     { showToast('Informe seu nome completo.', 'error'); document.getElementById('agen-nome')?.focus(); return; }
+            if (!telefone) { showToast('Informe seu telefone/WhatsApp.', 'error'); document.getElementById('agen-telefone')?.focus(); return; }
+            if (!agenTelefoneValido(telefone)) { showToast('Telefone inválido. Informe DDD + número (10 ou 11 dígitos).', 'error'); document.getElementById('agen-telefone')?.focus(); return; }
+            if (!data)     { showToast('Selecione a data da coleta.', 'error'); return; }
             if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
             if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
 
