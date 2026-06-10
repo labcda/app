@@ -4129,7 +4129,9 @@
                 if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
                 const s = document.createElement('script');
                 s.src = src; s.async = true;
-                s.onload = resolve; s.onerror = reject;
+                const t = setTimeout(() => reject(new Error('Script timeout: ' + src)), 10000);
+                s.onload  = () => { clearTimeout(t); resolve(); };
+                s.onerror = () => { clearTimeout(t); reject(new Error('Script error: ' + src)); };
                 document.head.appendChild(s);
             });
         }
@@ -4143,7 +4145,11 @@
                 await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
                 if (status) status.textContent = 'Carregando tabela de preços...';
 
-                const resp = await fetch(EXCEL_URL + '?v=' + Date.now(), { cache: 'no-store' });
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+                const resp = await fetch(EXCEL_URL + '?v=' + Date.now(), { cache: 'no-store', signal: controller.signal });
+                clearTimeout(timeout);
+
                 if (!resp.ok) throw new Error('Falha ao baixar tabela');
                 const buffer = await resp.arrayBuffer();
                 const wb = XLSX.read(buffer, { type: 'array' });
@@ -4162,10 +4168,11 @@
 
                 if (status) status.textContent = orcTabelaExames.length
                     ? `${orcTabelaExames.length} exames carregados.`
-                    : 'Não foi possível carregar a tabela.';
+                    : 'Tabela carregada, mas sem itens encontrados.';
             } catch (err) {
                 console.error('Erro ao carregar tabela:', err);
-                if (status) status.textContent = 'Não foi possível carregar a tabela. Recarregue a página.';
+                if (status) status.textContent = 'Tabela indisponível. Busca manual desativada.';
+                // Não relança o erro — a promise sempre resolve para não travar o splash
             }
         }
 
@@ -5426,48 +5433,49 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             updateThemeIcon();
-            carregarTabelaPrecos();
             iniciarChatPreparo();
             loadProfile();
             setupImportantCarousel();
             renderGuiaExames();
 
-            // Splash Logic — mínimo visual de 1.5s, fecha assim que o app estiver pronto
+            // Splash Logic
             const bar = document.getElementById('progressBar');
             const splashStart = Date.now();
-            const minDuration = 1500; // mínimo 1.5s para leitores rápidos
+            const minDuration = 1500;
+            let splashFechado = false;
 
             function fecharSplash() {
+                if (splashFechado) return;
+                splashFechado = true;
+                clearInterval(fakeProgress);
                 const elapsed = Date.now() - splashStart;
                 const delay = Math.max(0, minDuration - elapsed);
                 setTimeout(() => {
-                    // Anima barra até 100% rapidamente antes de fechar
-                    bar.style.transition = 'width 0.3s ease';
-                    bar.style.width = '100%';
+                    if (bar) { bar.style.transition = 'width 0.3s ease'; bar.style.width = '100%'; }
                     setTimeout(() => {
-                        document.getElementById('splashScreen').style.opacity = '0';
-                        setTimeout(() => { document.getElementById('splashScreen').style.display = 'none'; }, 500);
+                        const splash = document.getElementById('splashScreen');
+                        if (splash) {
+                            splash.style.opacity = '0';
+                            setTimeout(() => { splash.style.display = 'none'; }, 500);
+                        }
                     }, 350);
                 }, delay);
             }
 
-            // Progresso visual suave enquanto carrega
+            // Progresso visual suave até 85%
             let width = 0;
             const fakeProgress = setInterval(() => {
-                // Vai até 85% simulando carga; os últimos 15% fecham com fecharSplash()
                 if (width < 85) {
                     width += (85 - width) * 0.07;
-                    bar.style.width = width + '%';
+                    if (bar) bar.style.width = width + '%';
                 }
             }, 60);
 
-            // Aguarda todas as inicializações terminarem
-            Promise.allSettled([
-                new Promise(res => { carregarTabelaPrecos().then(res).catch(res); }),
-            ]).then(() => {
-                clearInterval(fakeProgress);
-                fecharSplash();
-            });
+            // Timeout de segurança: fecha o splash em no máximo 5s mesmo que a tabela falhe
+            setTimeout(fecharSplash, 5000);
+
+            // Fecha splash assim que a tabela carregar (sucesso ou erro)
+            carregarTabelaPrecos().finally(fecharSplash);
         });
 
         function loadProfile() {
