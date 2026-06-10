@@ -1460,7 +1460,7 @@
                     <input type="text" id="orc-search" autocomplete="off"
                         placeholder="Digite o nome ou código do exame..."
                         class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-2xl pl-5 pr-12 py-4 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
-                        oninput="orcAutoComplete()" onkeydown="orcKeyNav(event)">
+                        oninput="orcAutoComplete()" onkeydown="orcKeyNav(event)" onblur="setTimeout(()=>document.getElementById('orc-dropdown').classList.add('hidden'),200)">
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                         <i class="fa-solid fa-search"></i>
                     </div>
@@ -1528,12 +1528,69 @@
                 </div>
 
                 <!-- Total -->
-                <div class="border-t dark:border-slate-700 pt-4 mb-5">
+                <div class="border-t dark:border-slate-700 pt-4 mb-4">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-slate-500 dark:text-slate-400">Total estimado</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400">Total estimado (tabela particular)</span>
                         <span id="orc-total" class="text-2xl font-extrabold text-cda-primary">R$ 0,00</span>
                     </div>
                     <p class="text-[10px] text-slate-400 mt-1 leading-tight">*Valores da tabela particular. Convênios sob consulta.</p>
+                </div>
+
+                <!-- CARD DE DESCONTOS -->
+                <div id="orc-desconto-card" class="hidden mb-4 rounded-2xl overflow-hidden border border-cda-primary/20">
+                    <!-- Header do card -->
+                    <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%)" class="px-4 py-3 text-white">
+                        <p class="text-xs font-extrabold uppercase tracking-wider opacity-80 mb-1">💙 Laboratório CDA</p>
+                        <p class="text-sm font-bold leading-snug">Pacientes com convênio ou Cartão Fidelidade CDA têm descontos especiais!</p>
+                    </div>
+                    <!-- Descontos -->
+                    <div class="bg-white dark:bg-slate-800 px-4 py-3 space-y-2">
+                        <div class="flex items-center justify-between bg-cda-light dark:bg-slate-700 rounded-xl px-3 py-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">📱</span>
+                                <div>
+                                    <p class="text-xs font-extrabold text-slate-800 dark:text-white">Pix, dinheiro ou débito</p>
+                                    <p class="text-[11px] text-slate-500">à vista</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-extrabold text-cda-primary">40% OFF</p>
+                                <p id="orc-preco-pix" class="text-xs font-bold text-slate-600 dark:text-slate-300"></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-700 rounded-xl px-3 py-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">💳</span>
+                                <div>
+                                    <p class="text-xs font-extrabold text-slate-800 dark:text-white">Cartão de crédito</p>
+                                    <p id="orc-parcela-texto" class="text-[11px] text-slate-500">parcele em até 10x</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-extrabold text-cda-primary">35% OFF</p>
+                                <p id="orc-preco-credito" class="text-xs font-bold text-slate-600 dark:text-slate-300"></p>
+                            </div>
+                        </div>
+                        <!-- Cobrimos qualquer orçamento -->
+                        <div class="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-3 py-2.5 mt-1">
+                            <i class="fa-solid fa-trophy text-amber-500 mt-0.5 text-sm flex-shrink-0"></i>
+                            <p class="text-xs font-bold text-amber-800 dark:text-amber-300 leading-snug">Cobrimos qualquer orçamento! Apresente uma proposta e faremos questão de superar.</p>
+                        </div>
+                    </div>
+                    <!-- Agendamento VIP -->
+                    <div class="bg-cda-light dark:bg-slate-700/50 px-4 py-3 border-t border-cda-primary/10">
+                        <p class="text-xs font-extrabold text-cda-dark dark:text-cda-primary mb-1.5">🗓️ Agende e ganhe mimos especiais!</p>
+                        <div class="flex flex-wrap gap-x-3 gap-y-1">
+                            <span class="text-[11px] text-slate-600 dark:text-slate-300">✅ Sem fila</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-300">🛋️ Sala VIP com TV e ar</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-300">☕ Café expresso</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-300">🍪 Biscoitinho Club Social</span>
+                        </div>
+                    </div>
+                    <!-- Cartão Fidelidade -->
+                    <div class="bg-white dark:bg-slate-800 px-4 py-3 border-t border-slate-100 dark:border-slate-700">
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Se desejar saber mais sobre o nosso <strong class="text-cda-dark dark:text-cda-primary">Cartão Fidelidade CDA</strong>, é só perguntar — será um prazer explicar tudo! 💙</p>
+                    </div>
                 </div>
 
                 <!-- Ações finais -->
@@ -3929,9 +3986,6 @@
             dropdown.innerHTML = resultados.map((ex, i) => `
                 <div class="orc-dd-item flex justify-between items-center px-4 py-3 cursor-pointer hover:bg-cda-light dark:hover:bg-slate-700 transition-colors"
                      data-id="${ex.id}" data-idx="${i}"
-                     onmousedown="event.preventDefault(); orcSelecionarDoDropdown(${ex.id})"
-                     ontouchstart="event.stopPropagation()"
-                     ontouchend="event.preventDefault(); event.stopPropagation(); orcSelecionarDoDropdown(${ex.id})"
                      onclick="orcSelecionarDoDropdown(${ex.id})">
                     <div>
                         <p class="text-sm font-bold text-slate-800 dark:text-white leading-tight">${ex.nome}</p>
@@ -3968,12 +4022,7 @@
             orcRenderSelecionados();
         }
 
-        document.addEventListener('click', e => {
-            if (!e.target.closest('#orc-search') && !e.target.closest('#orc-dropdown')) {
-                const dd = document.getElementById('orc-dropdown');
-                if (dd) dd.classList.add('hidden');
-            }
-        });
+        // dropdown fecha via onblur no input (com delay de 200ms)
 
         // =====================================================
         // LISTA DE SELECIONADOS + TOTAL
@@ -3982,6 +4031,7 @@
             const container = document.getElementById('orc-selecionados');
             const emptyState = document.getElementById('orc-empty-state');
             const totalEl    = document.getElementById('orc-total');
+            const descontoCard = document.getElementById('orc-desconto-card');
             if (!container) return;
 
             container.querySelectorAll('.orc-item').forEach(el => el.remove());
@@ -3989,6 +4039,7 @@
             if (!orcSelecionados.length) {
                 if (emptyState) emptyState.classList.remove('hidden');
                 if (totalEl) totalEl.textContent = 'R$ 0,00';
+                if (descontoCard) descontoCard.classList.add('hidden');
                 return;
             }
 
@@ -4011,6 +4062,20 @@
                 container.appendChild(div);
             });
             if (totalEl) totalEl.textContent = formatCurrency(total);
+
+            // Atualiza card de descontos
+            if (descontoCard) {
+                descontoCard.classList.remove('hidden');
+                const totalPix    = total * 0.60;
+                const totalCredit = total * 0.65;
+                const parcela     = totalCredit / 10;
+                const pixEl    = document.getElementById('orc-preco-pix');
+                const credEl   = document.getElementById('orc-preco-credito');
+                const parcText = document.getElementById('orc-parcela-texto');
+                if (pixEl)    pixEl.textContent    = formatCurrency(totalPix);
+                if (credEl)   credEl.textContent   = formatCurrency(totalCredit);
+                if (parcText) parcText.textContent = `10x de ${formatCurrency(parcela)}`;
+            }
         }
 
         function orcRemover(id) {
@@ -4240,68 +4305,123 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-                const W = 210, margin = 18;
-                const corCDA  = [73, 188, 190];
-                const corDark = [15, 76, 92];
-                const corGray = [100, 116, 139];
-                const corLight = [241, 245, 249];
+                const W = 210, H = 297, margin = 16;
+                const cw = W - margin * 2;
+                const cPrimary = [73,188,190], cDark = [15,76,92], cMid = [55,167,170];
+                const cText = [30,41,59], cMuted = [100,116,139], cLight = [240,246,247];
+                const cWhite = [255,255,255], cGreen = [5,150,105], cAmber = [160,100,0];
+                const nomePac = localStorage.getItem('patient_name') || '';
+                const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+                let y = 0;
 
-                // Header
-                doc.setFillColor(...corDark);
-                doc.rect(0, 0, W, 38, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(18); doc.setFont('helvetica', 'bold');
-                doc.text('Laboratório CDA', margin, 16);
-                doc.setFontSize(10); doc.setFont('helvetica', 'normal');
-                doc.text('Orçamento de Exames — Tabela Particular', margin, 24);
-                doc.text(`Gerado em ${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}`, margin, 31);
-                const nomePac = localStorage.getItem('patient_name');
-                if (nomePac) { doc.setFont('helvetica','bold'); doc.text(`Paciente: ${nomePac}`, W - margin, 24, { align:'right' }); }
+                // ── CABEÇALHO ──
+                doc.setFillColor(...cDark); doc.rect(0,0,W,48,'F');
+                doc.setFillColor(...cMid); doc.circle(W+10,-10,60,'F');
+                doc.setFillColor(...cPrimary); doc.circle(W-5,55,30,'F');
+                doc.setFillColor(...cPrimary); doc.rect(0,0,W,3,'F');
+                doc.setTextColor(...cWhite);
+                doc.setFontSize(20); doc.setFont('helvetica','bold');
+                doc.text('Laboratorio CDA', margin, 22);
+                doc.setFontSize(9); doc.setFont('helvetica','normal');
+                doc.setTextColor(200,240,241);
+                doc.text('Diagnostico de Confianca', margin, 30);
+                doc.text('Afonso Claudio, ES  .  (27) 99898-0658', margin, 37);
+                doc.setFillColor(...cPrimary);
+                doc.roundedRect(W-margin-42,10,42,14,3,3,'F');
+                doc.setTextColor(...cWhite); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+                doc.text('ORCAMENTO', W-margin-21,19,{align:'center'});
+                y = 56;
 
-                // Tabela
-                let y = 50;
-                const colCod = margin, colNome = margin + 22, colVal = W - margin, rowH = 9;
-                doc.setFillColor(...corCDA);
-                doc.rect(margin, y - 5, W - margin * 2, rowH, 'F');
-                doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
-                doc.text('CÓD', colCod, y);
-                doc.text('DESCRIÇÃO DO EXAME', colNome, y);
-                doc.text('VALOR', colVal, y, { align:'right' });
-                y += rowH;
+                // ── PACIENTE ──
+                doc.setFillColor(...cLight);
+                doc.roundedRect(margin,y,cw,20,4,4,'F');
+                doc.setTextColor(...cMuted); doc.setFontSize(7); doc.setFont('helvetica','normal');
+                doc.text('PACIENTE', margin+5, y+7);
+                doc.text('DATA', margin+cw/2, y+7);
+                doc.setTextColor(...cText); doc.setFontSize(10); doc.setFont('helvetica','bold');
+                doc.text(nomePac || 'Nao informado', margin+5, y+15);
+                doc.text(hoje, margin+cw/2, y+15);
+                y += 28;
 
+                // ── TABELA ──
+                doc.setFillColor(...cDark); doc.roundedRect(margin,y,cw,9,2,2,'F');
+                doc.setTextColor(...cWhite); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+                doc.text('#', margin+3, y+6);
+                doc.text('EXAME', margin+10, y+6);
+                doc.text('VALOR', W-margin-3, y+6, {align:'right'});
+                y += 9;
                 let total = 0;
                 orcSelecionados.forEach((ex, i) => {
-                    if (y > 265) { doc.addPage(); y = 20; }
-                    if (i % 2 === 0) { doc.setFillColor(...corLight); doc.rect(margin, y-5, W-margin*2, rowH, 'F'); }
-                    doc.setTextColor(30, 41, 59); doc.setFont('helvetica','normal'); doc.setFontSize(8);
-                    doc.text(ex.codigo || '-', colCod, y);
-                    doc.text(doc.splitTextToSize(ex.nome, 130)[0], colNome, y);
-                    doc.setFont('helvetica','bold');
-                    doc.text(formatCurrency(ex.preco), colVal, y, { align:'right' });
+                    if (y > 228) { doc.addPage(); y = 20; }
+                    const rowH = 8.5;
+                    if (i%2===0) { doc.setFillColor(248,250,252); doc.rect(margin,y,cw,rowH,'F'); }
+                    doc.setTextColor(...cMuted); doc.setFontSize(7); doc.setFont('helvetica','normal');
+                    doc.text(String(i+1), margin+3, y+5.5);
+                    doc.setTextColor(...cText); doc.setFontSize(8); doc.setFont('helvetica','normal');
+                    doc.text(doc.splitTextToSize(ex.nome,140)[0], margin+10, y+5.5);
+                    doc.setFont('helvetica','bold'); doc.setTextColor(...cPrimary);
+                    doc.text(formatCurrency(ex.preco), W-margin-3, y+5.5, {align:'right'});
                     total += ex.preco; y += rowH;
                 });
+                doc.setDrawColor(...cPrimary); doc.setLineWidth(0.4); doc.line(margin,y+1,W-margin,y+1); y+=4;
+                doc.setFillColor(...cDark); doc.roundedRect(margin,y,cw,12,3,3,'F');
+                doc.setTextColor(...cWhite); doc.setFontSize(9); doc.setFont('helvetica','bold');
+                doc.text('TOTAL ESTIMADO (tabela particular)', margin+5, y+8);
+                doc.text(formatCurrency(total), W-margin-5, y+8, {align:'right'});
+                y += 18;
 
-                y += 2;
-                doc.setDrawColor(...corCDA); doc.setLineWidth(0.5); doc.line(margin, y, W-margin, y); y += 6;
-                doc.setFillColor(...corDark); doc.rect(margin, y-5, W-margin*2, 11, 'F');
-                doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(10);
-                doc.text('TOTAL ESTIMADO', margin + 4, y + 2);
-                doc.text(formatCurrency(total), colVal, y + 2, { align:'right' });
+                // ── DESCONTOS ──
+                const totalPix = total*0.60, totalCredit = total*0.65, parcela = totalCredit/10;
+                doc.setFillColor(...cLight); doc.roundedRect(margin,y,cw,56,4,4,'F');
+                doc.setFillColor(...cPrimary); doc.roundedRect(margin,y,3,56,1.5,1.5,'F');
+                doc.setTextColor(...cDark); doc.setFontSize(9); doc.setFont('helvetica','bold');
+                doc.text('Descontos Especiais CDA', margin+8, y+8);
+                doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(...cMuted);
+                doc.text('Pacientes com convenio ou Cartao Fidelidade CDA tem direito a:', margin+8, y+14);
+                doc.setFillColor(...cWhite); doc.roundedRect(margin+8,y+18,cw-10,10,2,2,'F');
+                doc.setTextColor(...cText); doc.setFontSize(8); doc.setFont('helvetica','bold');
+                doc.text('Pix, dinheiro ou debito (a vista)', margin+12, y+24.5);
+                doc.setTextColor(...cGreen); doc.setFontSize(9);
+                doc.text('40% OFF -> '+formatCurrency(totalPix), W-margin-6, y+24.5, {align:'right'});
+                doc.setFillColor(...cWhite); doc.roundedRect(margin+8,y+31,cw-10,10,2,2,'F');
+                doc.setTextColor(...cText); doc.setFontSize(8); doc.setFont('helvetica','bold');
+                doc.text('Cartao de credito (parcelado em ate 10x)', margin+12, y+37.5);
+                doc.setTextColor(...cGreen); doc.setFontSize(9);
+                doc.text('35% OFF -> 10x '+formatCurrency(parcela), W-margin-6, y+37.5, {align:'right'});
+                doc.setTextColor(...cAmber); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+                doc.text('  Cobrimos qualquer orcamento! Apresente uma proposta e faremos questao de superar.', margin+8, y+50);
+                y += 62;
 
-                y += 20;
-                doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(...corGray);
-                doc.text('* Valores da tabela particular. Convênios e pacotes sob consulta.', margin, y);
-                doc.text('* Este orçamento é uma estimativa e pode ser ajustado pelo laboratório.', margin, y+5);
-                doc.text('Laboratório CDA — Afonso Cláudio, ES  |  WhatsApp: (27) 99898-0658', margin, y+13);
+                // ── AGENDAMENTO VIP ──
+                if (y < 232) {
+                    doc.setFillColor(232,248,248); doc.roundedRect(margin,y,cw,28,4,4,'F');
+                    doc.setFillColor(...cPrimary); doc.roundedRect(margin,y,3,28,1.5,1.5,'F');
+                    doc.setTextColor(...cDark); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+                    doc.text('Agende e ganhe mimos especiais!', margin+8, y+8);
+                    doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(...cText);
+                    doc.text('v Atendimento sem fila   v Sala VIP com TV e ar-condicionado', margin+8, y+15);
+                    doc.text('v Cafe expresso   v Biscoitinho Club Social', margin+8, y+21.5);
+                    y += 34;
+                }
 
-                const safe = (nomePac || 'orcamento').replace(/[^a-z0-9]/gi,'_').toLowerCase();
-                doc.save(`orcamento_cda_${safe}.pdf`);
+                // ── RODAPÉ ──
+                doc.setFillColor(...cDark); doc.rect(0,H-20,W,20,'F');
+                doc.setFillColor(...cPrimary); doc.rect(0,H-20,W,2,'F');
+                doc.setTextColor(...cWhite); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+                doc.text('Laboratorio CDA . Afonso Claudio, ES . (27) 99898-0658', W/2, H-11, {align:'center'});
+                doc.setFontSize(6.5); doc.setTextColor(180,220,221);
+                doc.text('* Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', W/2, H-6, {align:'center'});
+
+                const safe = (nomePac||'orcamento').replace(/[^a-z0-9]/gi,'_').toLowerCase();
+                doc.save('orcamento_cda_'+safe+'.pdf');
                 showToast('PDF gerado com sucesso!', 'success');
             } catch (err) {
                 console.error('Erro PDF:', err);
                 showToast('Erro ao gerar PDF. Tente novamente.', 'error');
             }
         }
+
+
 
 
         const preparoOrientacoes = [
