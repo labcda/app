@@ -1397,9 +1397,10 @@
             <div id="guiaExamesList" class="space-y-3"></div>
         </section>
 
-        <!-- ORÇAMENTO PAGE (SIMULADOR IMEDIATO) -->
-        <section id="page-orcamento" class="page space-y-6">
-            <!-- HERO ORÇAMENTO -->
+        <!-- ORÇAMENTO PAGE — NOVA VERSÃO COM EXCEL + IA + PDF -->
+        <section id="page-orcamento" class="page space-y-5">
+
+            <!-- HERO -->
             <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10">
@@ -1408,94 +1409,122 @@
                     </span>
                     <h2 class="text-2xl font-extrabold leading-tight mb-1">Orçamento de Exames</h2>
                     <p class="text-sm text-white/80 leading-relaxed">Selecione os exames do pedido médico e veja o total estimado na tabela particular.</p>
-                </div>
-            </div>
-            
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- LISTA DE EXAMES -->
-                <div class="md:col-span-2 space-y-4">
-                    <div class="card-cda p-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
-                            <div>
-                                <h3 class="font-bold text-lg">Selecione os Exames</h3>
-                                <p id="tabelaStatus" class="text-xs text-slate-400 mt-1">Carregando tabela de preços...</p>
-                            </div>
-                            <span class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-cda-light dark:bg-slate-700 text-cda-primary text-xs font-extrabold uppercase tracking-wider">
-                                <i class="fa-solid fa-database"></i> Tabela CDA
-                            </span>
-                        </div>
-                        <div class="relative mb-4">
-                            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="searchExame" oninput="filterExames()" placeholder="Buscar por exame ou código" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
-                        </div>
-                        <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 mb-4 border border-slate-100 dark:border-slate-700">
-                            <label for="pedidoArquivo" class="text-xs font-bold text-slate-400 uppercase ml-1">Pedido médico em PDF ou foto</label>
-                            <div class="mt-2 grid md:grid-cols-[1fr_auto] gap-3 items-center">
-                                <input type="file" id="pedidoArquivo" accept="image/*,.pdf,application/pdf" onchange="prepararArquivoPedido()" class="w-full bg-white dark:bg-slate-800 rounded-xl px-4 py-3 text-sm text-slate-500 dark:text-slate-300 file:mr-4 file:border-0 file:bg-cda-light file:text-cda-primary file:font-bold file:rounded-lg file:px-3 file:py-2">
-                                <button onclick="lerArquivoPedido()" class="btn-cda-primary px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-file-import"></i> Ler arquivo
-                                </button>
-                            </div>
-                            <div id="pedidoPreview" class="hidden mt-3 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800"></div>
-
-                            <label for="pedidoTexto" class="text-xs font-bold text-slate-400 uppercase ml-1 block mt-4">Texto do pedido médico</label>
-                            <textarea id="pedidoTexto" rows="4" placeholder="Cole aqui o texto lido do PDF ou foto. Ex: Hemograma, TSH, Glicemia..." class="w-full mt-2 bg-white dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"></textarea>
-                            <div class="flex flex-wrap gap-2 mt-3">
-                                <button onclick="analisarPedidoTexto()" class="btn-cda-primary px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Encontrar exames
-                                </button>
-                                <button onclick="limparSelecao()" class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 px-4 py-3 rounded-xl font-bold text-sm border border-slate-200 dark:border-slate-600">
-                                    Limpar seleção
-                                </button>
-                            </div>
-                            <p id="pedidoStatus" class="text-xs text-slate-400 mt-3">Escolha um PDF/foto ou cole o texto do pedido. Confira os exames antes de enviar.</p>
-                        </div>
-                        <div id="examesList" class="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-                            <!-- Inserido via JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RESUMO E TOTAL -->
-                <div class="space-y-4">
-                    <div class="card-cda p-6 sticky top-6">
-                        <h3 class="font-bold text-lg mb-4">Resumo</h3>
-                        <div id="selectedExamesList" class="space-y-3 mb-6">
-                            <div class="flex flex-col items-center py-6 text-center">
-                                <div class="w-14 h-14 rounded-2xl bg-cda-light dark:bg-slate-700 flex items-center justify-center mb-3">
-                                    <i class="fa-solid fa-clipboard-list text-cda-primary text-2xl"></i>
-                                </div>
-                                <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Nenhum exame selecionado</p>
-                                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Busque e selecione os exames ao lado</p>
-                            </div>
-                        </div>
-                        <div class="border-t dark:border-slate-700 pt-4 mb-6">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-sm text-slate-500">Total Estimado</span>
-                                <span id="totalOrcamento" class="text-2xl font-extrabold text-cda-primary">R$ 0,00</span>
-                            </div>
-                            <p class="text-[10px] text-slate-400 leading-tight">*Valores baseados em tabela particular. Convênios sob consulta.</p>
-                        </div>
-                        <button onclick="finalizarOrcamento()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2">
-                            <i class="fa-brands fa-whatsapp text-lg"></i> ENVIAR PEDIDO
-                        </button>
-                    </div>
+                    <p id="orc-tabela-status" class="text-xs text-white/60 mt-2 font-medium"></p>
                 </div>
             </div>
 
-            <!-- OUTROS EXAMES -->
-            <div class="card-cda p-6 bg-slate-50 dark:bg-slate-800/50 border-dashed border-2">
-                <div class="flex flex-col md:flex-row items-center gap-6">
-                    <div class="w-16 h-16 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center text-3xl text-cda-primary shadow-sm">
-                        <i class="fa-solid fa-camera"></i>
+            <!-- BUSCA COM AUTOCOMPLETE -->
+            <div class="card-cda p-5">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-magnifying-glass text-cda-primary mr-1"></i> Buscar exame pelo nome ou código
+                </label>
+                <div class="relative">
+                    <input type="text" id="orc-search" autocomplete="off"
+                        placeholder="Digite o nome ou código do exame..."
+                        class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-2xl pl-5 pr-12 py-4 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
+                        oninput="orcAutoComplete()" onkeydown="orcKeyNav(event)">
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <i class="fa-solid fa-search"></i>
                     </div>
-                    <div class="flex-1 text-center md:text-left">
-                        <h4 class="font-bold text-slate-800 dark:text-white">Não encontrou seu exame?</h4>
-                        <p class="text-sm text-slate-500">Tire uma foto do seu pedido médico e envie para nosso time. Respondemos em minutos!</p>
-                    </div>
-                    <button onclick="window.open('https://wa.me/5527998980658?text=Olá! Gostaria de um orçamento para este pedido médico.', '_blank')" class="bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-100 transition">ENVIAR FOTO</button>
+                    <!-- DROPDOWN AUTOCOMPLETE -->
+                    <div id="orc-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 z-50 max-h-64 overflow-y-auto"></div>
                 </div>
             </div>
+
+            <!-- LEITURA DE PEDIDO MÉDICO (PDF/IMAGEM via IA) -->
+            <div class="card-cda p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-cda-light dark:bg-slate-700 flex items-center justify-center">
+                        <i class="fa-solid fa-wand-magic-sparkles text-cda-primary text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm text-slate-800 dark:text-white">Ler pedido médico com IA</p>
+                        <p class="text-xs text-slate-400">PDF ou foto — o Claude identifica os exames automaticamente</p>
+                    </div>
+                </div>
+
+                <div class="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-2xl p-4">
+                    <label for="orc-arquivo" class="flex flex-col items-center gap-2 cursor-pointer text-center" id="orc-upload-label">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300"></i>
+                        <span class="text-sm font-bold text-slate-500 dark:text-slate-400">Toque para selecionar PDF ou foto</span>
+                        <span class="text-xs text-slate-400">JPG, PNG ou PDF</span>
+                    </label>
+                    <input type="file" id="orc-arquivo" accept="image/*,.pdf" class="hidden" onchange="orcArquivoSelecionado()">
+                </div>
+
+                <div id="orc-arquivo-preview" class="hidden mt-3 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-600"></div>
+
+                <div class="flex gap-2 mt-3">
+                    <button onclick="orcLerComIA()" id="orc-btn-ler" class="btn-cda-primary px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 flex-1 justify-center" disabled>
+                        <i class="fa-solid fa-file-import"></i> Analisar com IA
+                    </button>
+                    <button onclick="orcLimparArquivo()" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-4 py-3 rounded-xl font-bold text-sm">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <p id="orc-ia-status" class="text-xs text-slate-400 mt-3 leading-relaxed hidden"></p>
+
+                <!-- RESULTADO DA IA: exames identificados e dúvidas -->
+                <div id="orc-ia-result" class="hidden mt-4 space-y-3"></div>
+            </div>
+
+            <!-- EXAMES SELECIONADOS + RESUMO -->
+            <div class="card-cda p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-slate-800 dark:text-white">Exames selecionados</h3>
+                    <button onclick="orcLimparSelecao()" class="text-xs text-slate-400 hover:text-red-500 font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> Limpar
+                    </button>
+                </div>
+
+                <!-- Lista de selecionados -->
+                <div id="orc-selecionados" class="space-y-2 mb-5">
+                    <div id="orc-empty-state" class="flex flex-col items-center py-8 text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-cda-light dark:bg-slate-700 flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-clipboard-list text-cda-primary text-2xl"></i>
+                        </div>
+                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Nenhum exame selecionado</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Busque acima ou use a leitura por IA</p>
+                    </div>
+                </div>
+
+                <!-- Total -->
+                <div class="border-t dark:border-slate-700 pt-4 mb-5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-500 dark:text-slate-400">Total estimado</span>
+                        <span id="orc-total" class="text-2xl font-extrabold text-cda-primary">R$ 0,00</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1 leading-tight">*Valores da tabela particular. Convênios sob consulta.</p>
+                </div>
+
+                <!-- Ações finais -->
+                <div class="flex flex-col gap-3">
+                    <button onclick="orcFinalizarWhatsApp()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar pelo WhatsApp
+                    </button>
+                    <button onclick="orcGerarPDF()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-red-500"></i> Baixar orçamento em PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- ENCAMINHAR PARA ATENDENTE -->
+            <div class="card-cda p-5 bg-slate-50 dark:bg-slate-800/50 border-dashed border-2">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-50 dark:bg-slate-700 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">
+                        <i class="fa-brands fa-whatsapp text-green-500"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-bold text-sm text-slate-800 dark:text-white">Preferir falar com um atendente?</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Envie foto do pedido e nossa equipe faz o orçamento para você.</p>
+                    </div>
+                    <button onclick="window.open('https://wa.me/5527998980658?text=Olá! Gostaria de um orçamento para este pedido médico.','_blank')" class="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs shadow-sm">
+                        Chamar
+                    </button>
+                </div>
+            </div>
+
         </section>
 
         <!-- OUTRAS PÁGINAS (Mantidas as correções anteriores) -->
@@ -3762,359 +3791,475 @@
 ];
         let guiaFiltroAtual = 'todos';
 
-        // BASE DE DADOS DE EXAMES COM PREÇOS
-        let examesPrecos = [];
-        let examesSelecionados = [];
-        let ocrWorker = null;
-        let pdfJsReady = null;
-        let tesseractReady = null;
+        // =====================================================
+        // ORÇAMENTO — ESTADO GLOBAL
+        // =====================================================
+        let orcTabelaExames = [];
+        let orcSelecionados  = [];
+        let orcArquivoAtual  = null;
+        let orcDropdownIdx   = -1;
 
+        // ---- CHAVE CLAUDE API (substitua pela sua) ----
+        const CLAUDE_API_KEY = 'sk-ant-REMOVIDO';
+        // -----------------------------------------------
 
+        const EXCEL_URL = 'https://raw.githubusercontent.com/labcda/appteste/main/tabela_preco_multiplicada_1667%20(1).xlsx';
+
+        // =====================================================
+        // UTILITÁRIOS
+        // =====================================================
         function normalizarTexto(texto) {
-            let normalizado = (texto || '')
+            return (texto || '')
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
                 .toUpperCase()
                 .replace(/[^A-Z0-9]+/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();
-
-            const sinonimos = [
-                ['GLICEMIA DE JEJUM', 'GLICOSE JEJUM'],
-                ['GLICEMIA', 'GLICOSE'],
-                ['EAS', 'URINA TIPO 1'],
-                ['URINA I', 'URINA TIPO 1'],
-                ['PARASITOLOGICO', 'FEZES PARASITOLOGICO'],
-                ['COLESTEROL TOTAL E FRACOES', 'COLESTEROL HDL LDL VLDL'],
-                ['TGO', 'AST'],
-                ['TGP', 'ALT']
-            ];
-
-            sinonimos.forEach(([entrada, saida]) => {
-                normalizado = normalizado.replace(new RegExp(`\\b${entrada}\\b`, 'g'), saida);
-            });
-
-            return normalizado.replace(/\s+/g, ' ').trim();
         }
 
         function formatCurrency(value) {
             return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        function carregarScript(src) {
+            return new Promise((resolve, reject) => {
+                if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+                const s = document.createElement('script');
+                s.src = src; s.async = true;
+                s.onload = resolve; s.onerror = reject;
+                document.head.appendChild(s);
+            });
+        }
+
+        // =====================================================
+        // CARREGAR EXCEL VIA SHEETJS
+        // =====================================================
         async function carregarTabelaPrecos() {
-            const status = document.getElementById('tabelaStatus');
-            const aplicarTabela = (dados, origem) => {
-                examesPrecos = Array.isArray(dados) ? dados : [];
-                if (status) {
-                    status.innerText = examesPrecos.length
-                        ? `${examesPrecos.length} exames carregados da sua tabela de preços.`
-                        : 'Não foi possível carregar a tabela de preços.';
-                }
-                renderExames();
-                return examesPrecos.length > 0;
-            };
-
-            if (window.EXAMES_CDA_DATA && aplicarTabela(window.EXAMES_CDA_DATA, 'script')) return;
-
+            const status = document.getElementById('orc-tabela-status');
             try {
-                const response = await fetch(`./data/exames.json?v=${Date.now()}`, { cache: 'no-store' });
-                if (!response.ok) throw new Error('Tabela não encontrada');
-                const dados = await response.json();
-                if (aplicarTabela(dados, 'json')) return;
-            } catch (error) {
-                if (window.EXAMES_CDA_DATA && aplicarTabela(window.EXAMES_CDA_DATA, 'fallback')) return;
-                examesPrecos = [];
-                if (status) status.innerText = 'Não foi possível carregar a tabela de preços.';
-                renderExames();
+                await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+                if (status) status.textContent = 'Carregando tabela de preços...';
+
+                const resp = await fetch(EXCEL_URL + '?v=' + Date.now(), { cache: 'no-store' });
+                if (!resp.ok) throw new Error('Falha ao baixar tabela');
+                const buffer = await resp.arrayBuffer();
+                const wb = XLSX.read(buffer, { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+                orcTabelaExames = rows.slice(1)
+                    .filter(r => r[1] && r[3] != null)
+                    .map((r, i) => ({
+                        id:     i + 1,
+                        codigo: String(r[0] || '').trim(),
+                        nome:   String(r[1] || '').trim(),
+                        preco:  Number(r[3]) || 0,
+                        busca:  normalizarTexto(String(r[0] || '') + ' ' + String(r[1] || ''))
+                    }));
+
+                if (status) status.textContent = orcTabelaExames.length
+                    ? `${orcTabelaExames.length} exames carregados.`
+                    : 'Não foi possível carregar a tabela.';
+            } catch (err) {
+                console.error('Erro ao carregar tabela:', err);
+                if (status) status.textContent = 'Não foi possível carregar a tabela. Recarregue a página.';
             }
         }
 
-        function renderExames() {
-            const list = document.getElementById('examesList');
-            if (!list) return;
+        // =====================================================
+        // AUTOCOMPLETE
+        // =====================================================
+        function orcAutoComplete() {
+            const input    = document.getElementById('orc-search');
+            const dropdown = document.getElementById('orc-dropdown');
+            const term     = normalizarTexto(input.value);
+            orcDropdownIdx = -1;
 
-            const term = normalizarTexto(document.getElementById('searchExame')?.value || '');
-            const examesFiltrados = term
-                ? examesPrecos.filter(ex => ex.busca.includes(term))
-                : examesPrecos.slice(0, 80);
+            if (term.length < 2) { dropdown.classList.add('hidden'); return; }
 
-            if (examesPrecos.length === 0) {
-                list.innerHTML = '<p class="text-sm text-slate-400 italic p-4">Nenhum exame carregado.</p>';
+            const resultados = orcTabelaExames.filter(ex => ex.busca.includes(term)).slice(0, 12);
+
+            if (!resultados.length) {
+                dropdown.innerHTML = `<div class="px-4 py-3 text-sm text-slate-400 dark:text-slate-500">Nenhum exame encontrado para "<strong>${input.value}</strong>"</div>`;
+                dropdown.classList.remove('hidden');
                 return;
             }
 
-            if (examesFiltrados.length === 0) {
-                list.innerHTML = '<p class="text-sm text-slate-400 italic p-4">Nenhum exame encontrado para essa busca.</p>';
-                return;
-            }
-
-            list.innerHTML = examesFiltrados.map(ex => {
-                const checked = examesSelecionados.includes(ex.id);
-                return `
-                <div class="exame-item ${checked ? 'selected' : ''} p-4 rounded-2xl bg-white dark:bg-slate-800 flex justify-between items-center shadow-sm mb-2" onclick="toggleExame(${ex.id})">
+            dropdown.innerHTML = resultados.map((ex, i) => `
+                <div class="orc-dd-item flex justify-between items-center px-4 py-3 cursor-pointer hover:bg-cda-light dark:hover:bg-slate-700 transition-colors"
+                     data-id="${ex.id}" data-idx="${i}"
+                     onclick="orcSelecionarDoDropdown(${ex.id})">
                     <div>
-                        <p class="font-bold text-sm dark:text-white">${ex.nome}</p>
-                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">${ex.codigo || 'SEM CÓDIGO'} &bull; ${ex.categoria}</p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-white leading-tight">${ex.nome}</p>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">${ex.codigo || 'S/CÓD'}</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-cda-primary">${formatCurrency(ex.preco)}</span>
-                        <div id="check-${ex.id}" class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center ${checked ? 'bg-cda-primary border-cda-primary' : ''}">
-                            <i class="fa-solid fa-check text-[10px] text-white"></i>
-                        </div>
-                    </div>
-                </div>
-            `;
-            }).join('');
+                    <span class="text-sm font-extrabold text-cda-primary ml-3 whitespace-nowrap">${formatCurrency(ex.preco)}</span>
+                </div>`).join('');
+            dropdown.classList.remove('hidden');
         }
 
-        function toggleExame(id) {
-            const index = examesSelecionados.indexOf(id);
-            if (index > -1) {
-                examesSelecionados.splice(index, 1);
+        function orcKeyNav(e) {
+            const dropdown = document.getElementById('orc-dropdown');
+            const items    = dropdown.querySelectorAll('.orc-dd-item');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); orcDropdownIdx = Math.min(orcDropdownIdx + 1, items.length - 1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); orcDropdownIdx = Math.max(orcDropdownIdx - 1, 0); }
+            else if (e.key === 'Enter' && orcDropdownIdx >= 0) { e.preventDefault(); orcSelecionarDoDropdown(Number(items[orcDropdownIdx].dataset.id)); return; }
+            else if (e.key === 'Escape') { dropdown.classList.add('hidden'); return; }
+            items.forEach((el, i) => el.classList.toggle('bg-cda-light', i === orcDropdownIdx));
+            if (items[orcDropdownIdx]) items[orcDropdownIdx].scrollIntoView({ block: 'nearest' });
+        }
+
+        function orcSelecionarDoDropdown(id) {
+            const ex = orcTabelaExames.find(e => e.id === id);
+            if (!ex) return;
+            if (!orcSelecionados.find(s => s.id === id)) {
+                orcSelecionados.push({ ...ex });
+                showToast(ex.nome + ' adicionado', 'success', 2000);
             } else {
-                examesSelecionados.push(id);
+                showToast('Exame já está na lista', 'info', 2000);
             }
-            renderExames();
-            updateResumo();
+            document.getElementById('orc-search').value = '';
+            document.getElementById('orc-dropdown').classList.add('hidden');
+            orcRenderSelecionados();
         }
 
-        function limparSelecao() {
-            examesSelecionados = [];
-            renderExames();
-            updateResumo();
-            const status = document.getElementById('pedidoStatus');
-            if (status) status.innerText = 'Seleção limpa.';
-        }
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#orc-search') && !e.target.closest('#orc-dropdown')) {
+                const dd = document.getElementById('orc-dropdown');
+                if (dd) dd.classList.add('hidden');
+            }
+        });
 
-        function updateResumo() {
-            const list = document.getElementById('selectedExamesList');
-            const totalDisplay = document.getElementById('totalOrcamento');
+        // =====================================================
+        // LISTA DE SELECIONADOS + TOTAL
+        // =====================================================
+        function orcRenderSelecionados() {
+            const container = document.getElementById('orc-selecionados');
+            const emptyState = document.getElementById('orc-empty-state');
+            const totalEl    = document.getElementById('orc-total');
+            if (!container) return;
 
-            if (examesSelecionados.length === 0) {
-                list.innerHTML = '<p class="text-sm text-slate-400 italic">Nenhum exame selecionado</p>';
-                totalDisplay.innerText = 'R$ 0,00';
+            container.querySelectorAll('.orc-item').forEach(el => el.remove());
+
+            if (!orcSelecionados.length) {
+                if (emptyState) emptyState.classList.remove('hidden');
+                if (totalEl) totalEl.textContent = 'R$ 0,00';
                 return;
             }
+
+            if (emptyState) emptyState.classList.add('hidden');
 
             let total = 0;
-            const html = examesSelecionados.map(id => {
-                const ex = examesPrecos.find(e => e.id === id);
-                if (!ex) return '';
-                total += Number(ex.preco || 0);
-                return `
-                    <div class="flex justify-between items-center animate__animated animate__fadeIn gap-3">
-                        <span class="text-xs text-slate-600 dark:text-slate-300">${ex.nome}</span>
-                        <span class="text-xs font-bold dark:text-white whitespace-nowrap">${formatCurrency(ex.preco)}</span>
+            orcSelecionados.forEach(ex => {
+                total += ex.preco;
+                const div = document.createElement('div');
+                div.className = 'orc-item flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl px-4 py-3';
+                div.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800 dark:text-white truncate leading-tight">${ex.nome}</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">${ex.codigo || 'S/CÓD'}</p>
                     </div>
-                `;
-            }).join('');
-
-            list.innerHTML = html;
-            totalDisplay.innerText = formatCurrency(total);
+                    <span class="text-sm font-extrabold text-cda-primary whitespace-nowrap">${formatCurrency(ex.preco)}</span>
+                    <button onclick="orcRemover(${ex.id})" class="w-7 h-7 rounded-full bg-red-50 dark:bg-red-900/30 text-red-400 flex items-center justify-center hover:bg-red-100 transition flex-shrink-0" aria-label="Remover">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>`;
+                container.appendChild(div);
+            });
+            if (totalEl) totalEl.textContent = formatCurrency(total);
         }
 
-        function filterExames() {
-            renderExames();
+        function orcRemover(id) {
+            orcSelecionados = orcSelecionados.filter(e => e.id !== id);
+            orcRenderSelecionados();
         }
 
-        function setPedidoStatus(message) {
-            const status = document.getElementById('pedidoStatus');
-            if (status) status.innerText = message;
+        function orcLimparSelecao() {
+            orcSelecionados = [];
+            orcRenderSelecionados();
+            showToast('Seleção limpa', 'info', 2000);
         }
 
-        function prepararArquivoPedido() {
-            const file = document.getElementById('pedidoArquivo')?.files?.[0];
-            const preview = document.getElementById('pedidoPreview');
-            if (!preview) return;
-            preview.innerHTML = '';
-            preview.classList.add('hidden');
-
-            if (!file) {
-                setPedidoStatus('Escolha um PDF/foto ou cole o texto do pedido. Confira os exames antes de enviar.');
-                return;
-            }
-
+        // =====================================================
+        // ARQUIVO — PREVIEW
+        // =====================================================
+        function orcArquivoSelecionado() {
+            const file    = document.getElementById('orc-arquivo')?.files?.[0];
+            const preview = document.getElementById('orc-arquivo-preview');
+            const btnLer  = document.getElementById('orc-btn-ler');
+            const label   = document.getElementById('orc-upload-label');
+            if (!file) return;
+            orcArquivoAtual = file;
+            preview.classList.remove('hidden');
+            btnLer.disabled = false;
             if (file.type.startsWith('image/')) {
-                const image = document.createElement('img');
-                image.src = URL.createObjectURL(file);
-                image.alt = 'Prévia do pedido médico';
-                image.className = 'w-full max-h-64 object-contain bg-white';
-                image.onload = () => URL.revokeObjectURL(image.src);
-                preview.appendChild(image);
-                preview.classList.remove('hidden');
-                setPedidoStatus(`Foto selecionada: ${file.name}. Toque em Ler arquivo para iniciar o OCR.`);
-                return;
-            }
-
-            if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-                preview.innerHTML = `<div class="p-4 flex items-center gap-3 text-sm text-slate-500 dark:text-slate-300"><i class="fa-solid fa-file-pdf text-2xl text-cda-primary"></i><span>${file.name}</span></div>`;
-                preview.classList.remove('hidden');
-                setPedidoStatus(`PDF selecionado: ${file.name}. Toque em Ler arquivo para extrair o texto.`);
+                preview.innerHTML = `<img src="${URL.createObjectURL(file)}" class="w-full max-h-48 object-contain rounded-2xl p-2">`;
+                label.innerHTML = `<i class="fa-solid fa-image text-2xl text-cda-primary"></i><span class="text-sm font-bold text-slate-600 dark:text-slate-300 truncate max-w-[200px]">${file.name}</span>`;
+            } else {
+                preview.innerHTML = `<div class="flex items-center gap-3 p-4"><i class="fa-solid fa-file-pdf text-2xl text-red-500"></i><span class="text-sm font-bold text-slate-600 dark:text-slate-300">${file.name}</span></div>`;
+                label.innerHTML = `<i class="fa-solid fa-file-pdf text-2xl text-red-500"></i><span class="text-sm font-bold text-slate-600 dark:text-slate-300 truncate max-w-[200px]">${file.name}</span>`;
             }
         }
 
-        function carregarScriptExterno(src) {
-            return new Promise((resolve, reject) => {
-                const existente = document.querySelector(`script[src="${src}"]`);
-                if (existente) {
-                    existente.addEventListener('load', resolve, { once: true });
-                    if (existente.dataset.loaded === 'true') resolve();
-                    return;
-                }
-                const script = document.createElement('script');
-                script.src = src;
-                script.async = true;
-                script.onload = () => {
-                    script.dataset.loaded = 'true';
-                    resolve();
-                };
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
+        function orcLimparArquivo() {
+            orcArquivoAtual = null;
+            document.getElementById('orc-arquivo').value = '';
+            document.getElementById('orc-arquivo-preview').classList.add('hidden');
+            document.getElementById('orc-btn-ler').disabled = true;
+            document.getElementById('orc-ia-status').classList.add('hidden');
+            document.getElementById('orc-ia-result').classList.add('hidden');
+            document.getElementById('orc-upload-label').innerHTML = `
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300"></i>
+                <span class="text-sm font-bold text-slate-500 dark:text-slate-400">Toque para selecionar PDF ou foto</span>
+                <span class="text-xs text-slate-400">JPG, PNG ou PDF</span>`;
         }
 
-        async function garantirTesseract() {
-            if (!tesseractReady) {
-                setPedidoStatus('Carregando leitor de imagem...');
-                tesseractReady = carregarScriptExterno('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
-            }
-            await tesseractReady;
-            if (!window.Tesseract) throw new Error('Leitor de imagem indisponível');
-        }
+        // =====================================================
+        // LEITURA COM IA (CLAUDE API)
+        // =====================================================
+        async function orcLerComIA() {
+            if (!orcArquivoAtual) return;
+            const statusEl = document.getElementById('orc-ia-status');
+            const resultEl = document.getElementById('orc-ia-result');
+            const btnLer   = document.getElementById('orc-btn-ler');
 
-        async function garantirPdfJs() {
-            if (!pdfJsReady) {
-                setPedidoStatus('Carregando leitor de PDF...');
-                pdfJsReady = carregarScriptExterno('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js').then(() => {
-                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                });
-            }
-            await pdfJsReady;
-            if (!window.pdfjsLib) throw new Error('Leitor de PDF indisponível');
-        }
-
-        async function reconhecerImagem(imageSource) {
-            await garantirTesseract();
-            const result = await window.Tesseract.recognize(imageSource, 'por', {
-                logger: (progress) => {
-                    if (progress.status === 'recognizing text') {
-                        const percent = Math.round((progress.progress || 0) * 100);
-                        setPedidoStatus(`Lendo imagem por OCR... ${percent}%`);
-                    }
-                }
-            });
-            return result?.data?.text || '';
-        }
-
-        async function extrairTextoPdf(file) {
-            await garantirPdfJs();
-            const data = await file.arrayBuffer();
-            const pdf = await window.pdfjsLib.getDocument({ data }).promise;
-            const maxPages = Math.min(pdf.numPages, 4);
-            const textParts = [];
-
-            for (let pageNumber = 1; pageNumber <= maxPages; pageNumber++) {
-                setPedidoStatus(`Lendo texto do PDF... página ${pageNumber}/${maxPages}`);
-                const page = await pdf.getPage(pageNumber);
-                const content = await page.getTextContent();
-                const pageText = content.items.map(item => item.str).join(' ').trim();
-                if (pageText) textParts.push(pageText);
-            }
-
-            if (textParts.join(' ').trim().length > 20) return textParts.join('\n');
-
-            await garantirTesseract();
-            const ocrParts = [];
-            for (let pageNumber = 1; pageNumber <= maxPages; pageNumber++) {
-                setPedidoStatus(`PDF escaneado. Fazendo OCR da página ${pageNumber}/${maxPages}...`);
-                const page = await pdf.getPage(pageNumber);
-                const viewport = page.getViewport({ scale: 1.8 });
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
-                await page.render({ canvasContext: context, viewport }).promise;
-                ocrParts.push(await reconhecerImagem(canvas));
-            }
-            return ocrParts.join('\n');
-        }
-
-        async function lerArquivoPedido() {
-            const file = document.getElementById('pedidoArquivo')?.files?.[0];
-            if (!file) {
-                setPedidoStatus('Escolha uma foto ou PDF do pedido médico primeiro.');
-                return;
-            }
+            statusEl.classList.remove('hidden');
+            resultEl.classList.add('hidden');
+            btnLer.disabled = true;
+            statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2 text-cda-primary"></i>Analisando pedido com IA...';
 
             try {
-                let texto = '';
-                if (file.type.startsWith('image/')) {
-                    texto = await reconhecerImagem(file);
-                } else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-                    texto = await extrairTextoPdf(file);
-                } else {
-                    setPedidoStatus('Formato não reconhecido. Use PDF, JPG ou PNG.');
-                    return;
+                const base64 = await new Promise((res, rej) => {
+                    const reader = new FileReader();
+                    reader.onload = () => res(reader.result.split(',')[1]);
+                    reader.onerror = rej;
+                    reader.readAsDataURL(orcArquivoAtual);
+                });
+
+                const isImage = orcArquivoAtual.type.startsWith('image/');
+                const mediaType = isImage ? orcArquivoAtual.type : 'application/pdf';
+
+                const listaTabela = orcTabelaExames
+                    .map(ex => `${ex.id}|${ex.codigo}|${ex.nome}|${ex.preco.toFixed(2)}`)
+                    .join('\n');
+
+                const prompt = `Você é um assistente especializado em laboratório clínico.
+
+Analise o pedido médico fornecido e identifique TODOS os exames solicitados.
+
+Para cada exame identificado:
+1. Tente encontrar o exame na tabela abaixo (por nome ou código)
+2. Se encontrar com certeza → inclua em "encontrados" com o id, nome, codigo e preco EXATOS da tabela
+3. Se tiver dúvida ou ambiguidade → inclua em "duvidas" com o motivo
+4. Se não encontrar → inclua em "nao_encontrados"
+
+REGRA CRÍTICA: Nunca suponha correspondências. Em caso de dúvida mínima, marque como "duvida".
+
+TABELA (formato: ID|CODIGO|NOME|PRECO):
+${listaTabela}
+
+Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
+{
+  "encontrados": [{"id":<numero>,"nome":"<nome_exato>","codigo":"<codigo>","preco":<numero>,"nome_pedido":"<como_aparece>"}],
+  "duvidas": [{"nome_pedido":"<como_aparece>","motivo":"<motivo>"}],
+  "nao_encontrados": [{"nome_pedido":"<como_aparece>"}]
+}`;
+
+                const contentBlock = isImage
+                    ? [{ type:'image', source:{ type:'base64', media_type: mediaType, data: base64 } }, { type:'text', text: prompt }]
+                    : [{ type:'document', source:{ type:'base64', media_type:'application/pdf', data: base64 } }, { type:'text', text: prompt }];
+
+                const resp = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000, messages:[{ role:'user', content: contentBlock }] })
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.json().catch(() => ({}));
+                    throw new Error(err?.error?.message || `Erro HTTP ${resp.status}`);
                 }
 
-                const campo = document.getElementById('pedidoTexto');
-                if (campo) campo.value = texto.trim();
-                if (texto.trim()) {
-                    setPedidoStatus('Texto extraído. Procurando exames na tabela...');
-                    analisarPedidoTexto();
-                } else {
-                    setPedidoStatus('Não consegui ler texto suficiente. Tente uma foto mais nítida ou cole o texto manualmente.');
+                const data = await resp.json();
+                const texto = (data.content || []).map(b => b.text || '').join('');
+                const resultado = JSON.parse(texto.replace(/```json|```/g, '').trim());
+                orcRenderResultadoIA(resultado);
+                statusEl.classList.add('hidden');
+
+            } catch (err) {
+                console.error('Erro IA:', err);
+                const ehChave = CLAUDE_API_KEY === 'SUA_CHAVE_AQUI' || String(err.message).includes('401');
+                statusEl.innerHTML = ehChave
+                    ? '<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>Chave da API não configurada. Insira sua <strong>CLAUDE_API_KEY</strong> no código.'
+                    : `<i class="fa-solid fa-triangle-exclamation text-red-500 mr-1"></i>Erro ao analisar: ${err.message}. <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-primary font-bold underline">Fale com um atendente</a>.`;
+            } finally {
+                btnLer.disabled = false;
+            }
+        }
+
+        function orcRenderResultadoIA(resultado) {
+            const resultEl = document.getElementById('orc-ia-result');
+            resultEl.classList.remove('hidden');
+            resultEl.innerHTML = '';
+
+            if (resultado.encontrados?.length) {
+                const sec = document.createElement('div');
+                sec.innerHTML = `<p class="text-xs font-extrabold text-green-700 dark:text-green-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-circle-check mr-1"></i>${resultado.encontrados.length} exame(s) identificado(s)</p>`;
+                resultado.encontrados.forEach(ex => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between gap-3 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-2xl px-4 py-3 mb-2';
+                    div.innerHTML = `
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-slate-800 dark:text-white truncate">${ex.nome}</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Pedido: "${ex.nome_pedido}"</p>
+                        </div>
+                        <span class="text-sm font-extrabold text-cda-primary whitespace-nowrap">${formatCurrency(ex.preco)}</span>
+                        <button onclick="orcAdicionarDaIA(${ex.id})" class="w-8 h-8 rounded-full bg-cda-primary text-white flex items-center justify-center hover:opacity-80 transition flex-shrink-0">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>`;
+                    sec.appendChild(div);
+                });
+                if (resultado.encontrados.length > 1) {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full bg-cda-primary text-white py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 mb-3';
+                    btn.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Adicionar todos os encontrados';
+                    btn.onclick = () => { resultado.encontrados.forEach(ex => orcAdicionarDaIA(ex.id)); showToast(resultado.encontrados.length + ' exames adicionados', 'success'); };
+                    sec.appendChild(btn);
                 }
-            } catch (error) {
-                setPedidoStatus('Não foi possível ler este arquivo. Tente outra imagem/PDF ou cole o texto manualmente.');
+                resultEl.appendChild(sec);
+            }
+
+            if (resultado.duvidas?.length) {
+                const sec = document.createElement('div');
+                sec.innerHTML = `<p class="text-xs font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-2 mt-3"><i class="fa-solid fa-circle-question mr-1"></i>${resultado.duvidas.length} exame(s) com dúvida</p>`;
+                resultado.duvidas.forEach(ex => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-3 mb-2';
+                    div.innerHTML = `<p class="text-sm font-bold text-slate-800 dark:text-white">"${ex.nome_pedido}"</p><p class="text-xs text-amber-700 dark:text-amber-300 mt-1"><i class="fa-solid fa-circle-info mr-1"></i>${ex.motivo}</p>`;
+                    sec.appendChild(div);
+                });
+                resultEl.appendChild(sec);
+            }
+
+            if (resultado.nao_encontrados?.length) {
+                const sec = document.createElement('div');
+                sec.innerHTML = `<p class="text-xs font-extrabold text-red-600 dark:text-red-400 uppercase tracking-wider mb-2 mt-3"><i class="fa-solid fa-circle-xmark mr-1"></i>${resultado.nao_encontrados.length} não encontrado(s) na tabela</p>`;
+                resultado.nao_encontrados.forEach(ex => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-2xl px-4 py-3 mb-2';
+                    div.innerHTML = `<p class="text-sm font-bold text-slate-800 dark:text-white">"${ex.nome_pedido}"</p>`;
+                    sec.appendChild(div);
+                });
+                resultEl.appendChild(sec);
+            }
+
+            if (resultado.duvidas?.length || resultado.nao_encontrados?.length) {
+                const aviso = document.createElement('div');
+                aviso.className = 'bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl px-4 py-3 mt-2 flex items-start gap-3';
+                aviso.innerHTML = `
+                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200">Itens com dúvida ou não encontrados</p>
+                        <p class="text-xs text-slate-500 mt-1">Recomendamos confirmar esses exames com um atendente antes de finalizar.</p>
+                        <button onclick="window.open('https://wa.me/5527998980658?text=Olá! Preciso de ajuda com orçamento de exames não encontrados no app.','_blank')" class="mt-2 text-xs font-bold text-cda-primary underline">Falar com atendente →</button>
+                    </div>`;
+                resultEl.appendChild(aviso);
             }
         }
 
-        function analisarPedidoTexto() {
-            const texto = normalizarTexto(document.getElementById('pedidoTexto')?.value || '');
-            const status = document.getElementById('pedidoStatus');
-            if (!texto) {
-                if (status) status.innerText = 'Cole o texto do pedido médico antes de analisar.';
-                return;
-            }
+        function orcAdicionarDaIA(id) {
+            const ex = orcTabelaExames.find(e => e.id === id);
+            if (!ex) return;
+            if (!orcSelecionados.find(s => s.id === id)) orcSelecionados.push({ ...ex });
+            orcRenderSelecionados();
+        }
 
-            const encontrados = examesPrecos.filter(ex => {
-                const nome = normalizarTexto(ex.nome);
-                const codigo = normalizarTexto(ex.codigo);
-                if (codigo && texto.includes(codigo)) return true;
-                if (nome.length >= 4 && texto.includes(nome)) return true;
+        // =====================================================
+        // FINALIZAR — WHATSAPP
+        // =====================================================
+        function orcFinalizarWhatsApp() {
+            if (!orcSelecionados.length) { showToast('Selecione ao menos um exame para continuar.', 'error'); return; }
+            const nome  = localStorage.getItem('patient_name') || 'Paciente';
+            const lista = orcSelecionados.map(ex => `• ${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
+            const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
+            const msg   = `Olá! Gostaria de confirmar o orçamento feito pelo app.\n\n*Paciente:* ${nome}\n\n*Exames:*\n${lista}\n\n*Total estimado:* ${total}\n\n_Valores da tabela particular. Sujeito a confirmação._`;
+            window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
+        }
 
-                const palavras = nome.split(' ').filter(p => p.length >= 4);
-                if (palavras.length === 1) return texto.includes(palavras[0]);
-                return palavras.length > 1 && palavras.filter(p => texto.includes(p)).length >= Math.min(2, palavras.length);
-            });
+        // =====================================================
+        // GERAR PDF
+        // =====================================================
+        async function orcGerarPDF() {
+            if (!orcSelecionados.length) { showToast('Selecione ao menos um exame para gerar o PDF.', 'error'); return; }
+            showToast('Gerando PDF...', 'info', 3000);
+            try {
+                await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+                const W = 210, margin = 18;
+                const corCDA  = [73, 188, 190];
+                const corDark = [15, 76, 92];
+                const corGray = [100, 116, 139];
+                const corLight = [241, 245, 249];
 
-            encontrados.forEach(ex => {
-                if (!examesSelecionados.includes(ex.id)) examesSelecionados.push(ex.id);
-            });
+                // Header
+                doc.setFillColor(...corDark);
+                doc.rect(0, 0, W, 38, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+                doc.text('Laboratório CDA', margin, 16);
+                doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+                doc.text('Orçamento de Exames — Tabela Particular', margin, 24);
+                doc.text(`Gerado em ${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}`, margin, 31);
+                const nomePac = localStorage.getItem('patient_name');
+                if (nomePac) { doc.setFont('helvetica','bold'); doc.text(`Paciente: ${nomePac}`, W - margin, 24, { align:'right' }); }
 
-            document.getElementById('searchExame').value = '';
-            renderExames();
-            updateResumo();
-            if (status) {
-                status.innerText = encontrados.length
-                    ? `${encontrados.length} exame(s) encontrados no texto. Confira antes de enviar.`
-                    : 'Nenhum exame foi identificado automaticamente. Tente buscar pelo nome ou código.';
+                // Tabela
+                let y = 50;
+                const colCod = margin, colNome = margin + 22, colVal = W - margin, rowH = 9;
+                doc.setFillColor(...corCDA);
+                doc.rect(margin, y - 5, W - margin * 2, rowH, 'F');
+                doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+                doc.text('CÓD', colCod, y);
+                doc.text('DESCRIÇÃO DO EXAME', colNome, y);
+                doc.text('VALOR', colVal, y, { align:'right' });
+                y += rowH;
+
+                let total = 0;
+                orcSelecionados.forEach((ex, i) => {
+                    if (y > 265) { doc.addPage(); y = 20; }
+                    if (i % 2 === 0) { doc.setFillColor(...corLight); doc.rect(margin, y-5, W-margin*2, rowH, 'F'); }
+                    doc.setTextColor(30, 41, 59); doc.setFont('helvetica','normal'); doc.setFontSize(8);
+                    doc.text(ex.codigo || '-', colCod, y);
+                    doc.text(doc.splitTextToSize(ex.nome, 130)[0], colNome, y);
+                    doc.setFont('helvetica','bold');
+                    doc.text(formatCurrency(ex.preco), colVal, y, { align:'right' });
+                    total += ex.preco; y += rowH;
+                });
+
+                y += 2;
+                doc.setDrawColor(...corCDA); doc.setLineWidth(0.5); doc.line(margin, y, W-margin, y); y += 6;
+                doc.setFillColor(...corDark); doc.rect(margin, y-5, W-margin*2, 11, 'F');
+                doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+                doc.text('TOTAL ESTIMADO', margin + 4, y + 2);
+                doc.text(formatCurrency(total), colVal, y + 2, { align:'right' });
+
+                y += 20;
+                doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(...corGray);
+                doc.text('* Valores da tabela particular. Convênios e pacotes sob consulta.', margin, y);
+                doc.text('* Este orçamento é uma estimativa e pode ser ajustado pelo laboratório.', margin, y+5);
+                doc.text('Laboratório CDA — Afonso Cláudio, ES  |  WhatsApp: (27) 99898-0658', margin, y+13);
+
+                const safe = (nomePac || 'orcamento').replace(/[^a-z0-9]/gi,'_').toLowerCase();
+                doc.save(`orcamento_cda_${safe}.pdf`);
+                showToast('PDF gerado com sucesso!', 'success');
+            } catch (err) {
+                console.error('Erro PDF:', err);
+                showToast('Erro ao gerar PDF. Tente novamente.', 'error');
             }
         }
 
-        function finalizarOrcamento() {
-            if (examesSelecionados.length === 0) {
-                showToast('Selecione ao menos um exame para continuar.', 'error');
-                return;
-            }
-            const selecionados = examesSelecionados.map(id => examesPrecos.find(e => e.id === id)).filter(Boolean);
-            const examesNomes = selecionados.map(ex => `${ex.codigo ? ex.codigo + ' - ' : ''}${ex.nome}`).join(', ');
-            const total = document.getElementById('totalOrcamento').innerText;
-            const nome = localStorage.getItem('patient_name') || 'Paciente';
-            const text = `Olá! Gostaria de confirmar o orçamento feito pelo app.%0A%0A- *Paciente:* ${nome}%0A- *Exames:* ${examesNomes}%0A- *Total Estimado:* ${total}`;
-            window.open(`https://wa.me/5527998980658?text=${text}`, '_blank');
-        }
 
         const preparoOrientacoes = [
             {
