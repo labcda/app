@@ -3803,7 +3803,7 @@
         const CLAUDE_API_KEY = 'sk-ant-REMOVIDO';
         // Proxy Cloudflare Worker — evita bloqueio CORS do browser
         // Após criar o worker (instruções abaixo), substitua a URL:
-        const CLAUDE_PROXY_URL = 'https://labcda-claude.SEU_SUBDOMINIO.workers.dev';
+        const CLAUDE_PROXY_URL = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
         // Enquanto o worker não estiver configurado, tenta direto (funciona em alguns ambientes):
         const CLAUDE_ENDPOINT = CLAUDE_PROXY_URL.includes('SEU_SUBDOMINIO')
             ? 'https://api.anthropic.com/v1/messages'
