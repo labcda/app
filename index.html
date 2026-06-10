@@ -5443,11 +5443,12 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const splashStart = Date.now();
             const minDuration = 1500;
             let splashFechado = false;
+            let fakeProgress = null; // declarado antes de fecharSplash para evitar ReferenceError
 
             function fecharSplash() {
                 if (splashFechado) return;
                 splashFechado = true;
-                clearInterval(fakeProgress);
+                if (fakeProgress) clearInterval(fakeProgress);
                 const elapsed = Date.now() - splashStart;
                 const delay = Math.max(0, minDuration - elapsed);
                 setTimeout(() => {
@@ -5464,7 +5465,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             // Progresso visual suave até 85%
             let width = 0;
-            const fakeProgress = setInterval(() => {
+            fakeProgress = setInterval(() => {
                 if (width < 85) {
                     width += (85 - width) * 0.07;
                     if (bar) bar.style.width = width + '%';
@@ -5475,7 +5476,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             setTimeout(fecharSplash, 5000);
 
             // Fecha splash assim que a tabela carregar (sucesso ou erro)
-            carregarTabelaPrecos().finally(fecharSplash);
+            carregarTabelaPrecos().then(fecharSplash).catch(fecharSplash);
         });
 
         function loadProfile() {
