@@ -1906,6 +1906,34 @@
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Exames solicitados</p>
                         <div id="agen-resumo-exames" class="text-xs text-slate-500 dark:text-slate-400 space-y-0.5"></div>
                         <p id="agen-resumo-total" class="text-sm font-extrabold text-cda-primary mt-2"></p>
+                        <!-- Descontos no resumo -->
+                        <div id="agen-resumo-descontos" class="mt-3 rounded-xl overflow-hidden border border-cda-primary/20">
+                            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%)" class="px-3 py-2 text-white">
+                                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-80">💙 Valores com desconto CDA</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 px-3 py-2 space-y-1.5">
+                                <div class="flex items-center justify-between bg-cda-light dark:bg-slate-700 rounded-lg px-2.5 py-2">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-sm">📱</span>
+                                        <div>
+                                            <p class="text-[11px] font-extrabold text-slate-800 dark:text-white">Pix / dinheiro / débito</p>
+                                            <p class="text-[10px] text-slate-500">40% OFF à vista</p>
+                                        </div>
+                                    </div>
+                                    <p id="agen-resumo-pix" class="text-sm font-extrabold text-cda-primary"></p>
+                                </div>
+                                <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-700 rounded-lg px-2.5 py-2">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-sm">💳</span>
+                                        <div>
+                                            <p class="text-[11px] font-extrabold text-slate-800 dark:text-white">Cartão de crédito</p>
+                                            <p id="agen-resumo-parcela-txt" class="text-[10px] text-slate-500">35% OFF em até 10x</p>
+                                        </div>
+                                    </div>
+                                    <p id="agen-resumo-credito" class="text-sm font-extrabold text-cda-primary"></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="agen-resumo-placeholder" class="flex flex-col items-center py-4 text-center mb-4">
@@ -4924,17 +4952,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         let agenState = { data: null, periodo: null, horario: null };
 
         function agenInicializar() {
-            const inp = document.getElementById('agen-data');
-            if (!inp) return;
-            const hoje = new Date();
-            inp.min = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
-            inp.value = '';
-            agenState = { data: null, periodo: null, horario: null };
-            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
-            agenEsconderHorarios();
-            agenAtualizarResumo();
-            const nome = localStorage.getItem('patient_name');
-            if (nome) document.getElementById('agen-nome').value = nome;
+            agenResetCompleto();
         }
 
         function agenIsDiaUtil(dataStr) {
@@ -5039,8 +5057,16 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     examesWrap.classList.remove('hidden');
                     document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
                         .map(ex => `<div class="flex justify-between"><span>${ex.nome}</span><span class="font-bold">${formatCurrency(ex.preco)}</span></div>`).join('');
-                    document.getElementById('agen-resumo-total').textContent =
-                        `Total estimado: ${formatCurrency(orcSelecionados.reduce((s,e) => s+e.preco, 0))}`;
+                    const totalBruto = orcSelecionados.reduce((s,e) => s+e.preco, 0);
+                    document.getElementById('agen-resumo-total').textContent = `Total estimado: ${formatCurrency(totalBruto)}`;
+
+                    // Descontos
+                    const totalPix    = totalBruto * 0.60;
+                    const totalCredit = totalBruto * 0.65;
+                    const parcela     = totalCredit / 10;
+                    document.getElementById('agen-resumo-pix').textContent    = formatCurrency(totalPix);
+                    document.getElementById('agen-resumo-credito').textContent = formatCurrency(totalCredit);
+                    document.getElementById('agen-resumo-parcela-txt').textContent = `35% OFF · 10x de ${formatCurrency(parcela)}`;
                 } else {
                     examesWrap.classList.add('hidden');
                 }
@@ -5195,8 +5221,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             let descExames = '';
             if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-                const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-                descExames = `\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrency(orcSelecionados.reduce((s,e)=>s+e.preco,0))}`;
+                const linhas      = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
+                const totalBruto  = orcSelecionados.reduce((s,e) => s+e.preco, 0);
+                const totalPix    = totalBruto * 0.60;
+                const totalCredit = totalBruto * 0.65;
+                const parcela     = totalCredit / 10;
+                descExames = `\n\nExames Solicitados:\n${linhas}`
+                    + `\n\nTotal estimado (tabela particular): ${formatCurrency(totalBruto)}`
+                    + `\nCom desconto Pix/débito (40% OFF): ${formatCurrency(totalPix)}`
+                    + `\nCom desconto crédito (35% OFF): ${formatCurrency(totalCredit)} · 10x de ${formatCurrency(parcela)}`;
             }
 
             btnSalvar.disabled = true;
@@ -5266,6 +5299,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const target = document.getElementById('page-' + pageId);
             if (!target) return;
 
+            // Reset das telas ao sair delas
+            const paginaAtual = document.querySelector('.page.active')?.id?.replace('page-','');
+            if (paginaAtual === 'orcamento' && pageId !== 'orcamento') {
+                orcResetCompleto();
+            }
+            if (paginaAtual === 'agendar' && pageId !== 'agendar') {
+                agenResetCompleto();
+            }
+
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             target.classList.add('active');
 
@@ -5292,13 +5334,11 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (pageId === 'home') {
                 loadProfile();
                 setupImportantCarousel();
-                // Re-dispara animações dos elementos anim-in
                 const animItems = target.querySelectorAll('.anim-in');
                 animItems.forEach(el => {
                     el.style.opacity = '0';
                     el.style.transform = 'translateY(30px)';
                     el.style.animation = 'none';
-                    // Força reflow para o browser "esquecer" o estado anterior
                     void el.offsetWidth;
                     el.style.animation = '';
                     el.style.opacity = '';
@@ -5306,7 +5346,6 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 });
             }
 
-            // Inicializa o chat de preparo ao entrar na aba
             if (pageId === 'preparo') {
                 iniciarChatPreparo();
             }
@@ -5318,6 +5357,69 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (pageId === 'agendar') {
                 agenInicializar();
             }
+
+            if (pageId === 'orcamento') {
+                orcInicializar();
+            }
+        }
+
+        // Reset completo do orçamento
+        function orcResetCompleto() {
+            if (typeof orcSelecionados !== 'undefined') orcSelecionados = [];
+            orcRenderSelecionados();
+            // Limpa campo de busca
+            const search = document.getElementById('orc-search');
+            if (search) search.value = '';
+            // Esconde dropdown
+            const dd = document.getElementById('orc-dropdown');
+            if (dd) { dd.innerHTML = ''; dd.classList.add('hidden'); }
+            // Limpa upload / preview / resultado IA
+            orcLimparArquivo();
+            const iaResult = document.getElementById('orc-ia-result');
+            if (iaResult) { iaResult.innerHTML = ''; iaResult.classList.add('hidden'); }
+            const iaStatus = document.getElementById('orc-ia-status');
+            if (iaStatus) { iaStatus.textContent = ''; iaStatus.classList.add('hidden'); }
+        }
+
+        // Inicializa orçamento ao entrar
+        function orcInicializar() {
+            orcResetCompleto();
+        }
+
+        // Reset completo do agendamento
+        function agenResetCompleto() {
+            agenState = { data: null, periodo: null, horario: null };
+            const nomeEl = document.getElementById('agen-nome');
+            const telEl  = document.getElementById('agen-telefone');
+            if (nomeEl) nomeEl.value = '';
+            if (telEl)  telEl.value  = '';
+            // Reset calendário customizado
+            const dataLabel = document.getElementById('agen-data-label');
+            if (dataLabel) {
+                dataLabel.textContent = 'Toque para escolher a data';
+                dataLabel.className = 'text-slate-400 dark:text-slate-400';
+            }
+            const dataInput = document.getElementById('agen-data');
+            if (dataInput) dataInput.value = '';
+            document.getElementById('agen-calendario')?.classList.add('hidden');
+            // Reset períodos
+            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
+            agenEsconderHorarios();
+            // Reset resumo
+            const resumo = document.getElementById('agen-resumo');
+            if (resumo) resumo.classList.add('hidden');
+            const placeholder = document.getElementById('agen-resumo-placeholder');
+            if (placeholder) placeholder.classList.remove('hidden');
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            if (btnSalvar) {
+                btnSalvar.classList.add('opacity-50','pointer-events-none');
+                btnSalvar.disabled = false;
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+            }
+            const statusEl = document.getElementById('agen-status');
+            if (statusEl) { statusEl.innerHTML = ''; statusEl.classList.add('hidden'); }
+            const telErro = document.getElementById('agen-tel-erro');
+            if (telErro) telErro.classList.add('hidden');
         }
 
         // INITIAL LOAD
