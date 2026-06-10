@@ -1206,11 +1206,49 @@
                             <i class="fa-solid fa-id-card text-cda-primary text-2xl"></i>
                         </div>
                     </article>
+                    <article class="info-slide">
+                        <div class="flex-1">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">📄 Retirada de Resultados</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Conforme a LGPD, para retirar resultados de exames presencialmente é necessário apresentar o <strong>protocolo de atendimento</strong> e/ou um <strong>documento oficial com foto</strong>.
+                            </p>
+                        </div>
+                        <div class="info-icon">
+                            <i class="fa-solid fa-file-circle-check text-cda-primary text-2xl"></i>
+                        </div>
+                    </article>
+                    <article class="info-slide">
+                        <div class="flex-1">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">📄 Retirada por Terceiros</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Conforme a LGPD, caso o paciente não possa retirar o resultado pessoalmente, a pessoa autorizada deve apresentar o <strong>protocolo de atendimento assinado pelo paciente</strong> e um <strong>documento oficial com foto</strong>.
+                            </p>
+                        </div>
+                        <div class="info-icon">
+                            <i class="fa-solid fa-people-arrows text-cda-primary text-2xl"></i>
+                        </div>
+                    </article>
+                    <article class="info-slide">
+                        <div class="flex-1">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">📍 Local de Atendimento</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                <strong>SUS:</strong> atendimento no 2º andar.<br>
+                                <strong>Convênios e particular:</strong> atendimento no térreo.<br><br>
+                                Em caso de dúvidas, nossa equipe está à disposição para ajudar.
+                            </p>
+                        </div>
+                        <div class="info-icon">
+                            <i class="fa-solid fa-location-dot text-cda-primary text-2xl"></i>
+                        </div>
+                    </article>
                 </div>
                 
                 <div class="carousel-dots anim-in" id="importantDots" style="animation-delay: 0.6s" aria-label="Navegar avisos">
                     <button type="button" class="carousel-dot active" aria-label="Aviso 1"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 2"></button>
+                    <button type="button" class="carousel-dot" aria-label="Aviso 3"></button>
+                    <button type="button" class="carousel-dot" aria-label="Aviso 4"></button>
+                    <button type="button" class="carousel-dot" aria-label="Aviso 5"></button>
                 </div>
                 <!-- BOTÃO INSTALAR APP (REPOSICIONADO) -->
                 <div class="mt-8 anim-in" style="animation-delay:0.7s">
@@ -3802,12 +3840,8 @@
         // ---- CHAVE CLAUDE API ----
         const CLAUDE_API_KEY = 'sk-ant-REMOVIDO';
         // Proxy Cloudflare Worker — evita bloqueio CORS do browser
-        // Após criar o worker (instruções abaixo), substitua a URL:
         const CLAUDE_PROXY_URL = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
-        // Enquanto o worker não estiver configurado, tenta direto (funciona em alguns ambientes):
-        const CLAUDE_ENDPOINT = CLAUDE_PROXY_URL.includes('SEU_SUBDOMINIO')
-            ? 'https://api.anthropic.com/v1/messages'
-            : CLAUDE_PROXY_URL;
+        const CLAUDE_ENDPOINT = CLAUDE_PROXY_URL;
 
         const EXCEL_URL = 'https://raw.githubusercontent.com/labcda/appteste/main/tabela_preco_multiplicada_1667%20(1).xlsx';
 
@@ -3896,7 +3930,9 @@
                 <div class="orc-dd-item flex justify-between items-center px-4 py-3 cursor-pointer hover:bg-cda-light dark:hover:bg-slate-700 transition-colors"
                      data-id="${ex.id}" data-idx="${i}"
                      onmousedown="event.preventDefault(); orcSelecionarDoDropdown(${ex.id})"
-                     ontouchend="event.preventDefault(); orcSelecionarDoDropdown(${ex.id})">
+                     ontouchstart="event.stopPropagation()"
+                     ontouchend="event.preventDefault(); event.stopPropagation(); orcSelecionarDoDropdown(${ex.id})"
+                     onclick="orcSelecionarDoDropdown(${ex.id})">
                     <div>
                         <p class="text-sm font-bold text-slate-800 dark:text-white leading-tight">${ex.nome}</p>
                         <p class="text-[11px] text-slate-400 font-medium mt-0.5">${ex.codigo || 'S/CÓD'}</p>
@@ -4096,9 +4132,9 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             } catch (err) {
                 console.error('Erro IA:', err);
-                const ehChave = CLAUDE_API_KEY === 'SUA_CHAVE_AQUI' || String(err.message).includes('401');
+                const ehChave = CLAUDE_API_KEY === 'SUA_CHAVE_AQUI' || String(err.message).toLowerCase().includes('api key') || String(err.message).includes('401') || String(err.message).includes('invalid x-api-key');
                 statusEl.innerHTML = ehChave
-                    ? '<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>Chave da API não configurada. Insira sua <strong>CLAUDE_API_KEY</strong> no código.'
+                    ? `<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>Serviço de IA temporariamente indisponível. <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-primary font-bold underline">Fale com um atendente</a>.`
                     : `<i class="fa-solid fa-triangle-exclamation text-red-500 mr-1"></i>Erro ao analisar: ${err.message}. <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-primary font-bold underline">Fale com um atendente</a>.`;
             } finally {
                 btnLer.disabled = false;
