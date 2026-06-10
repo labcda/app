@@ -5438,45 +5438,30 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             setupImportantCarousel();
             renderGuiaExames();
 
-            // Splash Logic
-            const bar = document.getElementById('progressBar');
-            const splashStart = Date.now();
-            const minDuration = 1500;
-            let splashFechado = false;
-            let fakeProgress = null; // declarado antes de fecharSplash para evitar ReferenceError
-
-            function fecharSplash() {
-                if (splashFechado) return;
-                splashFechado = true;
-                if (fakeProgress) clearInterval(fakeProgress);
-                const elapsed = Date.now() - splashStart;
-                const delay = Math.max(0, minDuration - elapsed);
-                setTimeout(() => {
-                    if (bar) { bar.style.transition = 'width 0.3s ease'; bar.style.width = '100%'; }
-                    setTimeout(() => {
-                        const splash = document.getElementById('splashScreen');
+            // ── SPLASH: fecha em 2.5s fixos, sem depender de nenhuma promise ──
+            (function() {
+                var bar    = document.getElementById('progressBar');
+                var splash = document.getElementById('splashScreen');
+                var w = 0;
+                var iv = setInterval(function() {
+                    w += (100 - w) * 0.06;
+                    if (bar) bar.style.width = Math.min(w, 98) + '%';
+                }, 60);
+                setTimeout(function() {
+                    clearInterval(iv);
+                    if (bar) { bar.style.transition = 'width 0.3s'; bar.style.width = '100%'; }
+                    setTimeout(function() {
                         if (splash) {
+                            splash.style.transition = 'opacity 0.5s';
                             splash.style.opacity = '0';
-                            setTimeout(() => { splash.style.display = 'none'; }, 500);
+                            setTimeout(function() { splash.style.display = 'none'; }, 520);
                         }
-                    }, 350);
-                }, delay);
-            }
+                    }, 300);
+                }, 2500);
+            })();
 
-            // Progresso visual suave até 85%
-            let width = 0;
-            fakeProgress = setInterval(() => {
-                if (width < 85) {
-                    width += (85 - width) * 0.07;
-                    if (bar) bar.style.width = width + '%';
-                }
-            }, 60);
-
-            // Timeout de segurança: fecha o splash em no máximo 5s mesmo que a tabela falhe
-            setTimeout(fecharSplash, 5000);
-
-            // Fecha splash assim que a tabela carregar (sucesso ou erro)
-            carregarTabelaPrecos().then(fecharSplash).catch(fecharSplash);
+            // Carrega tabela em background (não bloqueia o splash)
+            try { carregarTabelaPrecos(); } catch(e) {}
         });
 
         function loadProfile() {
