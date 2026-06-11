@@ -416,6 +416,7 @@
         
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.5s ease-out; }
+        .page.active.flex { display: flex !important; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(12px); }
@@ -1835,7 +1836,7 @@
             </div>
         </section>
 
-        <section id="page-resultados" class="page h-[600px] flex flex-col">
+        <section id="page-resultados" class="page flex flex-col" style="height: calc(100vh - 120px); min-height: 600px; margin-top: -20px;">
             <div id="results-autofill-info" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-3 mb-3 flex items-center justify-between">
                 <p class="text-xs text-amber-800 dark:text-amber-300 font-bold"><i class="fa-solid fa-key mr-1"></i> Usar chave e senha salvas no perfil?</p>
                 <button onclick="autofillResults()" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">Preencher</button>
@@ -2100,7 +2101,7 @@
             <i class="fa-solid fa-house text-xl"></i>
             <span>Início</span>
         </button>
-        <button onclick="navigateTo('agendar')" id="nav-agendar" class="nav-btn-new">
+        <button onclick="navigateTo('orcamento')" id="nav-agendar" class="nav-btn-new">
             <i class="fa-regular fa-calendar-check text-xl"></i>
             <span>Agendar</span>
         </button>
@@ -5237,8 +5238,9 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 document.getElementById('autofill-chave').value = chave;
                 document.getElementById('autofill-senha').value = senha;
                 document.getElementById('form-resultados-autofill').submit();
-                document.getElementById('results-autofill-info').classList.add('hidden');
-                showToast('Tentando preencher credenciais...', 'info');
+                document.getElementById('results-autofill-info').style.display = 'none';
+                document.getElementById('page-resultados').style.height = 'calc(100vh - 80px)';
+                showToast('Credenciais preenchidas!', 'success');
             }
         }
 
