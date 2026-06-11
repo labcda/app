@@ -5152,6 +5152,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 clearInterval(fakeProgress);
                 fecharSplash();
             });
+
+            // Timeout de segurança: se após 6 segundos ainda estiver travado, força a abertura
+            setTimeout(() => {
+                if (document.getElementById('splashScreen').style.display !== 'none') {
+                    console.warn('Timeout de segurança: Forçando fechamento da splash screen.');
+                    clearInterval(fakeProgress);
+                    fecharSplash();
+                }
+            }, 6000);
         });
 
         function loadProfile() {
@@ -5204,7 +5213,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             });
             window.addEventListener('load', async () => {
                 try {
-                    const registration = await navigator.serviceWorker.register('./service-worker.js');
+                    const registration = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
                     registration.update();
                 } catch (error) {}
             });
