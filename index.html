@@ -4085,39 +4085,57 @@
         async function carregarTabelaPrecos() {
             const status = document.getElementById('orc-tabela-status');
             try {
-                // Garante que a biblioteca XLSX esteja carregada
                 if (typeof XLSX === 'undefined') {
                     await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
                 }
                 
-                if (status) status.textContent = 'Buscando tabela...';
+                if (status) status.textContent = 'Lendo arquivo...';
 
-                // Tenta carregar a tabela localmente primeiro
                 const resp = await fetch(EXCEL_URL + '?v=' + Date.now());
-                if (!resp.ok) throw new Error('Arquivo não encontrado no servidor');
+                if (!resp.ok) throw new Error('Arquivo tabela_preco.xlsx não encontrado');
                 
                 const buffer = await resp.arrayBuffer();
                 const wb = XLSX.read(buffer, { type: 'array' });
                 const ws = wb.Sheets[wb.SheetNames[0]];
                 const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-                // Processa as linhas do Excel
+                if (!rows || rows.length < 1) throw new Error('Arquivo Excel vazio');
+
+                // Detecção dinâmica de colunas
+                let colNome = 1, colPreco = 3, colCodigo = 0;
+                
+                // Procura nos primeiros 5 registros onde estão as palavras-chave
+                for (let i = 0; i < Math.min(rows.length, 5); i++) {
+                    const row = rows[i];
+                    if (!row) continue;
+                    row.forEach((cell, idx) => {
+                        const val = String(cell || '').toLowerCase();
+                        if (val.includes('exame') || val.includes('nome') || val.includes('descricao')) colNome = idx;
+                        if (val.includes('preço') || val.includes('valor') || val.includes('vlr') || val.includes('r$')) colPreco = idx;
+                        if (val.includes('cod') || val.includes('id')) colCodigo = idx;
+                    });
+                }
+
                 orcTabelaExames = rows
-                    .filter(r => r && r[1] && r[3] != null) // r[1] é o nome, r[3] é o preço
-                    .map((r, i) => ({
-                        id:     i + 1,
-                        codigo: String(r[0] || '').trim(),
-                        nome:   String(r[1] || '').trim(),
-                        preco:  parseFloat(String(r[3]).replace(',', '.')) || 0,
-                        busca:  normalizarTexto(String(r[0] || '') + ' ' + String(r[1] || ''))
-                    }))
-                    .filter(ex => ex.nome.toLowerCase() !== 'nome' && ex.nome.toLowerCase() !== 'exame'); // Remove cabeçalhos
+                    .filter(r => r && r[colNome] && r[colPreco] != null)
+                    .map((r, i) => {
+                        const nomeStr = String(r[colNome] || '').trim();
+                        const precoRaw = String(r[colPreco] || '').replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+                        return {
+                            id:     i + 1,
+                            codigo: String(r[colCodigo] || '').trim(),
+                            nome:   nomeStr,
+                            preco:  parseFloat(precoRaw) || 0,
+                            busca:  normalizarTexto(String(r[colCodigo] || '') + ' ' + nomeStr)
+                        };
+                    })
+                    .filter(ex => ex.nome.toLowerCase() !== 'nome' && ex.nome.toLowerCase() !== 'exame' && ex.preco > 0);
 
                 if (status) status.textContent = `${orcTabelaExames.length} exames disponíveis.`;
-                console.log('Tabela carregada:', orcTabelaExames.length, 'exames');
+                console.log(`Sucesso: ${orcTabelaExames.length} exames carregados (Colunas: Nome=${colNome}, Preço=${colPreco})`);
             } catch (err) {
-                console.error('Erro ao carregar tabela:', err);
-                if (status) status.textContent = 'Erro ao carregar preços. Verifique o arquivo tabela_preco.xlsx';
+                console.error('Erro crítico na tabela:', err);
+                if (status) status.textContent = 'Erro ao ler tabela. Verifique o nome e as colunas do arquivo.';
             }
         }
 
