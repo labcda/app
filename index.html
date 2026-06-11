@@ -1201,6 +1201,57 @@
         </div>
     </div>
 
+    <!-- MODAL CONFIRMAÇÃO DE AGENDAMENTO -->
+    <div id="modal-agen-confirmacao" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[32px] shadow-2xl overflow-hidden anim-in">
+            <!-- Topo verde com ícone -->
+            <div class="bg-gradient-to-br from-green-400 to-emerald-500 p-8 flex flex-col items-center gap-3">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-calendar-check text-white text-4xl"></i>
+                </div>
+                <p class="text-white font-extrabold text-xl text-center">Agendamento Confirmado!</p>
+            </div>
+            <!-- Resumo -->
+            <div class="p-6 space-y-3">
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-solid fa-user text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Paciente</p>
+                        <p id="modal-agen-nome" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-regular fa-calendar text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Data e Horário</p>
+                        <p id="modal-agen-data" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-solid fa-flask text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Exames</p>
+                        <p id="modal-agen-exames" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-solid fa-credit-card text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Pagamento</p>
+                        <p id="modal-agen-pagamento" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 text-center pt-1">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>
+            </div>
+            <!-- Botão OK -->
+            <div class="px-6 pb-6">
+                <button onclick="modalAgenOk()" class="w-full btn-cda-primary py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 shadow-lg shadow-cda-primary/20">
+                    <i class="fa-solid fa-check"></i> OK, entendido!
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- FLOATING WHATSAPP -->
     <a href="https://wa.me/5527998980658" target="_blank" class="fab md:hidden">
         <i class="fa-brands fa-whatsapp"></i>
@@ -5159,6 +5210,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 });
                 const json = await resp.json();
                 if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
+                btnSalvar.disabled = false;
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
                 agenSucesso(nome, data, horario);
             } catch(err) {
                 console.error('Erro agendamento:', err);
@@ -5169,37 +5222,55 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         function agenSucesso(nome, data, horario) {
             const [y,m,d] = data.split('-').map(Number);
             const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-            showToast('Agendamento confirmado!', 'success', 4000);
-            const statusEl  = document.getElementById('agen-status');
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            statusEl.innerHTML = `
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4 text-left">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
-                        <p class="font-extrabold text-green-700 dark:text-green-400">Agendamento confirmado!</p>
-                    </div>
-                    <p class="text-sm text-slate-600 dark:text-slate-300"><strong>${nome}</strong></p>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">${dataExt} às ${horario}</p>
-                    <p class="text-xs text-slate-400 mt-2">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>
-                </div>`;
-            statusEl.classList.remove('hidden');
-            btnSalvar.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i>Agendado com sucesso!';
-            btnSalvar.classList.add('opacity-50','pointer-events-none');
+            const pagamento = agenPagamentoSelecionado() || '—';
+            const totalBruto = agenTotalSelecionado();
+            const totalPix = totalBruto * 0.60;
+            const totalCredito = totalBruto * 0.65;
+
             if (nome) localStorage.setItem('patient_name', nome);
             const telefone = document.getElementById('agen-telefone')?.value?.trim();
             if (telefone) localStorage.setItem('patient_phone', telefone);
 
-            // Limpar orçamento e agendamento após sucesso
-            setTimeout(() => {
-                orcSelecionados = [];
-                orcRenderSelecionados();
-                agenInicializar();
-                document.getElementById('agen-telefone').value = localStorage.getItem('patient_phone') || '';
-                statusEl.classList.add('hidden');
+            // Preenche dados do modal
+            document.getElementById('modal-agen-nome').textContent = nome;
+            document.getElementById('modal-agen-data').textContent = `${dataExt} às ${horario}`;
+
+            const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
+                ? `${orcSelecionados.length} exame${orcSelecionados.length > 1 ? 's' : ''} — PIX: ${formatCurrency(totalPix)} / Crédito: ${formatCurrency(totalCredito)}`
+                : '—';
+            document.getElementById('modal-agen-exames').textContent = qtd;
+            document.getElementById('modal-agen-pagamento').textContent = pagamento;
+
+            // Exibe o modal
+            const modal = document.getElementById('modal-agen-confirmacao');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function modalAgenOk() {
+            // Fecha modal
+            const modal = document.getElementById('modal-agen-confirmacao');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            // Limpa orçamento e agendamento
+            orcSelecionados = [];
+            orcRenderSelecionados();
+            agenInicializar();
+
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const statusEl  = document.getElementById('agen-status');
+            if (statusEl) statusEl.classList.add('hidden');
+            if (btnSalvar) {
                 btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
                 btnSalvar.disabled = false;
                 btnSalvar.classList.remove('opacity-50','pointer-events-none');
-            }, 4000);
+            }
+            const agenTel = document.getElementById('agen-telefone');
+            if (agenTel) agenTel.value = localStorage.getItem('patient_phone') || '';
+
+            // Retorna para Home
+            navigateTo('home');
         }
 
         function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
