@@ -2062,6 +2062,34 @@
     </nav>
 
     <script>
+        // Sistema de Toast — definido cedo para evitar ReferenceError
+        let _toastTimer = null;
+        function showToast(msg, tipo = 'success', duracao = 3000) {
+            const toast = document.getElementById('cda-toast');
+            const icon  = document.getElementById('cda-toast-icon');
+            const text  = document.getElementById('cda-toast-msg');
+            if (!toast) return;
+
+            const icones = {
+                success: 'fa-solid fa-circle-check',
+                error:   'fa-solid fa-circle-xmark',
+                info:    'fa-solid fa-circle-info'
+            };
+
+            toast.className = `toast-${tipo}`;
+            icon.className  = icones[tipo] || icones.info;
+            text.textContent = msg;
+
+            // Força reflow para reiniciar animação
+            void toast.offsetWidth;
+            toast.classList.add('toast-show');
+
+            if (_toastTimer) clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => {
+                toast.classList.remove('toast-show');
+            }, duracao);
+        }
+
         const guiaExamesData = [
   {
     "id": 1,
@@ -4100,7 +4128,7 @@
         let orcDropdownIdx   = -1;
 
         // ---- CHAVE CLAUDE API ----
-        const CLAUDE_API_KEY = 'sk-ant-REMOVIDO';
+        const CLAUDE_API_KEY = ''; // Chave removida por segurança. Use o proxy backend.
         // Proxy Cloudflare Worker — evita bloqueio CORS do browser
         const CLAUDE_PROXY_URL = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
         const CLAUDE_ENDPOINT = CLAUDE_PROXY_URL;
@@ -5526,34 +5554,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         <span id="cda-toast-msg"></span>
     </div>
 
-    <script>
-        // Sistema de Toast — substitui alert() em todo o app
-        let _toastTimer = null;
-        function showToast(msg, tipo = 'success', duracao = 3000) {
-            const toast = document.getElementById('cda-toast');
-            const icon  = document.getElementById('cda-toast-icon');
-            const text  = document.getElementById('cda-toast-msg');
 
-            const icones = {
-                success: 'fa-solid fa-circle-check',
-                error:   'fa-solid fa-circle-xmark',
-                info:    'fa-solid fa-circle-info'
-            };
-
-            toast.className = `toast-${tipo}`;
-            icon.className  = icones[tipo] || icones.info;
-            text.textContent = msg;
-
-            // Força reflow para reiniciar animação
-            void toast.offsetWidth;
-            toast.classList.add('toast-show');
-
-            if (_toastTimer) clearTimeout(_toastTimer);
-            _toastTimer = setTimeout(() => {
-                toast.classList.remove('toast-show');
-            }, duracao);
-        }
-    </script>
 
     </body>
 </html>
