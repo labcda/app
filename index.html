@@ -5107,60 +5107,62 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         // INITIAL LOAD
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => { // Mudado para 'load' para garantir que tudo (CSS/JS) baixou
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             updateThemeIcon();
-            carregarTabelaPrecos();
-            iniciarChatPreparo();
-            loadProfile();
-            setupImportantCarousel();
-            renderGuiaExames();
-
-            // Splash Logic — mínimo visual de 1.5s, fecha assim que o app estiver pronto
+            
+            // Splash Logic
             const bar = document.getElementById('progressBar');
             const splashStart = Date.now();
-            const minDuration = 1500; // mínimo 1.5s para leitores rápidos
+            const minDuration = 1200;
 
             function fecharSplash() {
                 const elapsed = Date.now() - splashStart;
                 const delay = Math.max(0, minDuration - elapsed);
                 setTimeout(() => {
-                    // Anima barra até 100% rapidamente antes de fechar
                     bar.style.transition = 'width 0.3s ease';
                     bar.style.width = '100%';
                     setTimeout(() => {
-                        document.getElementById('splashScreen').style.opacity = '0';
-                        setTimeout(() => { document.getElementById('splashScreen').style.display = 'none'; }, 500);
-                    }, 350);
+                        const splash = document.getElementById('splashScreen');
+                        if (splash) {
+                            splash.style.opacity = '0';
+                            setTimeout(() => { splash.style.display = 'none'; }, 500);
+                        }
+                    }, 300);
                 }, delay);
             }
 
-            // Progresso visual suave enquanto carrega
             let width = 0;
             const fakeProgress = setInterval(() => {
-                // Vai até 85% simulando carga; os últimos 15% fecham com fecharSplash()
-                if (width < 85) {
-                    width += (85 - width) * 0.07;
-                    bar.style.width = width + '%';
+                if (width < 90) {
+                    width += (90 - width) * 0.08;
+                    if (bar) bar.style.width = width + '%';
                 }
-            }, 60);
+            }, 50);
 
-            // Aguarda todas as inicializações terminarem
+            // Inicializações em paralelo sem travar o splash
+            loadProfile();
+            setupImportantCarousel();
+            
+            // Funções que podem demorar ou falhar são chamadas de forma independente
             Promise.allSettled([
-                new Promise(res => { carregarTabelaPrecos().then(res).catch(res); }),
-            ]).then(() => {
+                carregarTabelaPrecos(),
+                iniciarChatPreparo(),
+                renderGuiaExames()
+            ]).finally(() => {
                 clearInterval(fakeProgress);
                 fecharSplash();
             });
 
-            // Timeout de segurança: se após 6 segundos ainda estiver travado, força a abertura
+            // Timeout de segurança agressivo (4 segundos)
             setTimeout(() => {
-                if (document.getElementById('splashScreen').style.display !== 'none') {
-                    console.warn('Timeout de segurança: Forçando fechamento da splash screen.');
+                const splash = document.getElementById('splashScreen');
+                if (splash && splash.style.display !== 'none') {
+                    console.warn('Segurança: Forçando abertura do app.');
                     clearInterval(fakeProgress);
                     fecharSplash();
                 }
-            }, 6000);
+            }, 4000);
         });
 
         function loadProfile() {
