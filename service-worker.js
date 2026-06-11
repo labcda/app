@@ -38,35 +38,26 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Estratégia Network First com fallback para Cache
+// Estratégia Stale-While-Revalidate: Serve do cache e atualiza em background
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') {
-    return;
-  }
-
-  // Ignora extensões de browser e esquemas não suportados
-  if (!e.request.url.startsWith('http')) {
-    return;
-  }
+  if (e.request.method !== 'GET' || !e.request.url.startsWith('http')) return;
 
   e.respondWith(
-    fetch(e.request)
-      .then(response => {
-        // Cacheia apenas respostas válidas
-        if (response && response.status === 200 && response.type === 'basic') {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(e.request, responseClone);
-          });
+    caches.match(e.request).then((cachedResponse) => {
+      const fetchPromise = fetch(e.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseClone));
         }
-        return response;
-      })
-      .catch(() => {
-        return caches.match(e.request)
-          .then(response => {
-            // Se não encontrar no cache, tenta o index principal
-            return response || caches.match('./index.html');
-          });
-      })
+        return networkResponse;
+      }).catch(() => {
+        // Fallback para o index principal se a rede falhar e não houver cache
+        if (e.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
+
+      return cachedResponse || fetchPromise;
+    })
   );
 });
