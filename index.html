@@ -1191,11 +1191,11 @@
 
                 <!-- GRID DE AÇÕES -->
                 <div class="grid-actions anim-in" style="animation-delay: 0.3s">
-                    <div onclick="navigateTo('agendar')" class="action-item">
-                        <i class="fa-regular fa-calendar text-cda-primary"></i>
+                    <div onclick="navigateTo('orc')" class="action-item">
+                        <i class="fa-regular fa-calendar-check text-cda-primary"></i>
                         <div>
-                            <p class="action-item-title">Agendar</p>
-                            <p class="action-item-sub">Marque sua coleta</p>
+                            <p class="action-item-title">Agendamento/Orçamento</p>
+                            <p class="action-item-sub">Consulte e agende</p>
                         </div>
                     </div>
                     <div onclick="navigateTo('resultados')" class="action-item">
@@ -1219,13 +1219,7 @@
                             <p class="action-item-sub">Endereços e horários</p>
                         </div>
                     </div>
-                    <div onclick="navigateTo('orc')" class="action-item">
-                        <i class="fa-solid fa-calculator text-cda-primary"></i>
-                        <div>
-                            <p class="action-item-title">Orçamento</p>
-                            <p class="action-item-sub">Valores de exames</p>
-                        </div>
-                    </div>
+
                 </div>
 
                 <h2 class="section-title anim-in" style="animation-delay: 0.4s">Importante</h2>
@@ -4116,20 +4110,32 @@
                     });
                 }
 
-                orcTabelaExames = rows
-                    .filter(r => r && r[colNome] && r[colPreco] != null)
-                    .map((r, i) => {
-                        const nomeStr = String(r[colNome] || '').trim();
-                        const precoRaw = String(r[colPreco] || '').replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
-                        return {
-                            id:     i + 1,
-                            codigo: String(r[colCodigo] || '').trim(),
-                            nome:   nomeStr,
-                            preco:  parseFloat(precoRaw) || 0,
-                            busca:  normalizarTexto(String(r[colCodigo] || '') + ' ' + nomeStr)
-                        };
-                    })
-                    .filter(ex => ex.nome.toLowerCase() !== 'nome' && ex.nome.toLowerCase() !== 'exame' && ex.preco > 0);
+                // Processamento ultra-tolerante
+                orcTabelaExames = [];
+                for (let i = 0; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (!r || !r[colNome]) continue;
+                    
+                    const nomeStr = String(r[colNome]).trim();
+                    if (nomeStr.toLowerCase() === 'nome' || nomeStr.toLowerCase() === 'exame' || nomeStr.length < 2) continue;
+
+                    let precoRaw = String(r[colPreco] || '0').replace('R$', '').trim();
+                    if (precoRaw.includes(',') && precoRaw.includes('.')) {
+                        precoRaw = precoRaw.replace(/\./g, '').replace(',', '.');
+                    } else {
+                        precoRaw = precoRaw.replace(',', '.');
+                    }
+                    
+                    const precoFinal = parseFloat(precoRaw) || 0;
+                    
+                    orcTabelaExames.push({
+                        id:     i + 1,
+                        codigo: String(r[colCodigo] || '').trim(),
+                        nome:   nomeStr,
+                        preco:  precoFinal,
+                        busca:  normalizarTexto(String(r[colCodigo] || '') + ' ' + nomeStr)
+                    });
+                }
 
                 if (status) status.textContent = `${orcTabelaExames.length} exames disponíveis.`;
                 console.log(`Sucesso: ${orcTabelaExames.length} exames carregados (Colunas: Nome=${colNome}, Preço=${colPreco})`);
