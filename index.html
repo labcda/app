@@ -1329,7 +1329,7 @@
                     <div onclick="navigateTo('orcamento')" class="action-item">
                         <i class="fa-regular fa-calendar-check text-cda-primary"></i>
                         <div>
-                            <p class="action-item-title">Agendamento/Orçamento</p>
+                            <p class="action-item-title">Agendar &amp; Orçamento</p>
                             <p class="action-item-sub">Consulte e agende</p>
                         </div>
                     </div>
@@ -5200,11 +5200,19 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             statusEl.classList.add('hidden');
 
             try {
+                // Monta horários ISO para o Google Calendar usar corretamente
+                const [hh, mm] = horario.split(':').map(Number);
+                const startDateTime = `${data}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+                const endHh = hh + 1;
+                const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+
                 const resp = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         action: 'criar', data, horario, nome, telefone, pagamento,
+                        startTime: startDateTime,
+                        endTime: endDateTime,
                         descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`
                     })
                 });
