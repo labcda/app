@@ -5106,53 +5106,39 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
         }
 
-        // INITIAL LOAD
+        // INITIAL LOAD - VERSÃO ESTÁVEL
         window.addEventListener('load', () => {
-            // Garante que o tema seja aplicado
-            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
-            updateThemeIcon();
+            console.log('App carregado. Iniciando transição...');
             
-            // Força a página home a estar ativa caso nenhuma esteja
-            if (!document.querySelector('.page.active')) {
-                const homePage = document.getElementById('home');
-                if (homePage) homePage.classList.add('active');
-            }
+            // 1. Garante que a Home esteja ativa (ID correto é page-home)
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const home = document.getElementById('page-home');
+            if (home) home.classList.add('active');
 
-            const bar = document.getElementById('progressBar');
             const splash = document.getElementById('splashScreen');
+            const bar = document.getElementById('progressBar');
 
-            // 1. Anima a barra rapidamente até 100%
-            if (bar) {
-                bar.style.transition = 'width 0.8s ease-in-out';
-                bar.style.width = '100%';
-            }
-
-            // 2. Após a animação da barra, remove o splash à força
+            // 2. Anima barra e remove splash
+            if (bar) bar.style.width = '100%';
+            
             setTimeout(() => {
                 if (splash) {
-                    splash.style.transition = 'opacity 0.5s ease, visibility 0.5s ease';
                     splash.style.opacity = '0';
-                    splash.style.visibility = 'hidden';
-                    
-                    // Remove do DOM após a transição para não sobrar nada bloqueando cliques
                     setTimeout(() => {
-                        if (splash.parentNode) {
-                            splash.parentNode.removeChild(splash);
-                        }
-                        console.log('Splash removido com sucesso.');
+                        splash.style.display = 'none';
                     }, 500);
                 }
-            }, 1200); // Tempo total para o usuário ver a logo e a barra completar
+            }, 1000);
 
-            // 3. Inicializações em background (não bloqueantes)
+            // 3. Inicializações em background
             try {
                 loadProfile();
                 setupImportantCarousel();
                 carregarTabelaPrecos();
                 iniciarChatPreparo();
                 renderGuiaExames();
-            } catch (e) {
-                console.error('Erro na inicialização silenciosa:', e);
+            } catch(e) {
+                console.warn('Erro na inicialização:', e);
             }
         });
 
