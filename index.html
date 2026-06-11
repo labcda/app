@@ -4103,7 +4103,7 @@
 
             if (term.length < 2) { dropdown.classList.add('hidden'); return; }
 
-            const resultados = orcTabelaExames.filter(ex => ex.busca.includes(term)).slice(0, 12);
+            const resultados = orcTabelaExames.filter(ex => normalizarTexto(ex.busca).includes(term)).slice(0, 12);
 
             if (!resultados.length) {
                 dropdown.innerHTML = `<div class="px-4 py-3 text-sm text-slate-400 dark:text-slate-500">Nenhum exame encontrado para "<strong>${input.value}</strong>"</div>`;
@@ -4674,7 +4674,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             const termo = normalizarTexto(input?.value || '');
             const filtrados = guiaExamesData.filter(exame => {
-                const passaTexto = !termo || exame.busca.includes(termo);
+                const passaTexto = !termo || normalizarTexto(exame.busca).includes(termo);
                 const passaFiltro = guiaFiltroAtual === 'todos' || exame.tags.includes(guiaFiltroAtual) || exame.categoria === guiaFiltroAtual || exame.material === guiaFiltroAtual;
                 return passaTexto && passaFiltro;
             });
@@ -4885,7 +4885,21 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             } catch(err) { console.warn('Agenda indisponível:', err); }
 
             document.getElementById('agen-horarios-loading')?.classList.add('hidden');
-            const disponiveis = slots.filter(h => !ocupados.includes(h));
+
+            // Se for hoje, filtrar horários que já passaram (com 30min de margem)
+            const agora = new Date();
+            const [selY, selM, selD] = data.split('-').map(Number);
+            const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
+            const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
+
+            const disponiveis = slots.filter(h => {
+                if (ocupados.includes(h)) return false;
+                if (isHoje) {
+                    const [hh, mm] = h.split(':').map(Number);
+                    return (hh * 60 + mm) > minutosAgora;
+                }
+                return true;
+            });
 
             if (!disponiveis.length) {
                 document.getElementById('agen-horarios-vazio')?.classList.remove('hidden');
@@ -4926,10 +4940,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const examesWrap = document.getElementById('agen-resumo-exames-wrap');
                 if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
                     examesWrap.classList.remove('hidden');
+                    const totalBruto = orcSelecionados.reduce((s,e) => s+e.preco, 0);
+                    const totalPix = totalBruto * 0.60;
+                    const totalCredito = totalBruto * 0.65;
                     document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
                         .map(ex => `<div class="flex justify-between"><span>${ex.nome}</span><span class="font-bold">${formatCurrency(ex.preco)}</span></div>`).join('');
-                    document.getElementById('agen-resumo-total').textContent =
-                        `Total estimado: ${formatCurrency(orcSelecionados.reduce((s,e) => s+e.preco, 0))}`;
+                    document.getElementById('agen-resumo-total').innerHTML =
+                        `<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ${formatCurrency(totalBruto)}</div>
+                         <div class="text-cda-primary font-extrabold">PIX/Dinheiro: ${formatCurrency(totalPix)}</div>
+                         <div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ${formatCurrency(totalCredito)}</div>`;
                 } else {
                     examesWrap.classList.add('hidden');
                 }
@@ -4959,8 +4978,11 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             let descExames = '';
             if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+                const totalBruto = orcSelecionados.reduce((s,e)=>s+e.preco,0);
+                const totalPix = totalBruto * 0.60;
+                const totalCredito = totalBruto * 0.65;
                 const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-                descExames = `\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrency(orcSelecionados.reduce((s,e)=>s+e.preco,0))}`;
+                descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}`;
             }
 
             btnSalvar.disabled = true;
@@ -5005,6 +5027,18 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             btnSalvar.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i>Agendado com sucesso!';
             btnSalvar.classList.add('opacity-50','pointer-events-none');
             if (nome) localStorage.setItem('patient_name', nome);
+
+            // Limpar orçamento e agendamento após sucesso
+            setTimeout(() => {
+                orcSelecionados = [];
+                orcRenderSelecionados();
+                agenInicializar();
+                document.getElementById('agen-telefone').value = '';
+                statusEl.classList.add('hidden');
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                btnSalvar.disabled = false;
+                btnSalvar.classList.remove('opacity-50','pointer-events-none');
+            }, 4000);
         }
 
         function agenFallbackWhatsApp(nome, telefone, data, horario, descExames) {
