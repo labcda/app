@@ -5107,62 +5107,53 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         // INITIAL LOAD
-        window.addEventListener('load', () => { // Mudado para 'load' para garantir que tudo (CSS/JS) baixou
+        window.addEventListener('load', () => {
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             updateThemeIcon();
             
-            // Splash Logic
             const bar = document.getElementById('progressBar');
             const splashStart = Date.now();
-            const minDuration = 1200;
+            const minDuration = 1000; // 1 segundo de splash apenas para efeito visual
 
             function fecharSplash() {
                 const elapsed = Date.now() - splashStart;
                 const delay = Math.max(0, minDuration - elapsed);
                 setTimeout(() => {
-                    bar.style.transition = 'width 0.3s ease';
-                    bar.style.width = '100%';
+                    if (bar) {
+                        bar.style.transition = 'width 0.4s ease';
+                        bar.style.width = '100%';
+                    }
                     setTimeout(() => {
                         const splash = document.getElementById('splashScreen');
                         if (splash) {
                             splash.style.opacity = '0';
-                            setTimeout(() => { splash.style.display = 'none'; }, 500);
+                            setTimeout(() => { splash.style.display = 'none'; }, 400);
                         }
-                    }, 300);
+                    }, 200);
                 }, delay);
             }
 
+            // Progresso visual rápido
             let width = 0;
             const fakeProgress = setInterval(() => {
-                if (width < 90) {
-                    width += (90 - width) * 0.08;
+                if (width < 100) {
+                    width += 5;
                     if (bar) bar.style.width = width + '%';
+                    if (width >= 100) clearInterval(fakeProgress);
                 }
-            }, 50);
+            }, 30);
 
-            // Inicializações em paralelo sem travar o splash
+            // Dispara as cargas em background SEM esperar por elas
             loadProfile();
             setupImportantCarousel();
             
-            // Funções que podem demorar ou falhar são chamadas de forma independente
-            Promise.allSettled([
-                carregarTabelaPrecos(),
-                iniciarChatPreparo(),
-                renderGuiaExames()
-            ]).finally(() => {
-                clearInterval(fakeProgress);
-                fecharSplash();
-            });
+            // Tenta carregar os dados, mas não bloqueia a abertura do app
+            carregarTabelaPrecos().catch(e => console.warn('Erro tabela:', e));
+            iniciarChatPreparo().catch(e => console.warn('Erro chat:', e));
+            renderGuiaExames();
 
-            // Timeout de segurança agressivo (4 segundos)
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                if (splash && splash.style.display !== 'none') {
-                    console.warn('Segurança: Forçando abertura do app.');
-                    clearInterval(fakeProgress);
-                    fecharSplash();
-                }
-            }, 4000);
+            // Abre o app independente de qualquer coisa após o tempo mínimo
+            fecharSplash();
         });
 
         function loadProfile() {
