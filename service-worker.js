@@ -65,7 +65,7 @@ self.addEventListener('fetch', (e) => {
         return caches.match(e.request)
           .then(response => {
             // Se não encontrar no cache, tenta o index principal
-            return response || caches.match('./index(37).html');
+            return response || caches.match('./index.html');
           });
       })
   );
