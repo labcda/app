@@ -4085,32 +4085,39 @@
         async function carregarTabelaPrecos() {
             const status = document.getElementById('orc-tabela-status');
             try {
-                await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
-                if (status) status.textContent = 'Carregando tabela de preços...';
+                // Garante que a biblioteca XLSX esteja carregada
+                if (typeof XLSX === 'undefined') {
+                    await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+                }
+                
+                if (status) status.textContent = 'Buscando tabela...';
 
-                const resp = await fetch(EXCEL_URL + '?v=' + Date.now(), { cache: 'no-store' });
-                if (!resp.ok) throw new Error('Falha ao baixar tabela');
+                // Tenta carregar a tabela localmente primeiro
+                const resp = await fetch(EXCEL_URL + '?v=' + Date.now());
+                if (!resp.ok) throw new Error('Arquivo não encontrado no servidor');
+                
                 const buffer = await resp.arrayBuffer();
                 const wb = XLSX.read(buffer, { type: 'array' });
                 const ws = wb.Sheets[wb.SheetNames[0]];
                 const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-                orcTabelaExames = rows.slice(1)
-                    .filter(r => r[1] && r[3] != null)
+                // Processa as linhas do Excel
+                orcTabelaExames = rows
+                    .filter(r => r && r[1] && r[3] != null) // r[1] é o nome, r[3] é o preço
                     .map((r, i) => ({
                         id:     i + 1,
                         codigo: String(r[0] || '').trim(),
                         nome:   String(r[1] || '').trim(),
-                        preco:  Number(r[3]) || 0,
+                        preco:  parseFloat(String(r[3]).replace(',', '.')) || 0,
                         busca:  normalizarTexto(String(r[0] || '') + ' ' + String(r[1] || ''))
-                    }));
+                    }))
+                    .filter(ex => ex.nome.toLowerCase() !== 'nome' && ex.nome.toLowerCase() !== 'exame'); // Remove cabeçalhos
 
-                if (status) status.textContent = orcTabelaExames.length
-                    ? `${orcTabelaExames.length} exames carregados.`
-                    : 'Não foi possível carregar a tabela.';
+                if (status) status.textContent = `${orcTabelaExames.length} exames disponíveis.`;
+                console.log('Tabela carregada:', orcTabelaExames.length, 'exames');
             } catch (err) {
                 console.error('Erro ao carregar tabela:', err);
-                if (status) status.textContent = 'Não foi possível carregar a tabela. Recarregue a página.';
+                if (status) status.textContent = 'Erro ao carregar preços. Verifique o arquivo tabela_preco.xlsx';
             }
         }
 
