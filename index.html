@@ -1155,6 +1155,50 @@
         })();
     </script>
 
+    <!-- MODAL TERMOS DE USO -->
+    <div id="modal-termos" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] anim-in">
+            <div class="p-6 border-b dark:border-slate-700 flex items-center gap-4">
+                <div class="w-12 h-12 bg-cda-primary/10 rounded-2xl flex items-center justify-center text-cda-primary text-xl">
+                    <i class="fa-solid fa-file-shield"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-slate-800 dark:text-white text-lg">Termos e Privacidade</h3>
+                    <p class="text-xs text-slate-500">Leia e aceite para continuar</p>
+                </div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 space-y-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                <p class="font-bold text-slate-800 dark:text-white">LABORATÓRIO CDA - TERMO DE USO E CONSENTIMENTO</p>
+                
+                <p>O <strong>LABORATÓRIO CDA</strong> disponibiliza este Aplicativo Web Progressivo (PWA) para consulta de informações, orçamentos, agendamentos e acompanhamento de atendimentos.</p>
+                
+                <p><strong>1. ACEITAÇÃO:</strong> Ao utilizar o app, você declara concordância integral com estes termos. Se não concordar, interrompa o uso imediatamente.</p>
+                
+                <p><strong>2. RESPONSABILIDADE:</strong> Você é o único responsável pela segurança do seu dispositivo e confidencialidade dos dados de acesso. O laboratório não se responsabiliza por prejuízos decorrentes de perda, furto, roubo do aparelho ou compartilhamento de credenciais com terceiros.</p>
+                
+                <p><strong>3. CARÁTER PESSOAL:</strong> O acesso é individual e intransferível. Toda atividade na conta é de responsabilidade do usuário.</p>
+                
+                <p><strong>4. PRIVACIDADE E LGPD:</strong> Tratamos seus dados em conformidade com a Lei nº 13.709/2018 (LGPD) para identificação, agendamentos e prestação de serviços. Seus dados básicos são armazenados localmente no dispositivo.</p>
+                
+                <p><strong>5. DISPOSITIVO:</strong> Em caso de perda ou roubo do aparelho, é sua responsabilidade proteger seus dados. O laboratório não responde por acessos de terceiros nestes casos.</p>
+
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-600 text-[11px] space-y-2">
+                    <p class="font-bold uppercase tracking-wider text-slate-400 mb-1">Declaração de Consentimento:</p>
+                    <p>✓ Li integralmente este Termo e compreendi meus direitos;</p>
+                    <p>✓ Concordo com a instalação e uso do app em meu dispositivo;</p>
+                    <p>✓ Autorizo o tratamento de meus dados conforme a LGPD.</p>
+                </div>
+</div>
+            
+            <div class="p-6 bg-slate-50 dark:bg-slate-700/30 border-t dark:border-slate-700">
+                <button onclick="aceitarTermos()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-cda-primary/20">
+                    Aceitar e Continuar <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- FLOATING WHATSAPP -->
     <a href="https://wa.me/5527998980658" target="_blank" class="fab md:hidden">
         <i class="fa-brands fa-whatsapp"></i>
@@ -4877,7 +4921,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         // =====================================================
         // AGENDAMENTO — GOOGLE CALENDAR VIA APPS SCRIPT
         // =====================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwri7W3tP3F0adTEHLjD9mnVfFdNPZZmkK1fb_vXXTemTbeWIgzJeAVeQZ8zSYS6sMHFw/exec';
 
         const FERIADOS_NACIONAIS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
         const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
@@ -5249,6 +5293,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             if (pageId === 'exames') {
                 renderGuiaExames();
+                verificarTermos();
                 ['agen-nome','agen-telefone'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el && !el.dataset.agenListener) {
@@ -5269,6 +5314,64 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 if (chave && senha && info) {
                     info.classList.remove('hidden');
                 }
+            }
+        }
+
+
+        
+        async function aceitarTermos() {
+            const btn = document.querySelector('#modal-termos button');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
+
+            // Captura dados do dispositivo
+            const deviceData = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                vendor: navigator.vendor,
+                language: navigator.language,
+                screen: `${window.screen.width}x${window.screen.height}`,
+                timestamp: new Date().toISOString(),
+                url: window.location.href
+            };
+
+            try {
+                // Tenta registrar o consentimento na planilha via Apps Script
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Para evitar problemas de CORS se o script não estiver configurado para responder OPTIONS
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'consentimento',
+                        device: deviceData,
+                        nome: localStorage.getItem('patient_name') || 'Visitante',
+                        telefone: localStorage.getItem('patient_phone') || 'Não informado'
+                    })
+                });
+            } catch (e) {
+                console.warn('Erro ao registrar consentimento remoto, mas seguindo...', e);
+            }
+
+            localStorage.setItem('cda_termos_aceitos', 'true');
+            const modal = document.getElementById('modal-termos');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+            showToast('Obrigado! Aproveite o app.', 'success');
+        }
+, 300);
+            showToast('Obrigado! Aproveite o app.', 'success');
+        }
+
+        function verificarTermos() {
+            const aceito = localStorage.getItem('cda_termos_aceitos');
+            if (!aceito) {
+                const modal = document.getElementById('modal-termos');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
             }
         }
 
@@ -5303,6 +5406,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 carregarTabelaPrecos();
                 iniciarChatPreparo();
                 renderGuiaExames();
+                verificarTermos();
             } catch(e) {
                 console.warn('Erro na inicialização:', e);
             }
