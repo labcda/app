@@ -1135,8 +1135,9 @@
                 </div>
                 <button onclick="navigateTo('perfil')" class="header-auth">
                     <i class="fa-regular fa-circle-user text-xl"></i>
-                    <span>Entrar</span>
+                    <span id="patient-name-display">Entrar</span>
                 </button>
+                <span id="patient-status-display" class="hidden"></span>
                 <div class="relative flex items-center gap-3">
                     <button onclick="toggleDarkMode()" class="text-white/80">
                         <i id="theme-icon" class="fa-solid fa-moon"></i>
@@ -5122,16 +5123,19 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         function loadProfile() {
             const nome = localStorage.getItem('patient_name');
             if (nome) {
-                document.getElementById('patient-name-display').innerText = 'Olá, ' + nome.split(' ')[0] + '!';
-                document.getElementById('prof-nome').value = nome;
-                document.getElementById('agen-nome').value = nome;
-                // Atualiza hero do perfil
+                const nameDisplay = document.getElementById('patient-name-display');
+                if (nameDisplay) nameDisplay.innerText = 'Olá, ' + nome.split(' ')[0] + '!';
+                const profNome = document.getElementById('prof-nome');
+                if (profNome) profNome.value = nome;
+                const agenNome = document.getElementById('agen-nome');
+                if (agenNome) agenNome.value = nome;
                 const heroPerfil = document.getElementById('hero-perfil-nome');
                 if (heroPerfil) heroPerfil.innerText = 'Olá, ' + nome.split(' ')[0] + '!';
             }
             const id = localStorage.getItem('patient_id');
             if (id) {
-                document.getElementById('patient-status-display').innerText = 'Protocolo: ' + id;
+                const statusDisplay = document.getElementById('patient-status-display');
+                if (statusDisplay) statusDisplay.innerText = 'Protocolo: ' + id;
                 const proto = document.getElementById('prof-protocolo');
                 if (proto) proto.value = id;
             }
