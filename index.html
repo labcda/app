@@ -1091,6 +1091,43 @@
             color: white;
             box-shadow: 0 6px 16px rgba(73,188,190,0.35);
         }
+        .agen-pagamento-opcao input {
+            accent-color: #49BCBE;
+        }
+        .agen-pagamento-opcao:has(input:checked) {
+            border-color: #49BCBE;
+            background: #E8F8F8;
+            box-shadow: 0 6px 16px rgba(73,188,190,0.16);
+        }
+        .dark .agen-pagamento-opcao:has(input:checked) {
+            background: rgba(73,188,190,0.15);
+            border-color: #49BCBE;
+        }
+        input[type="date"] {
+            min-height: 48px;
+            -webkit-appearance: none;
+            appearance: none;
+            color-scheme: light;
+        }
+        .dark input[type="date"] {
+            color-scheme: dark;
+        }
+        @supports (padding: max(0px)) {
+            .bottom-nav-new { padding-bottom: max(25px, env(safe-area-inset-bottom)); }
+            main { padding-bottom: max(6rem, calc(5.5rem + env(safe-area-inset-bottom))); }
+        }
+        .action-item, .action-item-title {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        @media (display-mode: standalone) and (max-width: 430px), (max-width: 380px) {
+            .grid-actions { gap: 10px; }
+            .action-item { padding: 14px; min-height: 108px; }
+            .action-item-title { font-size: 13px; line-height: 1.18; }
+            .action-item-sub { font-size: 10px; }
+            #agen-data { font-size: 16px; padding-top: 14px; padding-bottom: 14px; }
+            #agen-horarios-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
     </style>
 </head>
 <body class="antialiased bg-cda-bg dark:bg-slate-900">
@@ -1659,7 +1696,7 @@
                         <i class="fa-brands fa-whatsapp text-green-500"></i>
                     </div>
                     <div class="flex-1">
-                        <p class="font-bold text-sm text-slate-800 dark:text-white">Preferir falar com um atendente?</p>
+                        <p class="font-bold text-sm text-slate-800 dark:text-white">Prefere falar com um atendente?</p>
                         <p class="text-xs text-slate-500 mt-0.5">Envie foto do pedido e nossa equipe faz o orçamento para você.</p>
                     </div>
                     <button onclick="window.open('https://wa.me/5527998980658?text=Olá! Gostaria de um orçamento para este pedido médico.','_blank')" class="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs shadow-sm">
@@ -1697,9 +1734,21 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
-                            <i class="fa-solid fa-hashtag text-cda-primary mr-1"></i> Protocolo / CPF
+                            <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp
                         </label>
-                        <input type="text" id="prof-protocolo" placeholder="Número de protocolo ou CPF" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        <input type="tel" id="prof-telefone" placeholder="(27) 99999-9999" inputmode="tel" autocomplete="tel" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-solid fa-key text-cda-primary mr-1"></i> Chave
+                        </label>
+                        <input type="text" id="prof-chave" placeholder="Digite sua chave" autocomplete="username" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-solid fa-lock text-cda-primary mr-1"></i> Senha
+                        </label>
+                        <input type="password" id="prof-senha" placeholder="Digite sua senha" autocomplete="current-password" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                     <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
                         <i class="fa-solid fa-floppy-disk"></i> Salvar Dados
@@ -1778,7 +1827,7 @@
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp
                         </label>
-                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999"
+                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" inputmode="tel" autocomplete="tel"
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                 </div>
@@ -1878,6 +1927,19 @@
                 </div>
                 <div id="agen-resumo-placeholder" class="flex flex-col items-center py-4 text-center mb-4">
                     <p class="text-xs text-slate-400">Preencha os dados e selecione um horário para confirmar</p>
+                </div>
+                <div id="agen-pagamento-wrap" class="mb-4 hidden">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 ml-1">Forma de pagamento</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 p-3 cursor-pointer transition-all">
+                            <input type="radio" name="agen-pagamento" value="Pix, dinheiro ou cartão de débito (40% de desconto)" onchange="agenAtualizarResumo()">
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">Pix, dinheiro ou cartão de débito <span class="text-cda-primary">40% OFF</span></span>
+                        </label>
+                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 p-3 cursor-pointer transition-all">
+                            <input type="radio" name="agen-pagamento" value="Cartão de crédito" onchange="agenAtualizarResumo()">
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">Cartão de crédito</span>
+                        </label>
+                    </div>
                 </div>
                 <button onclick="agenSalvar()" id="agen-btn-salvar"
                     class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2 opacity-50 pointer-events-none">
@@ -4810,7 +4872,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
         const SLOTS_TARDE = ['14:30','15:10','15:50'];
 
-        let agenState = { data: null, periodo: null, horario: null };
+        let agenState = { data: null, periodo: null, horario: null, pagamento: null };
 
         function agenInicializar() {
             const inp = document.getElementById('agen-data');
@@ -4818,12 +4880,17 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const hoje = new Date();
             inp.min = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
             inp.value = '';
-            agenState = { data: null, periodo: null, horario: null };
+            agenState = { data: null, periodo: null, horario: null, pagamento: null };
             ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
+            document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
+            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+            if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
             agenEsconderHorarios();
             agenAtualizarResumo();
             const nome = localStorage.getItem('patient_name');
+            const telefone = localStorage.getItem('patient_phone');
             if (nome) document.getElementById('agen-nome').value = nome;
+            if (telefone) document.getElementById('agen-telefone').value = telefone;
         }
 
         function agenIsDiaUtil(dataStr) {
@@ -4922,15 +4989,43 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             showToast(`Horário ${hora} selecionado`, 'success', 1500);
         }
 
+        function validarTelefoneBR(valor) {
+            const digitos = String(valor || '').replace(/\D/g, '');
+            if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
+            if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
+            return false;
+        }
+
+        function agenTotalSelecionado() {
+            if (typeof orcSelecionados === 'undefined' || !Array.isArray(orcSelecionados)) return 0;
+            return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+        }
+
+        function agenPagamentoSelecionado() {
+            return document.querySelector('input[name="agen-pagamento"]:checked')?.value || '';
+        }
+
         function agenAtualizarResumo() {
             const { data, periodo, horario } = agenState;
             const nome = document.getElementById('agen-nome')?.value?.trim() || '';
+            const telefone = document.getElementById('agen-telefone')?.value?.trim() || '';
             const resumo = document.getElementById('agen-resumo');
             const placeholder = document.getElementById('agen-resumo-placeholder');
             const btnSalvar = document.getElementById('agen-btn-salvar');
-            const pronto = data && periodo && horario && nome;
+            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+            const pagamento = agenPagamentoSelecionado();
+            agenState.pagamento = pagamento || null;
+            const totalBruto = agenTotalSelecionado();
+            const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+            const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && temExames && totalBruto >= 150 && pagamento;
 
-            if (pronto) {
+            if (data && periodo && horario) {
+                if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
+            } else if (pagamentoWrap) {
+                pagamentoWrap.classList.add('hidden');
+            }
+
+            if (data && periodo && horario && nome) {
                 const [y,m,d] = data.split('-').map(Number);
                 const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
                 document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
@@ -4938,51 +5033,58 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 document.getElementById('agen-resumo-nome').textContent = nome;
 
                 const examesWrap = document.getElementById('agen-resumo-exames-wrap');
-                if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+                if (temExames) {
                     examesWrap.classList.remove('hidden');
-                    const totalBruto = orcSelecionados.reduce((s,e) => s+e.preco, 0);
                     const totalPix = totalBruto * 0.60;
                     const totalCredito = totalBruto * 0.65;
+                    const pagamentoLinha = pagamento ? `<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ${pagamento}</div>` : '';
                     document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
-                        .map(ex => `<div class="flex justify-between"><span>${ex.nome}</span><span class="font-bold">${formatCurrency(ex.preco)}</span></div>`).join('');
+                        .map(ex => `<div class="flex justify-between gap-3"><span>${ex.nome}</span><span class="font-bold whitespace-nowrap">${formatCurrency(ex.preco)}</span></div>`).join('');
                     document.getElementById('agen-resumo-total').innerHTML =
                         `<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ${formatCurrency(totalBruto)}</div>
-                         <div class="text-cda-primary font-extrabold">PIX/Dinheiro: ${formatCurrency(totalPix)}</div>
-                         <div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ${formatCurrency(totalCredito)}</div>`;
+                         <div class="text-cda-primary font-extrabold">PIX/Dinheiro/Débito: ${formatCurrency(totalPix)}</div>
+                         <div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ${formatCurrency(totalCredito)}</div>
+                         ${pagamentoLinha}`;
                 } else {
                     examesWrap.classList.add('hidden');
                 }
 
                 resumo.classList.remove('hidden');
                 placeholder.classList.add('hidden');
-                btnSalvar.classList.remove('opacity-50','pointer-events-none');
             } else {
                 resumo.classList.add('hidden');
                 placeholder.classList.remove('hidden');
-                btnSalvar.classList.add('opacity-50','pointer-events-none');
             }
+
+            if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
+            else btnSalvar.classList.add('opacity-50','pointer-events-none');
         }
 
         async function agenSalvar() {
             const { data, periodo, horario } = agenState;
             const nome     = document.getElementById('agen-nome')?.value?.trim();
             const telefone = document.getElementById('agen-telefone')?.value?.trim();
+            const pagamento = agenPagamentoSelecionado();
             const btnSalvar = document.getElementById('agen-btn-salvar');
             const statusEl  = document.getElementById('agen-status');
+            const totalBruto = agenTotalSelecionado();
 
-            if (!nome)     { showToast('Informe seu nome.', 'error'); return; }
-            if (!telefone) { showToast('Informe seu telefone.', 'error'); return; }
+            if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
+            if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
+            if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
             if (!data)     { showToast('Selecione a data.', 'error'); return; }
             if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
             if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
+            if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
+            if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
+            if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
 
             let descExames = '';
             if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-                const totalBruto = orcSelecionados.reduce((s,e)=>s+e.preco,0);
                 const totalPix = totalBruto * 0.60;
                 const totalCredito = totalBruto * 0.65;
                 const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-                descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}`;
+                descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
             }
 
             btnSalvar.disabled = true;
@@ -4994,8 +5096,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
-                        action: 'criar', data, horario, nome, telefone,
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nOrigem: Aplicativo CDA${descExames}`
+                        action: 'criar', data, horario, nome, telefone, pagamento,
+                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`
                     })
                 });
                 const json = await resp.json();
@@ -5003,7 +5105,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 agenSucesso(nome, data, horario);
             } catch(err) {
                 console.error('Erro agendamento:', err);
-                agenFallbackWhatsApp(nome, telefone, data, horario, descExames);
+                agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
             }
         }
 
@@ -5027,13 +5129,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             btnSalvar.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i>Agendado com sucesso!';
             btnSalvar.classList.add('opacity-50','pointer-events-none');
             if (nome) localStorage.setItem('patient_name', nome);
+            const telefone = document.getElementById('agen-telefone')?.value?.trim();
+            if (telefone) localStorage.setItem('patient_phone', telefone);
 
             // Limpar orçamento e agendamento após sucesso
             setTimeout(() => {
                 orcSelecionados = [];
                 orcRenderSelecionados();
                 agenInicializar();
-                document.getElementById('agen-telefone').value = '';
+                document.getElementById('agen-telefone').value = localStorage.getItem('patient_phone') || '';
                 statusEl.classList.add('hidden');
                 btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
                 btnSalvar.disabled = false;
@@ -5041,10 +5145,10 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }, 4000);
         }
 
-        function agenFallbackWhatsApp(nome, telefone, data, horario, descExames) {
+        function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
             const [y,m,d] = data.split('-').map(Number);
             const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-            const msg = `Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Data:* ${dataExt}\n*Horário:* ${horario}${descExames}\n\n_Agendamento via Aplicativo CDA_`;
+            const msg = `Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Data:* ${dataExt}\n*Horário:* ${horario}\n*Forma de pagamento:* ${pagamento || 'Não informada'}${descExames}\n\n_Agendamento via Aplicativo CDA_`;
             window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
             const btnSalvar = document.getElementById('agen-btn-salvar');
             btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
@@ -5052,10 +5156,21 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         function orcIrParaAgendamento() {
+            if (!orcSelecionados.length) {
+                showToast('Selecione ao menos um exame para agendar a coleta.', 'error');
+                return;
+            }
+            const totalBruto = orcSelecionados.reduce((s,e)=>s+e.preco,0);
+            if (totalBruto < 150) {
+                showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000);
+                return;
+            }
             navigateTo('agendar');
             setTimeout(() => {
                 const nome = localStorage.getItem('patient_name');
+                const telefone = localStorage.getItem('patient_phone');
                 if (nome) document.getElementById('agen-nome').value = nome;
+                if (telefone) document.getElementById('agen-telefone').value = telefone;
                 agenAtualizarResumo();
             }, 100);
         }
@@ -5111,6 +5226,13 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             if (pageId === 'exames') {
                 renderGuiaExames();
+                ['agen-nome','agen-telefone'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && !el.dataset.agenListener) {
+                        el.dataset.agenListener = 'true';
+                        el.addEventListener('input', agenAtualizarResumo);
+                    }
+                });
             }
 
             if (pageId === 'agendar') {
@@ -5166,23 +5288,68 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const heroPerfil = document.getElementById('hero-perfil-nome');
                 if (heroPerfil) heroPerfil.innerText = 'Olá, ' + nome.split(' ')[0] + '!';
             }
-            const id = localStorage.getItem('patient_id');
-            if (id) {
-                const statusDisplay = document.getElementById('patient-status-display');
-                if (statusDisplay) statusDisplay.innerText = 'Protocolo: ' + id;
-                const proto = document.getElementById('prof-protocolo');
-                if (proto) proto.value = id;
+            const telefone = localStorage.getItem('patient_phone');
+            if (telefone) {
+                const profTelefone = document.getElementById('prof-telefone');
+                if (profTelefone) profTelefone.value = telefone;
+                const agenTelefone = document.getElementById('agen-telefone');
+                if (agenTelefone) agenTelefone.value = telefone;
+            }
+            const chave = localStorage.getItem('patient_key');
+            if (chave) {
+                const profChave = document.getElementById('prof-chave');
+                if (profChave) profChave.value = chave;
+            }
+            const senha = localStorage.getItem('patient_password');
+            if (senha) {
+                const profSenha = document.getElementById('prof-senha');
+                if (profSenha) profSenha.value = senha;
             }
         }
 
         function saveProfile(e) {
             e.preventDefault();
-            localStorage.setItem('patient_name', document.getElementById('prof-nome').value);
-            localStorage.setItem('patient_id', document.getElementById('prof-protocolo').value);
+            const nome = document.getElementById('prof-nome')?.value?.trim() || '';
+            const telefone = document.getElementById('prof-telefone')?.value?.trim() || '';
+            const chave = document.getElementById('prof-chave')?.value?.trim() || '';
+            const senha = document.getElementById('prof-senha')?.value || '';
+
+            if (telefone && !validarTelefoneBR(telefone)) {
+                showToast('Informe um telefone válido com DDD.', 'error');
+                return;
+            }
+
+            localStorage.setItem('patient_name', nome);
+            localStorage.setItem('patient_phone', telefone);
+            localStorage.setItem('patient_key', chave);
+            localStorage.setItem('patient_password', senha);
+            localStorage.removeItem('patient_id');
             loadProfile();
             showToast('Dados salvos com sucesso!', 'success');
             navigateTo('home');
         }
+
+        function aplicarMascaraTelefone(input) {
+            if (!input) return;
+            input.addEventListener('input', () => {
+                let v = input.value.replace(/\D/g, '').slice(0, 11);
+                if (v.length > 10) {
+                    v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+                } else if (v.length > 6) {
+                    v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                } else if (v.length > 2) {
+                    v = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+                } else if (v.length > 0) {
+                    v = v.replace(/(\d{0,2})/, '($1');
+                }
+                input.value = v;
+            });
+        }
+
+        window.addEventListener('load', () => {
+            aplicarMascaraTelefone(document.getElementById('prof-telefone'));
+            aplicarMascaraTelefone(document.getElementById('agen-telefone'));
+        });
 
         // DNA ANIMATION
         const dnaContainer = document.getElementById('dnaBackground');
