@@ -1,8 +1,9 @@
 const CACHE_NAME = 'pwa-cache-v3'; // Incrementado para forçar atualização
 const ASSETS = [
   './',
-  './index.html', // Ajustado para o nome real do arquivo
+  './index.html',
   './manifest.json',
+  './tabela_preco.xlsx',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
