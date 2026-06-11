@@ -1191,7 +1191,7 @@
 
                 <!-- GRID DE AÇÕES -->
                 <div class="grid-actions anim-in" style="animation-delay: 0.3s">
-                    <div onclick="navigateTo('orc')" class="action-item">
+                    <div onclick="navigateTo('orcamento')" class="action-item">
                         <i class="fa-regular fa-calendar-check text-cda-primary"></i>
                         <div>
                             <p class="action-item-title">Agendamento/Orçamento</p>
@@ -4083,43 +4083,59 @@
                     await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
                 }
                 
-                if (status) status.textContent = 'Lendo arquivo...';
+                if (status) status.textContent = 'Carregando banco de dados...';
 
-                const resp = await fetch(EXCEL_URL + '?v=' + Date.now());
-                if (!resp.ok) throw new Error('Arquivo tabela_preco.xlsx não encontrado');
+                // Tenta carregar o arquivo com tratamento de erro detalhado
+                const resp = await fetch(EXCEL_URL + '?v=' + Date.now()).catch(e => {
+                    throw new Error('Não foi possível conectar ao servidor para baixar a tabela.');
+                });
+
+                if (!resp.ok) {
+                    throw new Error(`Arquivo '${EXCEL_URL}' não encontrado. Certifique-se de que ele está na mesma pasta que o index.html.`);
+                }
                 
                 const buffer = await resp.arrayBuffer();
                 const wb = XLSX.read(buffer, { type: 'array' });
+                
+                if (!wb.SheetNames.length) throw new Error('O arquivo Excel parece estar vazio ou corrompido.');
+                
                 const ws = wb.Sheets[wb.SheetNames[0]];
                 const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-                if (!rows || rows.length < 1) throw new Error('Arquivo Excel vazio');
+                if (!rows || rows.length < 1) throw new Error('Nenhuma linha encontrada no arquivo Excel.');
 
-                // Detecção dinâmica de colunas
-                let colNome = 1, colPreco = 3, colCodigo = 0;
+                // Detecção de colunas aprimorada
+                let colNome = -1, colPreco = -1, colCodigo = -1;
                 
-                // Procura nos primeiros 5 registros onde estão as palavras-chave
-                for (let i = 0; i < Math.min(rows.length, 5); i++) {
+                // Varre as primeiras 10 linhas para achar o cabeçalho
+                for (let i = 0; i < Math.min(rows.length, 10); i++) {
                     const row = rows[i];
                     if (!row) continue;
                     row.forEach((cell, idx) => {
-                        const val = String(cell || '').toLowerCase();
-                        if (val.includes('exame') || val.includes('nome') || val.includes('descricao')) colNome = idx;
-                        if (val.includes('preço') || val.includes('valor') || val.includes('vlr') || val.includes('r$')) colPreco = idx;
-                        if (val.includes('cod') || val.includes('id')) colCodigo = idx;
+                        const val = String(cell || '').toLowerCase().trim();
+                        if (colNome === -1 && (val.includes('exame') || val.includes('nome') || val.includes('descri'))) colNome = idx;
+                        if (colPreco === -1 && (val.includes('preço') || val.includes('valor') || val.includes('vlr') || val.includes('r$') || val.includes('particular'))) colPreco = idx;
+                        if (colCodigo === -1 && (val.includes('cod') || val.includes('id') || val.includes('tuss'))) colCodigo = idx;
                     });
+                    if (colNome !== -1 && colPreco !== -1) break;
                 }
 
-                // Processamento ultra-tolerante
+                // Fallback se não detectar
+                if (colNome === -1) colNome = 1;
+                if (colPreco === -1) colPreco = 3;
+                if (colCodigo === -1) colCodigo = 0;
+
                 orcTabelaExames = [];
-                for (let i = 0; i < rows.length; i++) {
-                    const r = rows[i];
-                    if (!r || !r[colNome]) continue;
+                rows.forEach((r, i) => {
+                    if (!r || !r[colNome]) return;
                     
                     const nomeStr = String(r[colNome]).trim();
-                    if (nomeStr.toLowerCase() === 'nome' || nomeStr.toLowerCase() === 'exame' || nomeStr.length < 2) continue;
+                    // Pula cabeçalhos comuns
+                    const lowerNome = nomeStr.toLowerCase();
+                    if (lowerNome === 'nome' || lowerNome === 'exame' || lowerNome === 'descrição' || lowerNome.length < 3) return;
 
-                    let precoRaw = String(r[colPreco] || '0').replace('R$', '').trim();
+                    let precoRaw = String(r[colPreco] || '0').replace(/[R$\s]/g, '').trim();
+                    // Trata 1.250,00 ou 1250,00 ou 1250.00
                     if (precoRaw.includes(',') && precoRaw.includes('.')) {
                         precoRaw = precoRaw.replace(/\./g, '').replace(',', '.');
                     } else {
@@ -4127,6 +4143,7 @@
                     }
                     
                     const precoFinal = parseFloat(precoRaw) || 0;
+                    if (precoFinal <= 0) return; // Só adiciona exames com preço
                     
                     orcTabelaExames.push({
                         id:     i + 1,
@@ -4135,10 +4152,14 @@
                         preco:  precoFinal,
                         busca:  normalizarTexto(String(r[colCodigo] || '') + ' ' + nomeStr)
                     });
-                }
+                });
 
-                if (status) status.textContent = `${orcTabelaExames.length} exames disponíveis.`;
-                console.log(`Sucesso: ${orcTabelaExames.length} exames carregados (Colunas: Nome=${colNome}, Preço=${colPreco})`);
+                if (status) {
+                    status.textContent = orcTabelaExames.length > 0 
+                        ? `${orcTabelaExames.length} exames disponíveis.` 
+                        : 'Tabela lida, mas nenhum exame válido encontrado.';
+                }
+                console.log(`Sucesso: ${orcTabelaExames.length} exames (Colunas: N=${colNome}, P=${colPreco})`);
             } catch (err) {
                 console.error('Erro crítico na tabela:', err);
                 if (status) status.textContent = 'Erro ao ler tabela. Verifique o nome e as colunas do arquivo.';
