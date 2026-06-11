@@ -5106,46 +5106,55 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
         }
 
-        // INITIAL LOAD - SOLUÇÃO FORÇADA
-        (function() {
-            const forcarAbertura = () => {
-                console.log('Executando abertura forçada...');
-                
-                // 1. Garante que a Home esteja ativa
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                const home = document.getElementById('home');
-                if (home) home.classList.add('active');
-
-                // 2. Remove o Splash Screen imediatamente
-                const splash = document.getElementById('splashScreen');
-                if (splash) {
-                    splash.style.display = 'none';
-                    if (splash.parentNode) splash.parentNode.removeChild(splash);
-                }
-                
-                // 3. Inicializações secundárias
-                try {
-                    loadProfile();
-                    setupImportantCarousel();
-                    carregarTabelaPrecos();
-                    iniciarChatPreparo();
-                    renderGuiaExames();
-                } catch(e) {}
-            };
-
-            // Tenta abrir assim que o DOM estiver pronto
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', forcarAbertura);
-            } else {
-                forcarAbertura();
+        // INITIAL LOAD
+        window.addEventListener('load', () => {
+            // Garante que o tema seja aplicado
+            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+            updateThemeIcon();
+            
+            // Força a página home a estar ativa caso nenhuma esteja
+            if (!document.querySelector('.page.active')) {
+                const homePage = document.getElementById('home');
+                if (homePage) homePage.classList.add('active');
             }
 
-            // Backup: Tenta abrir novamente no window.load
-            window.addEventListener('load', forcarAbertura);
+            const bar = document.getElementById('progressBar');
+            const splash = document.getElementById('splashScreen');
 
-            // Backup Supremo: Abre após 3 segundos não importa o que aconteça
-            setTimeout(forcarAbertura, 3000);
-        })();
+            // 1. Anima a barra rapidamente até 100%
+            if (bar) {
+                bar.style.transition = 'width 0.8s ease-in-out';
+                bar.style.width = '100%';
+            }
+
+            // 2. Após a animação da barra, remove o splash à força
+            setTimeout(() => {
+                if (splash) {
+                    splash.style.transition = 'opacity 0.5s ease, visibility 0.5s ease';
+                    splash.style.opacity = '0';
+                    splash.style.visibility = 'hidden';
+                    
+                    // Remove do DOM após a transição para não sobrar nada bloqueando cliques
+                    setTimeout(() => {
+                        if (splash.parentNode) {
+                            splash.parentNode.removeChild(splash);
+                        }
+                        console.log('Splash removido com sucesso.');
+                    }, 500);
+                }
+            }, 1200); // Tempo total para o usuário ver a logo e a barra completar
+
+            // 3. Inicializações em background (não bloqueantes)
+            try {
+                loadProfile();
+                setupImportantCarousel();
+                carregarTabelaPrecos();
+                iniciarChatPreparo();
+                renderGuiaExames();
+            } catch (e) {
+                console.error('Erro na inicialização silenciosa:', e);
+            }
+        });
 
         function loadProfile() {
             const nome = localStorage.getItem('patient_name');
