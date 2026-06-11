@@ -5340,7 +5340,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 // Tenta registrar o consentimento na planilha via Apps Script
                 await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Para evitar problemas de CORS se o script não estiver configurado para responder OPTIONS
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         action: 'consentimento',
@@ -5355,14 +5355,13 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             localStorage.setItem('cda_termos_aceitos', 'true');
             const modal = document.getElementById('modal-termos');
-            modal.style.opacity = '0';
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 300);
-            showToast('Obrigado! Aproveite o app.', 'success');
-        }
-, 300);
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 300);
+            }
             showToast('Obrigado! Aproveite o app.', 'success');
         }
 
