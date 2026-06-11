@@ -1791,8 +1791,19 @@
             </div>
         </section>
 
-        <section id="page-resultados" class="page h-[600px]">
-            <iframe src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
+        <section id="page-resultados" class="page h-[600px] flex flex-col">
+            <div id="results-autofill-info" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-3 mb-3 flex items-center justify-between">
+                <p class="text-xs text-amber-800 dark:text-amber-300 font-bold"><i class="fa-solid fa-key mr-1"></i> Usar chave e senha salvas no perfil?</p>
+                <button onclick="autofillResults()" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">Preencher</button>
+            </div>
+            <iframe id="iframe-resultados" name="iframe-resultados" src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full flex-1 rounded-3xl border-none shadow-sm"></iframe>
+            
+            <!-- Form oculto para tentar o login via POST se necessário, ou apenas referência -->
+            <form id="form-resultados-autofill" method="POST" action="https://portal.worklabweb.com.br/resultados-on-line/1824" target="iframe-resultados" class="hidden">
+                <input type="hidden" name="tbCodigo" id="autofill-chave">
+                <input type="hidden" name="tbSenha" id="autofill-senha">
+                <input type="hidden" name="rdbOpcao" value="paciente">
+            </form>
         </section>
 
         <section id="page-agendar" class="page space-y-5">
@@ -5175,6 +5186,18 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }, 100);
         }
 
+        function autofillResults() {
+            const chave = localStorage.getItem('patient_key');
+            const senha = localStorage.getItem('patient_password');
+            if (chave && senha) {
+                document.getElementById('autofill-chave').value = chave;
+                document.getElementById('autofill-senha').value = senha;
+                document.getElementById('form-resultados-autofill').submit();
+                document.getElementById('results-autofill-info').classList.add('hidden');
+                showToast('Tentando preencher credenciais...', 'info');
+            }
+        }
+
         function navigateTo(pageId) {
             const target = document.getElementById('page-' + pageId);
             if (!target) return;
@@ -5237,6 +5260,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             if (pageId === 'agendar') {
                 agenInicializar();
+            }
+
+            if (pageId === 'resultados') {
+                const chave = localStorage.getItem('patient_key');
+                const senha = localStorage.getItem('patient_password');
+                const info = document.getElementById('results-autofill-info');
+                if (chave && senha && info) {
+                    info.classList.remove('hidden');
+                }
             }
         }
 
