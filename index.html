@@ -5369,14 +5369,23 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             let agendaOk = false;
             try {
                 const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 8000);
-                const resp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+                const timeout = setTimeout(() => controller.abort(), 10000);
+                const url = `${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${encodeURIComponent(CDA_TOKEN)}`;
+                console.log('[CDA] Consultando agenda:', url);
+                const resp = await fetch(url, {
+                    method: 'GET',
+                    redirect: 'follow',
+                    signal: controller.signal
+                });
                 clearTimeout(timeout);
-                const json = await resp.json();
+                const texto = await resp.text();
+                console.log('[CDA] Resposta bruta:', texto);
+                const json = JSON.parse(texto);
                 ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
+                console.log('[CDA] Ocupados:', ocupados);
                 agendaOk = true;
             } catch(err) {
-                console.warn('Agenda indisponível:', err);
+                console.warn('[CDA] Agenda indisponível:', err);
                 agendaOk = false;
             }
 
