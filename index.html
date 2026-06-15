@@ -1191,6 +1191,19 @@
             color: white;
             box-shadow: 0 6px 16px rgba(73,188,190,0.35);
         }
+        .agen-horario-btn.ocupado {
+            border-color: #E2E8F0;
+            background: #F1F5F9;
+            color: #CBD5E1;
+            cursor: not-allowed;
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        .dark .agen-horario-btn.ocupado {
+            border-color: #1E293B;
+            background: #0F172A;
+            color: #334155;
+        }
         .agen-pagamento-opcao input {
             accent-color: #49BCBE;
         }
@@ -2210,6 +2223,12 @@
                     <p class="text-sm font-bold text-slate-600 dark:text-slate-300">Sem horários disponíveis</p>
                     <p class="text-xs text-slate-400 mt-1">Tente outra data ou entre em contato</p>
                     <a href="https://wa.me/5527998980658" target="_blank" class="mt-3 text-xs font-bold text-cda-primary underline">Falar pelo WhatsApp →</a>
+                </div>
+                <div id="agen-horarios-erro" class="hidden">
+                    <div class="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-3 mb-3">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 shrink-0"></i>
+                        <p class="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">Não foi possível consultar a agenda em tempo real. Os horários exibidos são estimados — o laboratório confirmará disponibilidade após o agendamento.</p>
+                    </div>
                 </div>
             </div>
 
@@ -5326,7 +5345,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         function agenEsconderHorarios() {
-            ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio']
+            ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
                 .forEach(id => document.getElementById(id)?.classList.add('hidden'));
             document.getElementById('agen-horarios-placeholder')?.classList.remove('hidden');
         }
@@ -5336,18 +5355,39 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (!data || !periodo) return;
             const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
 
-            ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio']
+            // Esconde tudo e mostra loading
+            ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
                 .forEach(id => document.getElementById(id)?.classList.add('hidden'));
             document.getElementById('agen-horarios-loading')?.classList.remove('hidden');
 
+            // Limpa horário selecionado ao buscar novamente
+            agenState.horario = null;
+            document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
+            agenAtualizarResumo();
+
             let ocupados = [];
+            let agendaOk = false;
             try {
-                const resp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+                const resp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+                clearTimeout(timeout);
                 const json = await resp.json();
                 ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
-            } catch(err) { console.warn('Agenda indisponível:', err); }
+                agendaOk = true;
+            } catch(err) {
+                console.warn('Agenda indisponível:', err);
+                agendaOk = false;
+            }
 
             document.getElementById('agen-horarios-loading')?.classList.add('hidden');
+
+            // Se a agenda falhou, mostra todos os horários disponíveis localmente com aviso
+            if (!agendaOk) {
+                const erroEl = document.getElementById('agen-horarios-erro');
+                if (erroEl) erroEl.classList.remove('hidden');
+                // Continua com ocupados vazio (mostra todos os slots filtrados por hora)
+            }
 
             // Se for hoje, filtrar horários que já passaram (com 30min de margem)
             const agora = new Date();
@@ -5370,9 +5410,12 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
 
             const grid = document.getElementById('agen-horarios-grid');
-            grid.innerHTML = disponiveis.map(h =>
-                `<button type="button" class="agen-horario-btn" data-hora="${h}" onclick="agenSelecionarHorario('${h}')">${h}</button>`
-            ).join('');
+            grid.innerHTML = disponiveis.map(h => {
+                const isOcupado = ocupados.includes(h);
+                return `<button type="button" class="agen-horario-btn${isOcupado ? ' ocupado' : ''}" data-hora="${h}" 
+                    ${isOcupado ? 'disabled title="Horário já reservado"' : `onclick="agenSelecionarHorario('${h}')"`}
+                    >${h}${isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : ''}</button>`;
+            }).join('');
             grid.classList.remove('hidden');
         }
 
@@ -5475,6 +5518,35 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
             if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
 
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
+            statusEl.classList.add('hidden');
+
+            // Double-check: verifica se o horário ainda está disponível
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 6000);
+                const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+                clearTimeout(timeout);
+                const checkJson = await checkResp.json();
+                const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
+                if (ocupados.includes(horario)) {
+                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    // Rebusca horários para atualizar
+                    agenState.horario = null;
+                    agenAtualizarResumo();
+                    agenBuscarHorarios();
+                    return;
+                }
+            } catch(err) {
+                // Se não conseguir verificar, continua e tenta salvar (o servidor rejeitará se ocupado)
+                console.warn('Verificação prévia falhou, tentando salvar:', err);
+            }
+
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
+
             let descExames = '';
             if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
                 const totalPix = totalBruto * 0.60;
@@ -5482,10 +5554,6 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
                 descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
             }
-
-            btnSalvar.disabled = true;
-            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
-            statusEl.classList.add('hidden');
 
             try {
                 // Monta horários ISO para o Google Calendar usar corretamente
@@ -5505,6 +5573,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     })
                 });
                 const json = await resp.json();
+                if (json.ocupado) {
+                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro.`, 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    agenState.horario = null;
+                    agenAtualizarResumo();
+                    agenBuscarHorarios();
+                    return;
+                }
                 if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
                 btnSalvar.disabled = false;
                 btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
