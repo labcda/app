@@ -5261,6 +5261,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         // AGENDAMENTO — GOOGLE CALENDAR VIA APPS SCRIPT
         // =====================================================
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwri7W3tP3F0adTEHLjD9mnVfFdNPZZmkK1fb_vXXTemTbeWIgzJeAVeQZ8zSYS6sMHFw/exec';
+        // Token compartilhado com o Apps Script — valida que a requisição veio do app CDA
+        const CDA_TOKEN = '[REMOVIDO]';
 
         const FERIADOS_NACIONAIS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
         const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
@@ -5340,7 +5342,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             let ocupados = [];
             try {
-                const resp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}`);
+                const resp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`);
                 const json = await resp.json();
                 ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
             } catch(err) { console.warn('Agenda indisponível:', err); }
@@ -5496,7 +5498,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
-                        action: 'criar', data, horario, nome, telefone, pagamento,
+                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, pagamento,
                         startTime: startDateTime,
                         endTime: endDateTime,
                         descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`
@@ -5711,7 +5713,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
-                        action: 'consentimento',
+                        action: 'consentimento', token: CDA_TOKEN,
                         device: deviceData,
                         nome: _getItem('patient_name') || 'Visitante',
                         telefone: _getItem('patient_phone') || 'Não informado'
