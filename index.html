@@ -2038,6 +2038,20 @@
                         </label>
                         <input type="password" id="prof-senha" placeholder="Digite sua senha" autocomplete="current-password" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
+                    <!-- Lembrar meus dados -->
+                    <label id="lembrar-label" class="flex items-center gap-3 cursor-pointer select-none p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 transition-all hover:border-cda-primary/40">
+                        <div class="relative flex-shrink-0">
+                            <input type="checkbox" id="lembrar-dados" class="sr-only peer">
+                            <div class="w-10 h-6 bg-slate-300 dark:bg-slate-600 peer-checked:bg-cda-primary rounded-full transition-colors duration-200"></div>
+                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-4"></div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-slate-700 dark:text-slate-200">Lembrar meus dados</p>
+                            <p class="text-xs text-slate-400 dark:text-slate-400 mt-0.5">Seus dados ficam salvos neste dispositivo</p>
+                        </div>
+                        <i class="fa-solid fa-shield-halved text-cda-primary text-lg opacity-70"></i>
+                    </label>
+
                     <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
                         <i class="fa-solid fa-floppy-disk"></i> Salvar Dados
                     </button>
@@ -4804,7 +4818,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         // =====================================================
         function orcFinalizarWhatsApp() {
             if (!orcSelecionados.length) { showToast('Selecione ao menos um exame para continuar.', 'error'); return; }
-            const nome  = localStorage.getItem('patient_name') || 'Paciente';
+            const nome  = _getItem('patient_name') || 'Paciente';
             const lista = orcSelecionados.map(ex => `• ${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
             const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
             const msg   = `Olá! Gostaria de confirmar o orçamento feito pelo app.\n\n*Paciente:* ${nome}\n\n*Exames:*\n${lista}\n\n*Total estimado:* ${total}\n\n_Valores da tabela particular. Sujeito a confirmação._`;
@@ -4816,7 +4830,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         // =====================================================
         function orcCompartilharOrcamento() {
             if (!orcSelecionados.length) { showToast('Selecione ao menos um exame para compartilhar.', 'error'); return; }
-            const nome  = localStorage.getItem('patient_name') || 'Paciente';
+            const nome  = _getItem('patient_name') || 'Paciente';
             const lista = orcSelecionados.map(ex => `• ${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
             const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
             const msg   = `🧪 *Orçamento – Laboratório CDA*\n\n*Paciente:* ${nome}\n\n*Exames:*\n${lista}\n\n*Total estimado:* ${total}\n\n_Tabela particular. Sujeito a confirmação._\n_Laboratório CDA – Afonso Cláudio/ES_`;
@@ -4842,7 +4856,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const cPrimary = [73,188,190], cDark = [15,76,92], cMid = [55,167,170];
                 const cText = [30,41,59], cMuted = [100,116,139], cLight = [240,246,247];
                 const cWhite = [255,255,255], cGreen = [5,150,105], cAmber = [160,100,0];
-                const nomePac = localStorage.getItem('patient_name') || '';
+                const nomePac = _getItem('patient_name') || '';
                 const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
                 let y = 0;
 
@@ -5267,8 +5281,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
             agenEsconderHorarios();
             agenAtualizarResumo();
-            const nome = localStorage.getItem('patient_name');
-            const telefone = localStorage.getItem('patient_phone');
+            const nome = _getItem('patient_name');
+            const telefone = _getItem('patient_phone');
             if (nome) document.getElementById('agen-nome').value = nome;
             if (telefone) document.getElementById('agen-telefone').value = telefone;
         }
@@ -5547,7 +5561,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 btnSalvar.classList.remove('opacity-50','pointer-events-none');
             }
             const agenTel = document.getElementById('agen-telefone');
-            if (agenTel) agenTel.value = localStorage.getItem('patient_phone') || '';
+            if (agenTel) agenTel.value = _getItem('patient_phone') || '';
 
             // Retorna para Home
             navigateTo('home');
@@ -5575,8 +5589,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
             navigateTo('agendar');
             setTimeout(() => {
-                const nome = localStorage.getItem('patient_name');
-                const telefone = localStorage.getItem('patient_phone');
+                const nome = _getItem('patient_name');
+                const telefone = _getItem('patient_phone');
                 if (nome) document.getElementById('agen-nome').value = nome;
                 if (telefone) document.getElementById('agen-telefone').value = telefone;
                 agenAtualizarResumo();
@@ -5584,8 +5598,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         function autofillResults() {
-            const chave = localStorage.getItem('patient_key');
-            const senha = localStorage.getItem('patient_password');
+            const chave = _getItem('patient_key');
+            const senha = _getItem('patient_password');
             if (chave && senha) {
                 document.getElementById('autofill-chave').value = chave;
                 document.getElementById('autofill-senha').value = senha;
@@ -5662,8 +5676,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
 
             if (pageId === 'resultados') {
-                const chave = localStorage.getItem('patient_key');
-                const senha = localStorage.getItem('patient_password');
+                const chave = _getItem('patient_key');
+                const senha = _getItem('patient_password');
                 const info = document.getElementById('results-autofill-info');
                 if (chave && senha && info) {
                     info.classList.remove('hidden');
@@ -5699,8 +5713,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     body: JSON.stringify({
                         action: 'consentimento',
                         device: deviceData,
-                        nome: localStorage.getItem('patient_name') || 'Visitante',
-                        telefone: localStorage.getItem('patient_phone') || 'Não informado'
+                        nome: _getItem('patient_name') || 'Visitante',
+                        telefone: _getItem('patient_phone') || 'Não informado'
                     })
                 });
             } catch (e) {
@@ -5765,8 +5779,27 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
         });
 
+        // --- Lembrar dados: usa localStorage (persistente) ou sessionStorage (só sessão) ---
+        function _storage() {
+            return localStorage.getItem('cda_lembrar') === 'true' ? localStorage : sessionStorage;
+        }
+
+        function _getItem(key) {
+            return localStorage.getItem(key) || sessionStorage.getItem(key);
+        }
+
+        function _clearAll() {
+            const keys = ['patient_name','patient_phone','patient_key','patient_password','patient_id'];
+            keys.forEach(k => { localStorage.removeItem(k); sessionStorage.removeItem(k); });
+        }
+
         function loadProfile() {
-            const nome = localStorage.getItem('patient_name');
+            // Restaura preferência do toggle
+            const lembrar = localStorage.getItem('cda_lembrar') === 'true';
+            const toggle = document.getElementById('lembrar-dados');
+            if (toggle) toggle.checked = lembrar;
+
+            const nome = _getItem('patient_name');
             if (nome) {
                 const nameDisplay = document.getElementById('patient-name-display');
                 if (nameDisplay) nameDisplay.innerText = 'Olá, ' + nome.split(' ')[0] + '!';
@@ -5777,19 +5810,19 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const heroPerfil = document.getElementById('hero-perfil-nome');
                 if (heroPerfil) heroPerfil.innerText = 'Olá, ' + nome.split(' ')[0] + '!';
             }
-            const telefone = localStorage.getItem('patient_phone');
+            const telefone = _getItem('patient_phone');
             if (telefone) {
                 const profTelefone = document.getElementById('prof-telefone');
                 if (profTelefone) profTelefone.value = telefone;
                 const agenTelefone = document.getElementById('agen-telefone');
                 if (agenTelefone) agenTelefone.value = telefone;
             }
-            const chave = localStorage.getItem('patient_key');
+            const chave = _getItem('patient_key');
             if (chave) {
                 const profChave = document.getElementById('prof-chave');
                 if (profChave) profChave.value = chave;
             }
-            const senha = localStorage.getItem('patient_password');
+            const senha = _getItem('patient_password');
             if (senha) {
                 const profSenha = document.getElementById('prof-senha');
                 if (profSenha) profSenha.value = senha;
@@ -5802,19 +5835,27 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const telefone = document.getElementById('prof-telefone')?.value?.trim() || '';
             const chave = document.getElementById('prof-chave')?.value?.trim() || '';
             const senha = document.getElementById('prof-senha')?.value || '';
+            const lembrar = document.getElementById('lembrar-dados')?.checked || false;
 
             if (telefone && !validarTelefoneBR(telefone)) {
                 showToast('Informe um telefone válido com DDD.', 'error');
                 return;
             }
 
-            localStorage.setItem('patient_name', nome);
-            localStorage.setItem('patient_phone', telefone);
-            localStorage.setItem('patient_key', chave);
-            localStorage.setItem('patient_password', senha);
-            localStorage.removeItem('patient_id');
+            // Salva a preferência do toggle sempre em localStorage (sem dados sensíveis)
+            localStorage.setItem('cda_lembrar', lembrar ? 'true' : 'false');
+
+            // Limpa ambos antes de gravar no lugar certo
+            _clearAll();
+
+            const store = lembrar ? localStorage : sessionStorage;
+            store.setItem('patient_name', nome);
+            store.setItem('patient_phone', telefone);
+            store.setItem('patient_key', chave);
+            store.setItem('patient_password', senha);
+
             loadProfile();
-            showToast('Dados salvos com sucesso!', 'success');
+            showToast(lembrar ? 'Dados salvos e lembrados neste dispositivo!' : 'Dados salvos só para esta sessão.', 'success');
             navigateTo('home');
         }
 
