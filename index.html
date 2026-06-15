@@ -1660,22 +1660,24 @@
                     </div>
                 </div>
 
-                <div class="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-2xl p-4">
-                    <label for="orc-arquivo" class="flex flex-col items-center gap-2 cursor-pointer text-center" id="orc-upload-label">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300"></i>
-                        <span class="text-sm font-bold text-slate-500 dark:text-slate-400">Toque para selecionar PDF ou foto</span>
-                        <span class="text-xs text-slate-400">JPG, PNG ou PDF</span>
+                <div class="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl p-3">
+                    <label for="orc-arquivo" class="flex items-center gap-3 cursor-pointer" id="orc-upload-label">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-300 flex-shrink-0"></i>
+                        <div>
+                            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 block">Toque para selecionar PDF ou foto</span>
+                            <span class="text-[11px] text-slate-400">JPG, PNG ou PDF</span>
+                        </div>
                     </label>
                     <input type="file" id="orc-arquivo" accept="image/*,.pdf" class="hidden" onchange="orcArquivoSelecionado()">
                 </div>
 
-                <div id="orc-arquivo-preview" class="hidden mt-3 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-600"></div>
+                <div id="orc-arquivo-preview" class="hidden mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600"></div>
 
-                <div class="flex gap-2 mt-3">
-                    <button onclick="orcLerComIA()" id="orc-btn-ler" class="btn-cda-primary px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 flex-1 justify-center" disabled>
-                        <i class="fa-solid fa-file-import"></i> Ver Preços Agora
+                <div class="flex gap-2 mt-2">
+                    <button onclick="orcLerComIA()" id="orc-btn-ler" class="btn-cda-primary px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 flex-1 justify-center" disabled>
+                        <i class="fa-solid fa-file-import text-sm"></i> Ver Preços Agora
                     </button>
-                    <button onclick="orcLimparArquivo()" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-4 py-3 rounded-xl font-bold text-sm">
+                    <button onclick="orcLimparArquivo()" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-2 rounded-xl font-bold text-sm">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
@@ -1773,15 +1775,20 @@
                 </div>
 
                 <!-- Ações finais -->
-                <div class="flex flex-col gap-3">
-                    <button onclick="orcIrParaAgendamento()" class="w-full bg-cda-primary/10 dark:bg-cda-primary/20 border border-cda-primary/30 text-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
-                        <i class="fa-regular fa-calendar-check text-lg"></i> Agendar coleta
+                <div class="flex flex-col gap-2">
+                    <button onclick="orcIrParaAgendamento()" class="w-full bg-cda-primary/10 dark:bg-cda-primary/20 border border-cda-primary/30 text-cda-primary py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-calendar-check"></i> Agendar coleta
                     </button>
-                    <button onclick="orcFinalizarWhatsApp()" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar pelo WhatsApp
-                    </button>
-                    <button onclick="orcGerarPDF()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-file-pdf text-red-500"></i> Baixar orçamento em PDF
+                    <div class="flex gap-2">
+                        <button onclick="orcGerarPDF()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-red-500"></i> Baixar PDF
+                        </button>
+                        <button onclick="orcCompartilharOrcamento()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-share-nodes text-cda-primary"></i> Compartilhar
+                        </button>
+                    </div>
+                    <button onclick="orcFinalizarWhatsApp()" class="w-full btn-cda-primary py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp"></i> Confirmar pelo WhatsApp
                     </button>
                 </div>
             </div>
@@ -4598,6 +4605,22 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
             const msg   = `Olá! Gostaria de confirmar o orçamento feito pelo app.\n\n*Paciente:* ${nome}\n\n*Exames:*\n${lista}\n\n*Total estimado:* ${total}\n\n_Valores da tabela particular. Sujeito a confirmação._`;
             window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
+        }
+
+        // =====================================================
+        // COMPARTILHAR ORÇAMENTO
+        // =====================================================
+        function orcCompartilharOrcamento() {
+            if (!orcSelecionados.length) { showToast('Selecione ao menos um exame para compartilhar.', 'error'); return; }
+            const nome  = localStorage.getItem('patient_name') || 'Paciente';
+            const lista = orcSelecionados.map(ex => `• ${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
+            const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
+            const msg   = `🧪 *Orçamento – Laboratório CDA*\n\n*Paciente:* ${nome}\n\n*Exames:*\n${lista}\n\n*Total estimado:* ${total}\n\n_Tabela particular. Sujeito a confirmação._\n_Laboratório CDA – Afonso Cláudio/ES_`;
+            if (navigator.share) {
+                navigator.share({ title: 'Orçamento CDA', text: msg }).catch(() => {});
+            } else {
+                window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+            }
         }
 
         // =====================================================
