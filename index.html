@@ -4401,7 +4401,7 @@
         let orcDropdownIdx   = -1;
 
         // ---- CHAVE CLAUDE API ----
-        const CLAUDE_API_KEY = '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';
+        
         // Proxy Cloudflare Worker — evita bloqueio CORS do browser
         const CLAUDE_PROXY_URL = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
         const CLAUDE_ENDPOINT = CLAUDE_PROXY_URL;
@@ -4696,7 +4696,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
                 const resp = await fetch(CLAUDE_ENDPOINT, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-version': '2023-06-01' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000, messages:[{ role:'user', content: contentBlock }] })
                 });
 
@@ -4713,7 +4713,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             } catch (err) {
                 console.error('Erro IA:', err);
-                const ehChave = CLAUDE_API_KEY === 'SUA_CHAVE_AQUI' || String(err.message).toLowerCase().includes('api key') || String(err.message).includes('401') || String(err.message).includes('invalid x-api-key');
+                const ehChave = String(err.message).toLowerCase().includes('api key') || String(err.message).includes('401') || String(err.message).includes('invalid x-api-key');
                 statusEl.innerHTML = ehChave
                     ? `<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>Serviço de IA temporariamente indisponível. <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-primary font-bold underline">Fale com um atendente</a>.`
                     : `<i class="fa-solid fa-triangle-exclamation text-red-500 mr-1"></i>Erro ao analisar: ${err.message}. <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-primary font-bold underline">Fale com um atendente</a>.`;
