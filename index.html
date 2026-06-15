@@ -4846,18 +4846,63 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
                 let y = 0;
 
+                // ── LOGO CDA (carrega imagem antes de montar o PDF) ──
+                const LOGO_URL = 'https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop/Awv4y4n2aGiwnE3L/logo-cda-nova-PWX6CR6wZKHFxgw8.png';
+                let logoDataUrl = null;
+                try {
+                    const res = await fetch(LOGO_URL);
+                    const blob = await res.blob();
+                    logoDataUrl = await new Promise((resolve) => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 300; canvas.height = 120;
+                        const ctx = canvas.getContext('2d');
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => {
+                            ctx.clearRect(0, 0, 300, 120);
+                            // Desenha com fundo branco arredondado
+                            ctx.fillStyle = 'rgba(255,255,255,0)';
+                            ctx.fillRect(0, 0, 300, 120);
+                            const scale = Math.min(300 / img.width, 120 / img.height);
+                            const sw = img.width * scale, sh = img.height * scale;
+                            ctx.drawImage(img, (300 - sw) / 2, (120 - sh) / 2, sw, sh);
+                            resolve(canvas.toDataURL('image/png'));
+                        };
+                        img.onerror = () => resolve(null);
+                        img.src = URL.createObjectURL(blob);
+                    });
+                } catch(e) { logoDataUrl = null; }
+
                 // ── CABEÇALHO ──
                 doc.setFillColor(...cDark); doc.rect(0,0,W,48,'F');
                 doc.setFillColor(...cMid); doc.circle(W+10,-10,60,'F');
                 doc.setFillColor(...cPrimary); doc.circle(W-5,55,30,'F');
                 doc.setFillColor(...cPrimary); doc.rect(0,0,W,3,'F');
-                doc.setTextColor(...cWhite);
-                doc.setFontSize(20); doc.setFont('helvetica','bold');
-                doc.text('Laboratorio CDA', margin, 22);
-                doc.setFontSize(9); doc.setFont('helvetica','normal');
-                doc.setTextColor(200,240,241);
-                doc.text('Diagnostico de Confianca', margin, 30);
-                doc.text('Afonso Claudio, ES  .  (27) 99898-0658', margin, 37);
+
+                // Logo CDA ou texto fallback
+                if (logoDataUrl) {
+                    // Fundo branco arredondado atrás do logo
+                    doc.setFillColor(...cWhite);
+                    doc.roundedRect(margin, 8, 38, 32, 4, 4, 'F');
+                    doc.addImage(logoDataUrl, 'PNG', margin + 1, 9, 36, 30);
+                    // Textos deslocados para a direita do logo
+                    doc.setTextColor(...cWhite);
+                    doc.setFontSize(17); doc.setFont('helvetica','bold');
+                    doc.text('Laboratorio CDA', margin + 44, 22);
+                    doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+                    doc.setTextColor(200,240,241);
+                    doc.text('Diagnostico de Confianca', margin + 44, 30);
+                    doc.text('Afonso Claudio, ES  .  (27) 99898-0658', margin + 44, 37);
+                } else {
+                    doc.setTextColor(...cWhite);
+                    doc.setFontSize(20); doc.setFont('helvetica','bold');
+                    doc.text('Laboratorio CDA', margin, 22);
+                    doc.setFontSize(9); doc.setFont('helvetica','normal');
+                    doc.setTextColor(200,240,241);
+                    doc.text('Diagnostico de Confianca', margin, 30);
+                    doc.text('Afonso Claudio, ES  .  (27) 99898-0658', margin, 37);
+                }
+
                 doc.setFillColor(...cPrimary);
                 doc.roundedRect(W-margin-42,10,42,14,3,3,'F');
                 doc.setTextColor(...cWhite); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
