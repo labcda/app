@@ -4850,10 +4850,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const lista = orcSelecionados.map(ex => `• ${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
             const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
             const msg   = `🧪 *Orçamento – Laboratório CDA*\n\n*Paciente:* ${nome}\n\n*Exames:*\n${lista}\n\n*Total estimado:* ${total}\n\n_Tabela particular. Sujeito a confirmação._\n_Laboratório CDA – Afonso Cláudio/ES_`;
-            if (navigator.share) {
-                navigator.share({ title: 'Orçamento CDA', text: msg }).catch(() => {});
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (isMobile && navigator.share) {
+                // Mobile: usa menu nativo de compartilhamento
+                navigator.share({ title: 'Orçamento CDA', text: msg }).catch(() => {
+                    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+                });
             } else {
-                window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+                // Desktop: abre direto no WhatsApp Web (sem pedir para abrir app)
+                window.open('https://web.whatsapp.com/send?text=' + encodeURIComponent(msg), '_blank');
             }
         }
 
