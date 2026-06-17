@@ -16,14 +16,6 @@
     "busca": "CITRI CITRATO AMOSTRA ISOLADA PARTICULAR"
   },
   {
-    "id": 3,
-    "codigo": "CUN",
-    "nome": "CÁLCULO URINÁRIO - ANÁLISE FÍSICO-Q",
-    "categoria": "PARTICULAR",
-    "preco": 66.68,
-    "busca": "CUN CALCULO URINARIO ANALISE FISICO Q PARTICULAR"
-  },
-  {
     "id": 4,
     "codigo": "F07",
     "nome": "IgE ESP. AVEIA",
@@ -224,14 +216,6 @@
     "busca": "VITD VITAMINA D 25 HIDROXI PARTICULAR"
   },
   {
-    "id": 29,
-    "codigo": "POT",
-    "nome": "POTÁSSIO",
-    "categoria": "PARTICULAR",
-    "preco": 11.67,
-    "busca": "POT POTASSIO PARTICULAR"
-  },
-  {
     "id": 30,
     "codigo": "T4L",
     "nome": "T4 LIVRE",
@@ -270,14 +254,6 @@
     "categoria": "PARTICULAR",
     "preco": 25.0,
     "busca": "GGT GAMA GLUTAMILTRANSFERASE GGT PARTICULAR"
-  },
-  {
-    "id": 35,
-    "codigo": "SOD",
-    "nome": "SÓDIO",
-    "categoria": "PARTICULAR",
-    "preco": 11.67,
-    "busca": "SOD SODIO PARTICULAR"
   },
   {
     "id": 36,
@@ -386,10 +362,10 @@
   {
     "id": 49,
     "codigo": "HBSAG",
-    "nome": "HBsAg",
+    "nome": "HBSAG (HEPATITE B)",
     "categoria": "PARTICULAR",
     "preco": 58.34,
-    "busca": "HBSAG HBSAG PARTICULAR"
+    "busca": "HBSAG HEPATITE B PARTICULAR"
   },
   {
     "id": 50,
@@ -418,10 +394,10 @@
   {
     "id": 53,
     "codigo": "HCV",
-    "nome": "HCV ANTI",
+    "nome": "ANTI-HCV (HEPATITE C)",
     "categoria": "PARTICULAR",
     "preco": 58.34,
-    "busca": "HCV HCV ANTI PARTICULAR"
+    "busca": "HCV ANTI HCV HEPATITE C PARTICULAR"
   },
   {
     "id": 54,
@@ -470,14 +446,6 @@
     "categoria": "PARTICULAR",
     "preco": 41.68,
     "busca": "T3T TIROXINA T3 PARTICULAR"
-  },
-  {
-    "id": 60,
-    "codigo": "PAP",
-    "nome": "PAPANICOLAOU-Citop. Vaginal",
-    "categoria": "PARTICULAR",
-    "preco": 58.34,
-    "busca": "PAP PAPANICOLAOU CITOP VAGINAL PARTICULAR"
   },
   {
     "id": 61,
@@ -1238,14 +1206,6 @@
     "categoria": "PARTICULAR",
     "preco": 41.68,
     "busca": "FRU FRUTOSAMINA PARTICULAR"
-  },
-  {
-    "id": 156,
-    "codigo": "HE",
-    "nome": "ANTI-HBe (HEPATITE B)",
-    "categoria": "PARTICULAR",
-    "preco": 83.35,
-    "busca": "HE ANTI HBE HEPATITE B PARTICULAR"
   },
   {
     "id": 157,
@@ -3776,14 +3736,6 @@
     "busca": "CTNG CHLAMYDIA TRACHOMATIS E NEISSERIA GONORRHOEAE DETECCAO PARTICULAR"
   },
   {
-    "id": 473,
-    "codigo": "AMIDB",
-    "nome": "AMILASE TOTAL",
-    "categoria": "PARTICULAR",
-    "preco": 11.67,
-    "busca": "AMIDB AMILASE TOTAL PARTICULAR"
-  },
-  {
     "id": 474,
     "codigo": "PPD",
     "nome": "Interferon Gamma Release Assay",
@@ -4392,14 +4344,6 @@
     "busca": "AAFIN ANTICORPOS ANTI FATOR INTRINSECO PARTICULAR"
   },
   {
-    "id": 550,
-    "codigo": "FERDB",
-    "nome": "FERRITINA",
-    "categoria": "PARTICULAR",
-    "preco": 55.84,
-    "busca": "FERDB FERRITINA PARTICULAR"
-  },
-  {
     "id": 551,
     "codigo": "CRESU",
     "nome": "ORTO-CRESOL EM URINA-TOLUENO",
@@ -4438,14 +4382,6 @@
     "categoria": "PARTICULAR",
     "preco": 1033.54,
     "busca": "TOPIR TOPIRAMATO PARTICULAR"
-  },
-  {
-    "id": 556,
-    "codigo": "FALDB",
-    "nome": "FOSFATASE ALCALINA",
-    "categoria": "PARTICULAR",
-    "preco": 20.0,
-    "busca": "FALDB FOSFATASE ALCALINA PARTICULAR"
   },
   {
     "id": 557,
@@ -4582,14 +4518,6 @@
     "categoria": "PARTICULAR",
     "preco": 1500.3,
     "busca": "MI2 MI 2 ANTICORPOS ANTI SINTETASE PARTICULAR"
-  },
-  {
-    "id": 574,
-    "codigo": "HIR",
-    "nome": "HIV DETECCAO (Qualit.) PCR",
-    "categoria": "PARTICULAR",
-    "preco": 333.4,
-    "busca": "HIR HIV DETECCAO QUALIT PCR PARTICULAR"
   },
   {
     "id": 575,
@@ -4734,14 +4662,6 @@
     "categoria": "PARTICULAR",
     "preco": 58.34,
     "busca": "DNA ANTI DNA DUPLA HELICE PARTICULAR"
-  },
-  {
-    "id": 593,
-    "codigo": "DSTPC",
-    "nome": "PAINEL DST - DETECÇÃO POR PCR",
-    "categoria": "PARTICULAR",
-    "preco": 250.05,
-    "busca": "DSTPC PAINEL DST DETECCAO POR PCR PARTICULAR"
   },
   {
     "id": 594,
@@ -5142,14 +5062,6 @@
     "categoria": "PARTICULAR",
     "preco": 125.03,
     "busca": "TOXOA TOXOPLASMOSE IGA ELISA PARTICULAR"
-  },
-  {
-    "id": 644,
-    "codigo": "PAPAU",
-    "nome": "COLPOCITOLOGIA ONCÓTICA URGENTE",
-    "categoria": "PARTICULAR",
-    "preco": 100.02,
-    "busca": "PAPAU COLPOCITOLOGIA ONCOTICA URGENTE PARTICULAR"
   },
   {
     "id": 645,
