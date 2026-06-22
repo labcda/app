@@ -1617,582 +1617,364 @@
   // ========== FUNÇÃO AUXILIAR PARA ENVIAR PDF AO GOOGLE APPS SCRIPT ==========
 
   function agenInicializar() {
-    const inp = document.getElementById('agen-data');
-    if (!inp) return;
-    const hoje = new Date();
-    inp.min = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
-    inp.value = '';
-    agenState = { data: null, periodo: null, horario: null, pagamento: null };
-    ['manha','tarde'].forEach(p => {
-      const btn = document.getElementById('agen-btn-' + p);
-      if (btn) btn.classList.remove('ativo');
-    });
-    document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
-    const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
-    if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
-    agenEsconderHorarios();
-    agenAtualizarResumo();
+            const inp = document.getElementById('agen-data');
+            if (!inp) return;
+            const hoje = new Date();
+            inp.min = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+            inp.value = '';
+            agenState = { data: null, periodo: null, horario: null, pagamento: null };
+            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
+            document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
+            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+            if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
+            agenEsconderHorarios();
+            agenAtualizarResumo();
+            const nome = _getItem('patient_name');
+            const telefone = _getItem('patient_phone');
+            if (nome) document.getElementById('agen-nome').value = nome;
+            if (telefone) document.getElementById('agen-telefone').value = telefone;
+        }
 
-    // Limpa data de nascimento
-    const nascInput = document.getElementById('agen-nascimento');
-    if (nascInput) nascInput.value = '';
-    // Preenche com dados do orçamento se existirem, senão deixa em branco para edição
-    const nomeInput = document.getElementById('agen-nome');
-    const telefoneInput = document.getElementById('agen-telefone');
-    const savedOrcamento = localStorage.getItem('cda_ultimo_orcamento');
-    if (savedOrcamento) {
-      try {
-        const parsed = JSON.parse(savedOrcamento);
-        if (parsed.paciente && nomeInput) nomeInput.value = parsed.paciente;
-      } catch(e) {}
-    }
-    const savedNome = localStorage.getItem('patient_name');
-    const savedTelefone = localStorage.getItem('patient_phone');
-    if (savedNome && nomeInput && !nomeInput.value) nomeInput.value = savedNome;
-    if (savedTelefone && telefoneInput) telefoneInput.value = savedTelefone;
-  }
+        function agenIsDiaUtil(dataStr) {
+            const [y,m,d] = dataStr.split('-').map(Number);
+            const dia = new Date(y, m-1, d).getDay();
+            if (dia === 0 || dia === 6) return false;
+            const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            return !FERIADOS_NACIONAIS.includes(mmdd);
+        }
 
-  function agenIsDiaUtil(dataStr) {
-    const [y,m,d] = dataStr.split('-').map(Number);
-    const dia = new Date(y, m-1, d).getDay();
-    if (dia === 0 || dia === 6) return false;
-    const mmdd = String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    return !FERIADOS_NACIONAIS.includes(mmdd);
-  }
-
-  function agenOnDataChange() {
-    const inp = document.getElementById('agen-data');
-    if (!inp.value) return;
-    if (!agenIsDiaUtil(inp.value)) {
-      showToast('Esta data não está disponível (fim de semana ou feriado).', 'error');
-      inp.value = '';
-      agenState.data = null;
-      return;
-    }
-    agenState.data = inp.value;
-    agenState.horario = null;
-    ['manha','tarde'].forEach(p => {
-      const btn = document.getElementById('agen-btn-' + p);
-      if (btn) btn.classList.remove('ativo');
-    });
-    agenEsconderHorarios();
-    agenAtualizarResumo();
-    if (agenState.periodo) agenBuscarHorarios();
-  }
-
-  function agenSelecionarPeriodo(periodo) {
-    agenState.periodo = periodo;
-    agenState.horario = null;
-    ['manha','tarde'].forEach(p => {
-      const btn = document.getElementById('agen-btn-' + p);
-      if (btn) btn.classList.toggle('ativo', p === periodo);
-    });
-    agenAtualizarResumo();
-    if (agenState.data) agenBuscarHorarios();
-    else showToast('Selecione a data primeiro.', 'info', 2000);
-  }
-
-  function agenEsconderHorarios() {
-    ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
-      .forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
-    const ph = document.getElementById('agen-horarios-placeholder');
-    if (ph) ph.classList.remove('hidden');
-  }
-
-  async function agenBuscarHorarios() {
-    const { data, periodo } = agenState;
-    if (!data || !periodo) return;
-    const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
-    ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
-      .forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
-    const loading = document.getElementById('agen-horarios-loading');
-    if (loading) loading.classList.remove('hidden');
-    agenState.horario = null;
-    document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
-    agenAtualizarResumo();
-    let ocupados = [];
-    let agendaOk = false;
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
-      const url = APPS_SCRIPT_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
-      const resp = await fetch(url, { method: 'GET', signal: controller.signal });
-      clearTimeout(timeout);
-      const texto = await resp.text();
-      const json = JSON.parse(texto);
-      ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
-      agendaOk = true;
-    } catch(err) {
-      console.warn('[CDA] Agenda indisponível:', err);
-      agendaOk = false;
-    }
-    if (loading) loading.classList.add('hidden');
-    if (!agendaOk) {
-      const erroEl = document.getElementById('agen-horarios-erro');
-      if (erroEl) erroEl.classList.remove('hidden');
-    }
-    const agora = new Date();
-    const [selY, selM, selD] = data.split('-').map(Number);
-    const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
-    const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
-    const disponiveis = slots.filter(h => {
-      if (ocupados.includes(h)) return false;
-      if (isHoje) {
-        const [hh, mm] = h.split(':').map(Number);
-        return (hh * 60 + mm) > minutosAgora;
-      }
-      return true;
-    });
-    if (!disponiveis.length) {
-      const vazio = document.getElementById('agen-horarios-vazio');
-      if (vazio) vazio.classList.remove('hidden');
-      return;
-    }
-    const grid = document.getElementById('agen-horarios-grid');
-    grid.innerHTML = disponiveis.map(h => {
-      const isOcupado = ocupados.includes(h);
-      return '<button type="button" class="agen-horario-btn' + (isOcupado ? ' ocupado' : '') + '" data-hora="' + h + '" ' + (isOcupado ? 'disabled title="Horário já reservado"' : '') + '>' + h + (isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : '') + '</button>';
-    }).join('');
-    grid.onclick = function(e) {
-      const btn = e.target.closest('.agen-horario-btn:not(.ocupado)');
-      if (btn) agenSelecionarHorario(btn.dataset.hora);
-    };
-    grid.classList.remove('hidden');
-  }
-
-  function agenSelecionarHorario(hora) {
-    agenState.horario = hora;
-    document.querySelectorAll('.agen-horario-btn').forEach(btn => {
-      btn.classList.toggle('ativo', btn.dataset.hora === hora);
-    });
-    agenAtualizarResumo();
-    showToast('Horário ' + hora + ' selecionado', 'success', 1500);
-  }
-
-  function validarTelefoneBR(valor) {
-    const digitos = String(valor || '').replace(/\D/g, '');
-    if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
-    if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
-    return false;
-  }
-
-  function agenTotalSelecionado() {
-    if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
-      return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
-    }
-    if (ultimoOrcamento && ultimoOrcamento.total) return ultimoOrcamento.total;
-    if (ultimoOrcamento && ultimoOrcamento.exames) return ultimoOrcamento.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
-    try {
-      const saved = localStorage.getItem('cda_ultimo_orcamento');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.total) return parsed.total;
-        if (parsed.exames) return parsed.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
-      }
-    } catch(e) {}
-    return 0;
-  }
-
-  function agenPagamentoSelecionado() {
-    const checked = document.querySelector('input[name="agen-pagamento"]:checked');
-    return checked ? checked.value : '';
-  }
-
-  function agenAtualizarResumo() {
-    const { data, periodo, horario } = agenState;
-    const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
-    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
-    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
-    const resumo = document.getElementById('agen-resumo');
-    const placeholder = document.getElementById('agen-resumo-placeholder');
-    const btnSalvar = document.getElementById('agen-btn-salvar');
-    const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
-    const pagamento = agenPagamentoSelecionado();
-    agenState.pagamento = pagamento || null;
-
-    // Verificar documento (orçamento OU PDF, XOR)
-    const docInfo = agenTemDocumento();
-    const docValido = docInfo.valido;
-    const temOrcamento = docInfo.temOrcamento;
-    const temPDF = docInfo.temPDF;
-
-    // Atualizar UI do orçamento
-    const orcCard = document.getElementById('agen-resumo-orcamento-card');
-    const orcConteudo = document.getElementById('agen-resumo-orcamento-conteudo');
-    if (temOrcamento) {
-      let examesAtuais = [];
-      let totalBruto = 0;
-      if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-        examesAtuais = orcSelecionados;
-        totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
-      } else if (ultimoOrcamento && ultimoOrcamento.exames) {
-        examesAtuais = ultimoOrcamento.exames;
-        totalBruto = ultimoOrcamento.total || 0;
-      } else {
-        try {
-          const saved = localStorage.getItem('cda_ultimo_orcamento');
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed.exames) {
-              examesAtuais = parsed.exames;
-              totalBruto = parsed.total || 0;
+        function agenOnDataChange() {
+            const inp = document.getElementById('agen-data');
+            if (!inp.value) return;
+            if (!agenIsDiaUtil(inp.value)) {
+                showToast('Esta data não está disponível (fim de semana ou feriado).', 'error');
+                inp.value = '';
+                agenState.data = null;
+                return;
             }
-          }
-        } catch(e) {}
-      }
-      const totalPix = totalBruto * 0.60;
-      const totalCredito = totalBruto * 0.65;
-      orcConteudo.innerHTML = '<div class="font-bold text-slate-800">' + examesAtuais.length + ' exame(s)</div>' +
-        '<div class="text-xs text-slate-500 mt-1">' + examesAtuais.map(e => e.nome).join(', ').substring(0, 80) + (examesAtuais.length > 2 ? '...' : '') + '</div>' +
-        '<div class="mt-2 text-sm font-bold text-cda-primary">PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito) + '</div>';
-      orcCard.classList.remove('hidden');
-    } else {
-      orcCard.classList.add('hidden');
-      orcConteudo.innerHTML = '';
-    }
-
-
-    let examesAtuais = [];
-    let totalBruto = 0;
-    let totalPix = 0;
-    let totalCredito = 0;
-    let parcelaCredito = 0;
-    let temExames = false;
-    if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
-      examesAtuais = orcSelecionados;
-      totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
-      temExames = true;
-    } else if (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0) {
-      examesAtuais = ultimoOrcamento.exames;
-      totalBruto = ultimoOrcamento.total || 0;
-      totalPix = ultimoOrcamento.totalPix || (totalBruto * 0.60);
-      totalCredito = ultimoOrcamento.totalCredito || (totalBruto * 0.65);
-      parcelaCredito = ultimoOrcamento.parcelaCredito || (totalCredito / 10);
-      temExames = true;
-      orcSelecionados = [...examesAtuais];
-    } else {
-      try {
-        const saved = localStorage.getItem('cda_ultimo_orcamento');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.exames && parsed.exames.length > 0) {
-            examesAtuais = parsed.exames;
-            totalBruto = parsed.total || 0;
-            totalPix = parsed.totalPix || (totalBruto * 0.60);
-            totalCredito = parsed.totalCredito || (totalBruto * 0.65);
-            parcelaCredito = parsed.parcelaCredito || (totalCredito / 10);
-            temExames = true;
-            ultimoOrcamento = parsed;
-            orcSelecionados = [...examesAtuais];
-          }
+            agenState.data = inp.value;
+            agenState.horario = null;
+            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
+            agenEsconderHorarios();
+            agenAtualizarResumo();
+            if (agenState.periodo) agenBuscarHorarios();
         }
-      } catch(e) {}
-    }
-    if (temExames && totalPix === 0) {
-      totalPix = totalBruto * 0.60;
-      totalCredito = totalBruto * 0.65;
-      parcelaCredito = totalCredito / 10;
-    }
-    // Validação: nome, telefone, nascimento, data, periodo, horario, pagamento E (orcamento XOR PDF)
-    const pronto = data && periodo && horario && nome && telefone && nascimento && pagamento && docValido;
-    if (data && periodo && horario) {
-      if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
-    } else if (pagamentoWrap) {
-      pagamentoWrap.classList.add('hidden');
-    }
-    if (data && periodo && horario && nome && telefone && nascimento) {
-      const [y,m,d] = data.split('-').map(Number);
-      const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      document.getElementById('agen-resumo-data').textContent = dataExt + ' — ' + (periodo === 'manha' ? 'Manhã' : 'Tarde');
-      document.getElementById('agen-resumo-hora').textContent = 'Horário: ' + horario;
-      document.getElementById('agen-resumo-nome').textContent = nome;
-      document.getElementById('agen-resumo-telefone').textContent = telefone;
-      const nascExt = new Date(nascimento).toLocaleDateString('pt-BR');
-      document.getElementById('agen-resumo-nascimento').textContent = 'Nascimento: ' + nascExt;
 
-      // Mostrar documento (Orçamento)
-      const docWrap = document.getElementById('agen-resumo-doc-wrap');
-      const docInfo = agenTemDocumento();
-      if (docInfo.temOrcamento) {
-        docWrap.classList.remove('hidden');
-        document.getElementById('agen-resumo-doc').innerHTML = '<i class="fa-solid fa-file-invoice-dollar text-cda-primary mr-1"></i> Orçamento com exames';
-      } else {
-        docWrap.classList.add('hidden');
-      }
-
-      const examesWrap = document.getElementById('agen-resumo-exames-wrap');
-      if (temExames) {
-        examesWrap.classList.remove('hidden');
-        const pagamentoLinha = pagamento ? '<div class="text-slate-600 font-bold mt-1">Pagamento escolhido: ' + pagamento + '</div>' : '';
-        let examesHTML = '';
-        for (let i = 0; i < examesAtuais.length; i++) {
-          const ex = examesAtuais[i];
-          const preco = Number(ex.preco) || 0;
-          examesHTML += '<div class="flex justify-between gap-3" style="padding: 4px 0; border-bottom: 1px solid #f0f0f0;">' +
-            '<span style="font-size: 0.85rem; color: #334155;">' + (ex.nome || 'Sem nome') + '</span>' +
-            '<span style="font-weight: 700; font-size: 0.85rem; color: #0F4C5C; white-space: nowrap;">' + formatCurrency(preco) + '</span>' +
-          '</div>';
+        function agenSelecionarPeriodo(periodo) {
+            agenState.periodo = periodo;
+            agenState.horario = null;
+            ['manha','tarde'].forEach(p => {
+                document.getElementById(`agen-btn-${p}`)?.classList.toggle('ativo', p === periodo);
+            });
+            agenAtualizarResumo();
+            if (agenState.data) agenBuscarHorarios();
+            else showToast('Selecione a data primeiro.', 'info', 2000);
         }
-        document.getElementById('agen-resumo-exames').innerHTML = examesHTML;
-        document.getElementById('agen-resumo-total').innerHTML =
-          '<div style="text-decoration: line-through; color: #94a3b8; font-size: 0.75rem; margin-bottom: 4px;">Particular: ' + formatCurrency(totalBruto) + '</div>' +
-          '<div style="color: #0F4C5C; font-weight: 800; font-size: 1rem; margin-bottom: 2px;">PIX/Dinheiro/Débito: ' + formatCurrency(totalPix) + '</div>' +
-          '<div style="color: #475569; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px;">Cartão de crédito: ' + formatCurrency(totalCredito) + '</div>' +
-          '<div style="color: #64748b; font-size: 0.75rem;">10x de ' + formatCurrency(parcelaCredito) + '</div>' +
-          pagamentoLinha;
-      } else {
-        examesWrap.classList.add('hidden');
-      }
-      resumo.classList.remove('hidden');
-      placeholder.classList.add('hidden');
-    } else {
-      resumo.classList.add('hidden');
-      placeholder.classList.remove('hidden');
-    }
 
-    // Mostrar/ocultar área de pagamento baseado em dados preenchidos
-    if (data && periodo && horario && nome && telefone && nascimento) {
-      if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
-    } else if (pagamentoWrap) {
-      pagamentoWrap.classList.add('hidden');
-    }
-    if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
-    else btnSalvar.classList.add('opacity-50','pointer-events-none');
-  }
-
-  async function agenSalvar() {
-    const { data, periodo, horario } = agenState;
-    const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
-    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
-    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
-    const pagamento = agenPagamentoSelecionado();
-    const btnSalvar = document.getElementById('agen-btn-salvar');
-    const statusEl = document.getElementById('agen-status');
-    const totalBruto = agenTotalSelecionado();
-
-    // 1. Validar nome, telefone, data de nascimento
-    if (!nome) { showToast('Informe o nome do paciente.', 'error'); return; }
-    if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
-    if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
-    if (!nascimento) { showToast('Informe a data de nascimento.', 'error'); return; }
-
-    // 2. Validar data, período, horário
-    if (!data) { showToast('Selecione a data.', 'error'); return; }
-    if (!periodo) { showToast('Selecione o período.', 'error'); return; }
-    if (!horario) { showToast('Selecione o horário.', 'error'); return; }
-    if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
-
-    // 3. Verificar se tem orçamento
-    const docInfo = agenTemDocumento();
-    if (!docInfo.valido) {
-      showToast('Você precisa ter um orçamento para agendar.', 'error', 5000);
-      return;
-    }
-
-    btnSalvar.disabled = true;
-    btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
-    if (statusEl) { statusEl.textContent = ''; statusEl.classList.add('hidden'); }
-
-    // Verificar se horário ainda está livre
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 6000);
-      const checkUrl = APPS_SCRIPT_URL + '?action=listar&data=' + encodeURIComponent(data) + '&token=' + encodeURIComponent(CDA_TOKEN);
-      const checkResp = await fetch(checkUrl, { method: 'GET', signal: controller.signal, redirect: 'follow' });
-      clearTimeout(timeout);
-      const checkJson = await checkResp.json();
-      const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
-      if (ocupados.includes(horario)) {
-        showToast('O horário ' + horario + ' acabou de ser reservado. Por favor, escolha outro.', 'error', 5000);
-        btnSalvar.disabled = false;
-        btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
-        agenState.horario = null;
-        agenAtualizarResumo();
-        agenBuscarHorarios();
-        return;
-      }
-    } catch(err) {
-      console.warn('[CDA] Não foi possível verificar disponibilidade:', err);
-    }
-
-    btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando agendamento...';
-
-    // Preparar dados dos exames
-    let descExames = '';
-    let listaExames = '';
-    if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-      const totalPix = totalBruto * 0.60;
-      const totalCredito = totalBruto * 0.65;
-      listaExames = orcSelecionados.map(ex => ex.nome + ': ' + formatCurrency(ex.preco)).join('\n');
-      descExames = '\n\nLista de Exames:\n' + listaExames + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Débito (40% desc): ' + formatCurrency(totalPix) + '\nCartão de crédito (35% desc): ' + formatCurrency(totalCredito);
-    }
-
-    let descricao = 'Paciente: ' + nome + '\nTelefone: ' + telefone;
-    if (nascimento) descricao += '\nData de nascimento: ' + new Date(nascimento).toLocaleDateString('pt-BR');
-    descricao += '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA';
-    descricao += descExames;
-
-    try {
-      const [y, m, d] = data.split('-').map(Number);
-      const [hh, mm] = horario.split(':').map(Number);
-      const startDateTime = data + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
-      const endHh = hh + 1;
-      const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
-
-      // MÉTODO 1: Tentar POST com text/plain (evita preflight CORS)
-      const payload = {
-        action: 'criar',
-        token: CDA_TOKEN,
-        data: data,
-        horario: horario,
-        nome: nome,
-        telefone: telefone,
-        nascimento: nascimento,
-        pagamento: pagamento,
-        startTime: startDateTime,
-        endTime: endDateTime,
-        descricao: descricao,
-        temOrcamento: docInfo.temOrcamento
-      };
-
-      console.log('[CDA] Enviando via POST...');
-
-      let resp, json;
-      let postOk = false;
-
-      try {
-        resp = await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
-          redirect: 'follow'
-        });
-        const texto = await resp.text();
-        console.log('[CDA] POST response:', resp.status, texto.substring(0, 200));
-        try {
-          json = JSON.parse(texto);
-          postOk = true;
-        } catch(e) {
-          console.warn('[CDA] POST parse error:', e);
+        function agenEsconderHorarios() {
+            ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
+                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
+            document.getElementById('agen-horarios-placeholder')?.classList.remove('hidden');
         }
-      } catch(postErr) {
-        console.warn('[CDA] POST failed:', postErr);
-      }
 
-      // MÉTODO 2: Se POST falhou, tentar GET com parâmetros na URL
-      if (!postOk) {
-        console.log('[CDA] Tentando via GET...');
-        try {
-          const getParams = new URLSearchParams({
-            action: 'criar',
-            token: CDA_TOKEN,
-            data: data,
-            horario: horario,
-            nome: nome,
-            telefone: telefone,
-            nascimento: nascimento || '',
-            pagamento: pagamento,
-            startTime: startDateTime,
-            endTime: endDateTime,
-            descricao: descricao,
-            temOrcamento: docInfo.temOrcamento ? '1' : '0'
-          });
-          const getUrl = APPS_SCRIPT_URL + '?' + getParams.toString();
-          resp = await fetch(getUrl, { method: 'GET', redirect: 'follow' });
-          const texto = await resp.text();
-          console.log('[CDA] GET response:', resp.status, texto.substring(0, 200));
-          json = JSON.parse(texto);
-          postOk = true;
-        } catch(getErr) {
-          console.warn('[CDA] GET failed:', getErr);
+        async function agenBuscarHorarios() {
+            const { data, periodo } = agenState;
+            if (!data || !periodo) return;
+            const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
+
+            // Esconde tudo e mostra loading
+            ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
+                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
+            document.getElementById('agen-horarios-loading')?.classList.remove('hidden');
+
+            // Limpa horário selecionado ao buscar novamente
+            agenState.horario = null;
+            document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
+            agenAtualizarResumo();
+
+            let ocupados = [];
+            let agendaOk = false;
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 10000);
+                const url = `${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${encodeURIComponent(CDA_TOKEN)}`;
+                console.log('[CDA] Consultando agenda:', url);
+                const resp = await fetch(url, {
+                    method: 'GET',
+                    redirect: 'follow',
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+                const texto = await resp.text();
+                console.log('[CDA] Resposta bruta:', texto);
+                const json = JSON.parse(texto);
+                ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
+                console.log('[CDA] Ocupados:', ocupados);
+                agendaOk = true;
+            } catch(err) {
+                console.warn('[CDA] Agenda indisponível:', err);
+                agendaOk = false;
+            }
+
+            document.getElementById('agen-horarios-loading')?.classList.add('hidden');
+
+            // Se a agenda falhou, mostra todos os horários disponíveis localmente com aviso
+            if (!agendaOk) {
+                const erroEl = document.getElementById('agen-horarios-erro');
+                if (erroEl) erroEl.classList.remove('hidden');
+                // Continua com ocupados vazio (mostra todos os slots filtrados por hora)
+            }
+
+            // Se for hoje, filtrar horários que já passaram (com 30min de margem)
+            const agora = new Date();
+            const [selY, selM, selD] = data.split('-').map(Number);
+            const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
+            const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
+
+            const disponiveis = slots.filter(h => {
+                if (ocupados.includes(h)) return false;
+                if (isHoje) {
+                    const [hh, mm] = h.split(':').map(Number);
+                    return (hh * 60 + mm) > minutosAgora;
+                }
+                return true;
+            });
+
+            if (!disponiveis.length) {
+                document.getElementById('agen-horarios-vazio')?.classList.remove('hidden');
+                return;
+            }
+
+            const grid = document.getElementById('agen-horarios-grid');
+            grid.innerHTML = disponiveis.map(h => {
+                const isOcupado = ocupados.includes(h);
+                return `<button type="button" class="agen-horario-btn${isOcupado ? ' ocupado' : ''}" data-hora="${h}" 
+                    ${isOcupado ? 'disabled title="Horário já reservado"' : `onclick="agenSelecionarHorario('${h}')"`}
+                    >${h}${isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : ''}</button>`;
+            }).join('');
+            grid.classList.remove('hidden');
         }
-      }
 
-      if (!postOk || !json) {
-        throw new Error('Não foi possível comunicar com o servidor. Verifique sua conexão.');
-      }
+        function agenSelecionarHorario(hora) {
+            agenState.horario = hora;
+            document.querySelectorAll('.agen-horario-btn').forEach(btn => {
+                btn.classList.toggle('ativo', btn.dataset.hora === hora);
+            });
+            agenAtualizarResumo();
+            showToast(`Horário ${hora} selecionado`, 'success', 1500);
+        }
 
-      if (json.ocupado) {
-        showToast('O horário ' + horario + ' acabou de ser reservado. Por favor, escolha outro.', 'error', 5000);
-        btnSalvar.disabled = false;
-        btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
-        agenState.horario = null;
-        agenAtualizarResumo();
-        agenBuscarHorarios();
-        return;
-      }
+        function validarTelefoneBR(valor) {
+            const digitos = String(valor || '').replace(/\D/g, '');
+            if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
+            if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
+            return false;
+        }
 
-      if (!json.ok) {
-        throw new Error(json.erro || 'Erro ao salvar: resposta não-ok do servidor');
-      }
+        function agenTotalSelecionado() {
+            if (typeof orcSelecionados === 'undefined' || !Array.isArray(orcSelecionados)) return 0;
+            return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+        }
 
-      btnSalvar.disabled = false;
-      btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
-      agenSucesso(nome, data, horario);
-    } catch(err) {
-      console.error('[CDA] Erro agendamento:', err);
-      if (statusEl) {
-        statusEl.textContent = 'Erro ao salvar: ' + (err.message || 'Erro desconhecido');
-        statusEl.classList.remove('hidden');
-        statusEl.style.color = '#ef4444';
-      }
-      showToast('Erro ao salvar. Abrindo WhatsApp como fallback...', 'error', 4000);
-      agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
-      btnSalvar.disabled = false;
-      btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
-    }
-  }function agenSucesso(nome, data, horario) {
-    const [y,m,d] = data.split('-').map(Number);
-    const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-    const pagamento = agenPagamentoSelecionado() || '—';
-    const totalBruto = agenTotalSelecionado();
-    const totalPix = totalBruto * 0.60;
-    const totalCredito = totalBruto * 0.65;
-    if (nome) localStorage.setItem('patient_name', nome);
-    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
-    if (telefone) localStorage.setItem('patient_phone', telefone);
-    document.getElementById('modal-agen-nome').textContent = nome;
-    document.getElementById('modal-agen-data').textContent = dataExt + ' às ' + horario;
-    // Mostrar exames
-    let qtd = '—';
-    if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-      qtd = orcSelecionados.length + ' exame' + (orcSelecionados.length > 1 ? 's' : '') + ' — PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito);
-    } else if (totalBruto > 0) {
-      qtd = 'Orçamento anterior — PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito);
-    } else {
-      qtd = 'Agendamento direto (sem orçamento)';
-    }
-    document.getElementById('modal-agen-exames').textContent = qtd;
-    document.getElementById('modal-agen-pagamento').textContent = pagamento;
-    const modal = document.getElementById('modal-agen-confirmacao');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  }
+        function agenPagamentoSelecionado() {
+            return document.querySelector('input[name="agen-pagamento"]:checked')?.value || '';
+        }
 
-  function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
-    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
-    const [y,m,d] = data.split('-').map(Number);
-    const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-    let msg = 'Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ' + nome + '\n*Telefone:* ' + telefone;
-    if (nascimento) msg += '\n*Data de nascimento:* ' + new Date(nascimento).toLocaleDateString('pt-BR');
-    msg += '\n*Data:* ' + dataExt + '\n*Horário:* ' + horario + '\n*Forma de pagamento:* ' + (pagamento || 'Não informada');
-    if (descExames) msg += descExames;
-    msg += '\n\n_Agendamento via Aplicativo CDA_';
-    window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
-    const btnSalvar = document.getElementById('agen-btn-salvar');
-    btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
-    btnSalvar.disabled = false;
-  }
+        function agenAtualizarResumo() {
+            const { data, periodo, horario } = agenState;
+            const nome = document.getElementById('agen-nome')?.value?.trim() || '';
+            const telefone = document.getElementById('agen-telefone')?.value?.trim() || '';
+            const resumo = document.getElementById('agen-resumo');
+            const placeholder = document.getElementById('agen-resumo-placeholder');
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+            const pagamento = agenPagamentoSelecionado();
+            agenState.pagamento = pagamento || null;
+            const totalBruto = agenTotalSelecionado();
+            const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+            const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && temExames && totalBruto >= 150 && pagamento;
 
-  function modalAgenOk() {
-    const modal = document.getElementById('modal-agen-confirmacao');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    orcSelecionados = [];
-    orcRenderSelecionados();
-    agenInicializar();
-    navigateToPage('home');
-  }
+            if (data && periodo && horario) {
+                if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
+            } else if (pagamentoWrap) {
+                pagamentoWrap.classList.add('hidden');
+            }
+
+            if (data && periodo && horario && nome) {
+                const [y,m,d] = data.split('-').map(Number);
+                const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+                document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
+                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario}`;
+                document.getElementById('agen-resumo-nome').textContent = nome;
+
+                const examesWrap = document.getElementById('agen-resumo-exames-wrap');
+                if (temExames) {
+                    examesWrap.classList.remove('hidden');
+                    const totalPix = totalBruto * 0.60;
+                    const totalCredito = totalBruto * 0.65;
+                    const pagamentoLinha = pagamento ? `<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ${pagamento}</div>` : '';
+                    document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
+                        .map(ex => `<div class="flex justify-between gap-3"><span>${ex.nome}</span><span class="font-bold whitespace-nowrap">${formatCurrency(ex.preco)}</span></div>`).join('');
+                    document.getElementById('agen-resumo-total').innerHTML =
+                        `<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ${formatCurrency(totalBruto)}</div>
+                         <div class="text-cda-primary font-extrabold">PIX/Dinheiro/Débito: ${formatCurrency(totalPix)}</div>
+                         <div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ${formatCurrency(totalCredito)}</div>
+                         ${pagamentoLinha}`;
+                } else {
+                    examesWrap.classList.add('hidden');
+                }
+
+                resumo.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                resumo.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+
+            if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
+            else btnSalvar.classList.add('opacity-50','pointer-events-none');
+        }
+
+        async function agenSalvar() {
+            const { data, periodo, horario } = agenState;
+            const nome     = document.getElementById('agen-nome')?.value?.trim();
+            const telefone = document.getElementById('agen-telefone')?.value?.trim();
+            const pagamento = agenPagamentoSelecionado();
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const statusEl  = document.getElementById('agen-status');
+            const totalBruto = agenTotalSelecionado();
+
+            if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
+            if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
+            if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
+            if (!data)     { showToast('Selecione a data.', 'error'); return; }
+            if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
+            if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
+            if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
+            if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
+            if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
+
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
+            statusEl.classList.add('hidden');
+
+            // Double-check: verifica se o horário ainda está disponível
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 6000);
+                const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+                clearTimeout(timeout);
+                const checkJson = await checkResp.json();
+                const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
+                if (ocupados.includes(horario)) {
+                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    // Rebusca horários para atualizar
+                    agenState.horario = null;
+                    agenAtualizarResumo();
+                    agenBuscarHorarios();
+                    return;
+                }
+            } catch(err) {
+                // Se não conseguir verificar, continua e tenta salvar (o servidor rejeitará se ocupado)
+                console.warn('Verificação prévia falhou, tentando salvar:', err);
+            }
+
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
+
+            let descExames = '';
+            if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+                const totalPix = totalBruto * 0.60;
+                const totalCredito = totalBruto * 0.65;
+                const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
+                descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
+            }
+
+            try {
+                // Monta horários ISO para o Google Calendar usar corretamente
+                const [hh, mm] = horario.split(':').map(Number);
+                const startDateTime = `${data}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+                const endHh = hh + 1;
+                const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+
+                const resp = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, pagamento,
+                        startTime: startDateTime,
+                        endTime: endDateTime,
+                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`
+                    })
+                });
+                const json = await resp.json();
+                if (json.ocupado) {
+                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro.`, 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    agenState.horario = null;
+                    agenAtualizarResumo();
+                    agenBuscarHorarios();
+                    return;
+                }
+                if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
+                btnSalvar.disabled = false;
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                agenSucesso(nome, data, horario);
+            } catch(err) {
+                console.error('Erro agendamento:', err);
+                agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
+            }
+        }
+
+        function agenSucesso(nome, data, horario) {
+            const [y,m,d] = data.split('-').map(Number);
+            const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+            const pagamento = agenPagamentoSelecionado() || '—';
+            const totalBruto = agenTotalSelecionado();
+            const totalPix = totalBruto * 0.60;
+            const totalCredito = totalBruto * 0.65;
+
+            if (nome) localStorage.setItem('patient_name', nome);
+            const telefone = document.getElementById('agen-telefone')?.value?.trim();
+            if (telefone) localStorage.setItem('patient_phone', telefone);
+
+            // Preenche dados do modal
+            document.getElementById('modal-agen-nome').textContent = nome;
+            document.getElementById('modal-agen-data').textContent = `${dataExt} às ${horario}`;
+
+            const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
+                ? `${orcSelecionados.length} exame${orcSelecionados.length > 1 ? 's' : ''} — PIX: ${formatCurrency(totalPix)} / Crédito: ${formatCurrency(totalCredito)}`
+                : '—';
+            document.getElementById('modal-agen-exames').textContent = qtd;
+            document.getElementById('modal-agen-pagamento').textContent = pagamento;
+
+            // Exibe o modal
+            const modal = document.getElementById('modal-agen-confirmacao');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function modalAgenOk() {
+            // Fecha modal
+            const modal = document.getElementById('modal-agen-confirmacao');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            // Limpa orçamento e agendamento
+            orcSelecionados = [];
+            orcRenderSelecionados();
+            agenInicializar();
+
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const statusEl  = document.getElementById('agen-status');
+            if (statusEl) statusEl.classList.add('hidden');
+            if (btnSalvar) {
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                btnSalvar.disabled = false;
+                btnSalvar.classList.remove('opacity-50','pointer-events-none');
+            }
 
   document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
 
