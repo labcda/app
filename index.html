@@ -1847,6 +1847,7 @@
             if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
             if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
             if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
+  if (!nascimento) { showToast('Informe a data de nascimento.', 'error'); return; }
             if (!data)     { showToast('Selecione a data.', 'error'); return; }
             if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
             if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
