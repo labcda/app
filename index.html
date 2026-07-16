@@ -146,6 +146,13 @@
             border-color: #334155;
         }
 
+        .dark .termos-box {
+            background: #1E293B !important;
+        }
+        .dark .termos-texto {
+            color: #CBD5E1 !important;
+        }
+
         .main-card-promo .badge {
             background: linear-gradient(135deg, #0F4C5C, #49BCBE);
             color: white;
@@ -1118,6 +1125,57 @@
         })();
     </script>
 
+    <!-- TERMO DE USO E PRIVACIDADE (LGPD) — exibido na primeira abertura -->
+    <div id="termosOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;">
+        <div class="termos-box" style="background:#fff;border-radius:24px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);padding:20px 24px;color:#fff;flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <i class="fa-solid fa-shield-halved" style="font-size:1.5rem;"></i>
+                    <div>
+                        <p style="font-weight:800;font-size:1.05rem;">Termo de Uso e Privacidade</p>
+                        <p style="font-size:0.75rem;opacity:0.85;">Por favor, leia antes de continuar</p>
+                    </div>
+                </div>
+            </div>
+            <div class="termos-texto" style="padding:20px 24px;overflow-y:auto;font-size:0.83rem;line-height:1.65;color:#334155;">
+                <p style="margin-bottom:10px;">Ao utilizar este aplicativo, você concorda com os termos abaixo.</p>
+
+                <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">1. Sobre os dados armazenados neste aplicativo</p>
+                <p>Para sua conveniência, este aplicativo pode armazenar <strong>localmente, apenas no seu próprio celular ou computador</strong>, dados como nome, telefone, protocolo, chave de acesso e senha de resultados, entre outras informações que você optar por inserir. Esses dados <strong>não ficam salvos em nossos servidores</strong> — permanecem apenas no navegador/dispositivo que você está usando.</p>
+
+                <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">2. Você não é obrigado a fornecer seus dados</p>
+                <p>O preenchimento de qualquer campo com dados pessoais é <strong>inteiramente opcional</strong>. Você pode usar as funcionalidades básicas do aplicativo, como o simulador de orçamento, sem informar nome, protocolo, chave ou senha. Se você optar por preencher esses dados, isso é feito por sua conta e risco, para fins de conveniência (preenchimento automático e acesso mais rápido aos seus resultados).</p>
+
+                <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">3. Responsabilidade pela segurança do dispositivo</p>
+                <p>Como os dados ficam armazenados localmente no seu celular ou computador, <strong>você é o único responsável por</strong>:</p>
+                <ul style="margin:6px 0 6px 18px;list-style:disc;">
+                    <li>Manter seu dispositivo protegido (senha, biometria, bloqueio de tela);</li>
+                    <li>Não emprestar ou compartilhar seu celular com terceiros enquanto houver dados salvos neste aplicativo;</li>
+                    <li>Qualquer perda, roubo, furto ou extravio do dispositivo, e o acesso indevido aos dados armazenados que isso venha a causar.</li>
+                </ul>
+                <p>O Laboratório CDA <strong>não se responsabiliza</strong> por vazamento, uso indevido ou acesso não autorizado a dados armazenados localmente no seu dispositivo, decorrentes de perda do aparelho, empréstimo a terceiros, malware, ou qualquer outra situação fora do nosso controle direto.</p>
+
+                <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">4. Dados sensíveis</p>
+                <p>Alguns dos dados que você pode optar por inserir (como informações de exames, protocolos e senha de acesso a resultados) podem ser considerados <strong>dados sensíveis</strong> nos termos da Lei Geral de Proteção de Dados (Lei nº 13.709/2018 — LGPD). Recomendamos atenção redobrada ao decidir inserir esse tipo de informação, especialmente em dispositivos compartilhados com outras pessoas.</p>
+
+                <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">5. Conformidade com a LGPD</p>
+                <p>O Laboratório CDA trata os dados pessoais coletados em conformidade com a LGPD, utilizando-os exclusivamente para as finalidades de atendimento, agendamento, emissão de orçamentos e acompanhamento de exames. Você pode solicitar, a qualquer momento, a exclusão dos seus dados — seja localmente (limpando os dados deste aplicativo no seu dispositivo), seja diretamente com o laboratório.</p>
+
+                <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">6. Uso do aplicativo</p>
+                <p>Este aplicativo é uma ferramenta de apoio e conveniência. Informações de agendamento, orçamento e disponibilidade de horários estão sempre sujeitas a confirmação pela equipe do Laboratório CDA. Em caso de dúvidas, fale conosco pelo WhatsApp oficial do laboratório.</p>
+
+                <p style="margin-top:14px;">Ao marcar a caixa abaixo e tocar em "Concordo e continuar", você declara que leu e concorda com este Termo de Uso.</p>
+            </div>
+            <div style="padding:16px 24px;border-top:1px solid #e2e8f0;flex-shrink:0;">
+                <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;">
+                    <input type="checkbox" id="termos-checkbox" onchange="termosToggleCheckbox()" style="margin-top:3px;width:18px;height:18px;flex-shrink:0;">
+                    <span style="font-size:0.78rem;color:#475569;">Li e concordo com os termos acima, incluindo minha responsabilidade pela segurança dos dados que eu inserir neste aplicativo.</span>
+                </label>
+                <button id="termos-btn-concordar" onclick="aceitarTermos()" class="w-full btn-cda-primary py-3.5 rounded-2xl font-bold" disabled style="opacity:0.5;">Concordo e continuar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FLOATING WHATSAPP -->
     <a href="https://wa.me/5527998980658" target="_blank" class="fab md:hidden">
         <i class="fa-brands fa-whatsapp"></i>
@@ -1728,6 +1786,19 @@
                         </label>
                         <input type="text" id="prof-protocolo" placeholder="Número de protocolo ou CPF" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-solid fa-key text-cda-primary mr-1"></i> Chave de Acesso (Resultados)
+                        </label>
+                        <input type="text" id="prof-chave" placeholder="Chave de acesso aos resultados" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-solid fa-lock text-cda-primary mr-1"></i> Senha (Resultados)
+                        </label>
+                        <input type="password" id="prof-senha" placeholder="Senha de acesso aos resultados" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-snug -mt-2">Esses dados ficam salvos só neste aparelho, para preencher automaticamente seu acesso aos resultados. <a href="#" onclick="verTermosNovamente(); return false;" class="text-cda-primary font-bold underline">Ver Termo de Uso</a>.</p>
                     <button type="submit" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
                         <i class="fa-solid fa-floppy-disk"></i> Salvar Dados
                     </button>
@@ -1770,7 +1841,7 @@
         </section>
 
         <section id="page-resultados" class="page h-[600px]">
-            <iframe src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
+            <iframe id="iframe-resultados" src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
         </section>
 
         <section id="page-agendar" class="page space-y-5">
@@ -5382,6 +5453,34 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 agenInicializar();
             }
 
+            if (pageId === 'resultados') {
+                atualizarIframeResultados();
+            }
+
+        }
+
+        // Tenta pré-preencher o login do portal de resultados (WorkLab) passando
+        // os dados salvos no perfil como parâmetros de URL. IMPORTANTE: por ser
+        // um site de terceiro dentro de um iframe, não é possível preencher os
+        // campos por JavaScript (bloqueio de segurança do navegador entre
+        // origens diferentes) — isso só funciona SE o próprio WorkLab aceitar
+        // login via parâmetros na URL. Os nomes de parâmetro abaixo (chave,
+        // senha, nome) são uma tentativa com os nomes mais comuns nesse tipo de
+        // portal; se não funcionar, é preciso confirmar com o suporte do
+        // WorkLab quais parâmetros (se algum) o link de fato aceita.
+        function atualizarIframeResultados() {
+            const iframe = document.getElementById('iframe-resultados');
+            if (!iframe) return;
+            const base = 'https://portal.worklabweb.com.br/resultados-on-line/1824';
+            const nome  = localStorage.getItem('patient_name');
+            const chave = localStorage.getItem('patient_key');
+            const senha = localStorage.getItem('patient_password');
+            if (!chave && !senha) { iframe.src = base; return; }
+            const params = new URLSearchParams();
+            if (chave) params.set('chave', chave);
+            if (senha) params.set('senha', senha);
+            if (nome)  params.set('nome', nome);
+            iframe.src = base + '?' + params.toString();
         }
 
         // INITIAL LOAD - VERSÃO ESTÁVEL
@@ -5415,10 +5514,44 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 carregarTabelaPrecos();
                 iniciarChatPreparo();
                 renderGuiaExames();
+                verificarTermosAceitos();
             } catch(e) {
                 console.warn('Erro na inicialização:', e);
             }
         });
+
+        // TERMO DE USO E PRIVACIDADE (LGPD)
+        function verificarTermosAceitos() {
+            const aceito = localStorage.getItem('cda_termos_aceitos');
+            if (!aceito) {
+                const overlay = document.getElementById('termosOverlay');
+                if (overlay) overlay.style.display = 'flex';
+            }
+        }
+
+        function termosToggleCheckbox() {
+            const chk = document.getElementById('termos-checkbox');
+            const btn = document.getElementById('termos-btn-concordar');
+            if (!chk || !btn) return;
+            btn.disabled = !chk.checked;
+            btn.style.opacity = chk.checked ? '1' : '0.5';
+        }
+
+        function aceitarTermos() {
+            localStorage.setItem('cda_termos_aceitos', 'true');
+            localStorage.setItem('cda_termos_aceitos_em', new Date().toISOString());
+            const overlay = document.getElementById('termosOverlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        function verTermosNovamente() {
+            const overlay = document.getElementById('termosOverlay');
+            if (!overlay) return;
+            // Reabrir para consulta não deve travar quem já aceitou — some o
+            // checkbox/botão de aceite fica desabilitado até marcar de novo,
+            // mas fechar simplesmente esconde o overlay sem apagar a aceitação já salva.
+            overlay.style.display = 'flex';
+        }
 
         function loadProfile() {
             const nome = localStorage.getItem('patient_name');
@@ -5443,12 +5576,18 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const proto = document.getElementById('prof-protocolo');
                 if (proto) proto.value = id;
             }
+            const chave = localStorage.getItem('patient_key');
+            if (chave) { const el = document.getElementById('prof-chave'); if (el) el.value = chave; }
+            const senha = localStorage.getItem('patient_password');
+            if (senha) { const el = document.getElementById('prof-senha'); if (el) el.value = senha; }
         }
 
         function saveProfile(e) {
             e.preventDefault();
             localStorage.setItem('patient_name', document.getElementById('prof-nome').value);
             localStorage.setItem('patient_id', document.getElementById('prof-protocolo').value);
+            localStorage.setItem('patient_key', document.getElementById('prof-chave').value);
+            localStorage.setItem('patient_password', document.getElementById('prof-senha').value);
             loadProfile();
             showToast('Dados salvos com sucesso!', 'success');
             navigateTo('home');
