@@ -1176,6 +1176,22 @@
         </div>
     </div>
 
+    <!-- CONFIRMAÇÃO DE AGENDAMENTO (janela com botão OK) -->
+    <div id="agendamentoSucessoOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;">
+        <div class="termos-box" style="background:#fff;border-radius:24px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
+            <div style="padding:28px 24px 20px;text-align:center;">
+                <div style="width:64px;height:64px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fa-solid fa-check" style="font-size:1.75rem;color:#16A34A;"></i>
+                </div>
+                <p class="termos-texto" style="font-weight:800;font-size:1.15rem;color:#1E293B;margin-bottom:6px;">Agendamento confirmado!</p>
+                <div id="agendamento-sucesso-corpo" class="termos-texto" style="font-size:0.85rem;color:#475569;line-height:1.6;"></div>
+            </div>
+            <div style="padding:0 24px 24px;">
+                <button onclick="fecharModalSucessoAgendamento()" class="w-full btn-cda-primary py-3.5 rounded-2xl font-bold">OK</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FLOATING WHATSAPP -->
     <a href="https://wa.me/5527998980658" target="_blank" class="fab md:hidden">
         <i class="fa-brands fa-whatsapp"></i>
@@ -1789,12 +1805,6 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
-                            <i class="fa-solid fa-hashtag text-cda-primary mr-1"></i> Protocolo / CPF
-                        </label>
-                        <input type="text" id="prof-protocolo" placeholder="Número de protocolo ou CPF" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-solid fa-key text-cda-primary mr-1"></i> Chave de Acesso (Resultados)
                         </label>
                         <input type="text" id="prof-chave" placeholder="Chave de acesso aos resultados" class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
@@ -2030,6 +2040,7 @@
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Exames solicitados</p>
                         <div id="agen-resumo-exames" class="text-xs text-slate-500 dark:text-slate-400 space-y-0.5"></div>
                         <p id="agen-resumo-total" class="text-sm font-extrabold text-cda-primary mt-2"></p>
+                        <p id="agen-resumo-pagamento" class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1"></p>
                     </div>
                 </div>
                 <div id="agen-resumo-placeholder" class="flex flex-col items-center py-4 text-center mb-4">
@@ -4282,6 +4293,10 @@
             return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        function formatCurrencyArredondado(value) {
+            return Math.round(Number(value || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
         function carregarScript(src) {
             return new Promise((resolve, reject) => {
                 if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
@@ -5326,6 +5341,12 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     .map(ex => `<div class="flex justify-between"><span>${ex.nome}</span><span class="font-bold">${formatCurrency(ex.preco)}</span></div>`).join('');
                 document.getElementById('agen-resumo-total').textContent = `Total estimado: ${formatCurrency(totalBruto)}`;
 
+                const ehCredito = pagamento.toLowerCase().indexOf('crédito') >= 0;
+                const valorComDesconto = totalBruto * (ehCredito ? 0.65 : 0.60);
+                const nomePagamento = ehCredito ? 'Cartão de crédito' : 'Pix, dinheiro ou débito';
+                const pagamentoEl = document.getElementById('agen-resumo-pagamento');
+                if (pagamentoEl) pagamentoEl.textContent = `Forma de pagamento: ${nomePagamento} — ${formatCurrencyArredondado(valorComDesconto)}`;
+
                 resumo.classList.remove('hidden');
                 placeholder.classList.add('hidden');
                 btnSalvar.classList.remove('opacity-50','pointer-events-none');
@@ -5428,24 +5449,27 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         function agenSucesso(nome, data, horario, pagamento) {
             const [y,m,d] = data.split('-').map(Number);
             const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-            showToast('Agendamento confirmado!', 'success', 4000);
-            const statusEl  = document.getElementById('agen-status');
             const btnSalvar = document.getElementById('agen-btn-salvar');
-            statusEl.innerHTML = `
-                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4 text-left">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
-                        <p class="font-extrabold text-green-700 dark:text-green-400">Agendamento confirmado!</p>
-                    </div>
-                    <p class="text-sm text-slate-600 dark:text-slate-300"><strong>${nome}</strong></p>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">${dataExt} às ${horario}</p>
-                    <p class="text-xs text-slate-400 mt-2">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>
-                </div>`;
-            statusEl.classList.remove('hidden');
+
+            const corpo = document.getElementById('agendamento-sucesso-corpo');
+            if (corpo) {
+                corpo.innerHTML = `
+                    <p><strong>${nome}</strong></p>
+                    <p>${dataExt} às ${horario}</p>
+                    <p style="margin-top:8px;font-size:0.78rem;color:#94A3B8;">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>`;
+            }
+            const overlay = document.getElementById('agendamentoSucessoOverlay');
+            if (overlay) overlay.style.display = 'flex';
+
             btnSalvar.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i>Agendado com sucesso!';
             btnSalvar.classList.add('opacity-50','pointer-events-none');
             if (nome) localStorage.setItem('patient_name', nome);
             salvarAppAgendamento(nome, data, horario, pagamento);
+        }
+
+        function fecharModalSucessoAgendamento() {
+            const overlay = document.getElementById('agendamentoSucessoOverlay');
+            if (overlay) overlay.style.display = 'none';
         }
 
         function agenFallbackWhatsApp(nome, telefone, data, horario, descExames) {
@@ -5640,13 +5664,6 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const headerAuth = document.querySelector('.header-auth span');
                 if (headerAuth) headerAuth.innerText = nome.split(' ')[0];
             }
-            const id = localStorage.getItem('patient_id');
-            if (id) {
-                const statusDisplay = document.getElementById('patient-status-display');
-                if (statusDisplay) statusDisplay.innerText = 'Protocolo: ' + id;
-                const proto = document.getElementById('prof-protocolo');
-                if (proto) proto.value = id;
-            }
             const chave = localStorage.getItem('patient_key');
             if (chave) { const el = document.getElementById('prof-chave'); if (el) el.value = chave; }
             const senha = localStorage.getItem('patient_password');
@@ -5656,7 +5673,6 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         function saveProfile(e) {
             e.preventDefault();
             localStorage.setItem('patient_name', document.getElementById('prof-nome').value);
-            localStorage.setItem('patient_id', document.getElementById('prof-protocolo').value);
             localStorage.setItem('patient_key', document.getElementById('prof-chave').value);
             localStorage.setItem('patient_password', document.getElementById('prof-senha').value);
             loadProfile();
