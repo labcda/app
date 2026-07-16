@@ -1285,14 +1285,29 @@
                             <i class="fa-solid fa-location-dot text-cda-primary text-2xl"></i>
                         </div>
                     </article>
+                    <article class="info-slide">
+                        <div class="flex-1">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm mb-2">🗓️ Agendamento online</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Por enquanto, o agendamento pelo app é <strong>somente para atendimento Particular</strong>.
+                            </p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mt-2">
+                                Pacientes de <strong>Unimed, Samp São Bernardo, Postal Saúde, Saúde Caixa</strong> e <strong>SUS</strong> são atendidos por ordem de chegada, sem necessidade de agendamento prévio.
+                            </p>
+                        </div>
+                        <div class="info-icon">
+                            <i class="fa-regular fa-calendar-check text-cda-primary text-2xl"></i>
+                        </div>
+                    </article>
                 </div>
-                
+
                 <div class="carousel-dots anim-in" id="importantDots" style="animation-delay: 0.6s" aria-label="Navegar avisos">
                     <button type="button" class="carousel-dot active" aria-label="Aviso 1"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 2"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 3"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 4"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 5"></button>
+                    <button type="button" class="carousel-dot" aria-label="Aviso 6"></button>
                 </div>
                 <!-- BOTÃO INSTALAR APP (REPOSICIONADO) -->
                 <div class="mt-8 anim-in" style="animation-delay:0.7s">
@@ -1492,6 +1507,17 @@
                     <h2 class="text-2xl font-extrabold leading-tight mb-1">Orçamento de Exames</h2>
                     <p class="text-sm text-white/80 leading-relaxed">Selecione os exames do pedido médico e veja o total estimado na tabela particular.</p>
                     <p id="orc-tabela-status" class="text-xs text-white/60 mt-2 font-medium"></p>
+                </div>
+            </div>
+
+            <!-- AVISO: AGENDAMENTO ONLINE SÓ PARA PARTICULAR -->
+            <div class="card-cda p-4" style="border-left:4px solid #F59E0B;">
+                <div class="flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-amber-500 text-lg mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-sm text-slate-800 dark:text-white mb-1">Agendamento online: por enquanto, só para Particular</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Pacientes de convênio (Unimed, Samp São Bernardo, Postal Saúde, Saúde Caixa) e SUS são atendidos por ordem de chegada — basta comparecer no horário de atendimento, sem precisar agendar.</p>
+                    </div>
                 </div>
             </div>
 
@@ -1761,6 +1787,17 @@
                 </div>
             </div>
 
+            <!-- AVISO: AGENDAMENTO ONLINE SÓ PARA PARTICULAR -->
+            <div class="card-cda p-4" style="border-left:4px solid #F59E0B;">
+                <div class="flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-amber-500 text-lg mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-sm text-slate-800 dark:text-white mb-1">Agendamento online: por enquanto, só para Particular</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Pacientes de convênio (Unimed, Samp São Bernardo, Postal Saúde, Saúde Caixa) e SUS são atendidos por ordem de chegada — basta comparecer no horário de atendimento, sem precisar agendar.</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- ETAPA 1 — DADOS DO PACIENTE -->
             <div class="card-cda p-5" id="agen-step-1">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
@@ -1858,6 +1895,46 @@
                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">4</span>
                     Confirmar agendamento
                 </p>
+                <div id="agen-sem-orcamento-aviso" class="hidden flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
+                    <div>
+                        <p class="text-sm font-bold text-amber-800 dark:text-amber-300">Faça o orçamento antes de agendar</p>
+                        <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">Selecione os exames na aba <strong>Orçamento</strong> para poder confirmar a coleta.</p>
+                    </div>
+                </div>
+                <div id="agen-pagamento-wrap" class="hidden mb-4">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 ml-1">Forma de pagamento</p>
+                    <div class="space-y-2">
+                        <label class="agen-pagamento-opcao flex items-center justify-between gap-2 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-cda-light dark:bg-slate-700 px-3 py-2.5 cursor-pointer transition-all">
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="agen-pagamento" value="Pix, dinheiro ou cartão de débito (40% de desconto)" onchange="agenAtualizarResumo()">
+                                <span class="text-lg">📱</span>
+                                <div>
+                                    <p class="text-xs font-extrabold text-slate-800 dark:text-white">Pix, dinheiro ou débito</p>
+                                    <p class="text-[11px] text-slate-500">à vista</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-extrabold text-cda-primary">40% OFF</p>
+                                <p id="agen-preco-pix" class="text-xs font-bold text-slate-600 dark:text-slate-300"></p>
+                            </div>
+                        </label>
+                        <label class="agen-pagamento-opcao flex items-center justify-between gap-2 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-3 py-2.5 cursor-pointer transition-all">
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="agen-pagamento" value="Cartão de crédito" onchange="agenAtualizarResumo()">
+                                <span class="text-lg">💳</span>
+                                <div>
+                                    <p class="text-xs font-extrabold text-slate-800 dark:text-white">Cartão de crédito</p>
+                                    <p id="agen-parcela-texto" class="text-[11px] text-slate-500">parcele em até 10x</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-extrabold text-cda-primary">35% OFF</p>
+                                <p id="agen-preco-credito" class="text-xs font-bold text-slate-600 dark:text-slate-300"></p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
                 <div id="agen-resumo" class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 mb-4 space-y-2 hidden">
                     <div class="flex items-center gap-3">
                         <i class="fa-regular fa-calendar-check text-cda-primary w-4"></i>
@@ -4849,7 +4926,11 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         // =====================================================
         // AGENDAMENTO — GOOGLE CALENDAR VIA APPS SCRIPT
         // =====================================================
-        const APPS_SCRIPT_URL      = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
+        // Mesma URL de agenda usada pelo painel administrativo — precisa ser a
+        // mesma para que disponibilidade e criação de eventos batam com o
+        // calendário real que a equipe usa (a URL antiga aqui apontava para um
+        // backend/calendário diferente, por isso horários ocupados não apareciam).
+        const APPS_SCRIPT_AGENDA_URL = 'https://script.google.com/macros/s/AKfycbyaCe1qi8balumQbWeZ6A-_b-eGx0pRH8PEL7MsxvuiPYJq52ztL-f2Ej6ypRLo6ejz/exec';
         const CDA_PAINEL_URL       = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
         const CDA_TOKEN            = 'CDA-2025-xK9#mPqL';
 
@@ -4985,16 +5066,47 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio']
                 .forEach(id => document.getElementById(id)?.classList.add('hidden'));
             document.getElementById('agen-horarios-loading')?.classList.remove('hidden');
+            agenState.horario = null;
+            document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
+            agenAtualizarResumo();
 
             let ocupados = [];
+            let agendaOk = false;
             try {
-                const resp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}`);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 10000);
+                const url = APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
+                const resp = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
+                clearTimeout(timeout);
                 const json = await resp.json();
-                ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
+                ocupados = Array.isArray(json.ocupados) ? json.ocupados.map(h => String(h).trim()) : [];
+                agendaOk = true;
             } catch(err) { console.warn('Agenda indisponível:', err); }
 
             document.getElementById('agen-horarios-loading')?.classList.add('hidden');
-            const disponiveis = slots.filter(h => !ocupados.includes(h));
+
+            function normalizarHora(h) {
+                const partes = String(h).trim().split(':');
+                if (partes.length < 2) return h;
+                return String(parseInt(partes[0])).padStart(2,'0') + ':' + partes[1].padStart(2,'0');
+            }
+            const ocupadosNorm = ocupados.map(normalizarHora);
+            const agora = new Date();
+            const [selY, selM, selD] = data.split('-').map(Number);
+            const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
+            const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
+            const disponiveis = slots.filter(h => {
+                if (ocupadosNorm.includes(h)) return false;
+                if (isHoje) {
+                    const [hh, mm] = h.split(':').map(Number);
+                    return (hh * 60 + mm) > minutosAgora;
+                }
+                return true;
+            });
+
+            if (!agendaOk) {
+                showToast('Não foi possível confirmar a agenda em tempo real agora. Tente novamente em instantes.', 'error', 5000);
+            }
 
             if (!disponiveis.length) {
                 document.getElementById('agen-horarios-vazio')?.classList.remove('hidden');
@@ -5017,13 +5129,47 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             showToast(`Horário ${hora} selecionado`, 'success', 1500);
         }
 
+        function agenPagamentoSelecionado() {
+            const checked = document.querySelector('input[name="agen-pagamento"]:checked');
+            return checked ? checked.value : '';
+        }
+
         function agenAtualizarResumo() {
             const { data, periodo, horario } = agenState;
             const nome = document.getElementById('agen-nome')?.value?.trim() || '';
             const resumo = document.getElementById('agen-resumo');
             const placeholder = document.getElementById('agen-resumo-placeholder');
             const btnSalvar = document.getElementById('agen-btn-salvar');
-            const pronto = data && periodo && horario && nome;
+            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+            const semOrcamentoAviso = document.getElementById('agen-sem-orcamento-aviso');
+            const pagamento = agenPagamentoSelecionado();
+            const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+            const totalBruto = temExames ? orcSelecionados.reduce((s,e) => s + (parseFloat(e.preco) || 0), 0) : 0;
+
+            // Sem orçamento feito, não dá pra confirmar — avisa assim que a pessoa
+            // já escolheu data/período/horário mas ainda não passou pelo Orçamento.
+            if (data && periodo && horario && !temExames) {
+                semOrcamentoAviso?.classList.remove('hidden');
+            } else {
+                semOrcamentoAviso?.classList.add('hidden');
+            }
+
+            if (data && periodo && horario && temExames) {
+                pagamentoWrap?.classList.remove('hidden');
+                const totalPix = totalBruto * 0.60;
+                const totalCredito = totalBruto * 0.65;
+                const parcela = totalCredito / 10;
+                const pixEl = document.getElementById('agen-preco-pix');
+                const credEl = document.getElementById('agen-preco-credito');
+                const parcText = document.getElementById('agen-parcela-texto');
+                if (pixEl)    pixEl.textContent    = formatCurrency(totalPix);
+                if (credEl)   credEl.textContent   = formatCurrency(totalCredito);
+                if (parcText) parcText.textContent = `10x de ${formatCurrency(parcela)}`;
+            } else {
+                pagamentoWrap?.classList.add('hidden');
+            }
+
+            const pronto = data && periodo && horario && nome && temExames && pagamento;
 
             if (pronto) {
                 const [y,m,d] = data.split('-').map(Number);
@@ -5033,15 +5179,10 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 document.getElementById('agen-resumo-nome').textContent = nome;
 
                 const examesWrap = document.getElementById('agen-resumo-exames-wrap');
-                if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-                    examesWrap.classList.remove('hidden');
-                    document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
-                        .map(ex => `<div class="flex justify-between"><span>${ex.nome}</span><span class="font-bold">${formatCurrency(ex.preco)}</span></div>`).join('');
-                    document.getElementById('agen-resumo-total').textContent =
-                        `Total estimado: ${formatCurrency(orcSelecionados.reduce((s,e) => s+e.preco, 0))}`;
-                } else {
-                    examesWrap.classList.add('hidden');
-                }
+                examesWrap.classList.remove('hidden');
+                document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
+                    .map(ex => `<div class="flex justify-between"><span>${ex.nome}</span><span class="font-bold">${formatCurrency(ex.preco)}</span></div>`).join('');
+                document.getElementById('agen-resumo-total').textContent = `Total estimado: ${formatCurrency(totalBruto)}`;
 
                 resumo.classList.remove('hidden');
                 placeholder.classList.add('hidden');
@@ -5059,42 +5200,90 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const telefone = document.getElementById('agen-telefone')?.value?.trim();
             const btnSalvar = document.getElementById('agen-btn-salvar');
             const statusEl  = document.getElementById('agen-status');
+            const pagamento = agenPagamentoSelecionado();
+            const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
 
-            if (!nome)     { showToast('Informe seu nome.', 'error'); return; }
-            if (!telefone) { showToast('Informe seu telefone.', 'error'); return; }
-            if (!data)     { showToast('Selecione a data.', 'error'); return; }
-            if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
-            if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
+            if (!nome)      { showToast('Informe seu nome.', 'error'); return; }
+            if (!telefone)  { showToast('Informe seu telefone.', 'error'); return; }
+            if (!data)      { showToast('Selecione a data.', 'error'); return; }
+            if (!periodo)   { showToast('Selecione o período.', 'error'); return; }
+            if (!horario)   { showToast('Selecione o horário.', 'error'); return; }
+            if (!temExames) { showToast('Faça o orçamento antes de agendar — selecione os exames na aba Orçamento.', 'error', 5000); return; }
+            if (!pagamento) { showToast('Escolha a forma de pagamento.', 'error'); return; }
 
-            let descExames = '';
-            if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-                const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-                descExames = `\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrency(orcSelecionados.reduce((s,e)=>s+e.preco,0))}`;
-            }
+            const totalBruto = orcSelecionados.reduce((s,e) => s + (parseFloat(e.preco) || 0), 0);
+            const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
+            const descExames = `\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrency(totalBruto)}\nForma de pagamento: ${pagamento}`;
 
             btnSalvar.disabled = true;
-            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
             statusEl.classList.add('hidden');
 
             try {
-                const resp = await fetch(APPS_SCRIPT_URL, {
+                // Confere de novo bem antes de salvar — evita que dois pacientes
+                // reservem o mesmo horário quase ao mesmo tempo.
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+                const checkResp = await fetch(APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN), { signal: controller.signal });
+                clearTimeout(timeout);
+                const checkJson = await checkResp.json();
+                const ocupadosCheck = Array.isArray(checkJson.ocupados)
+                    ? checkJson.ocupados.map(h => { const p = String(h).trim().split(':'); return p.length >= 2 ? String(parseInt(p[0])).padStart(2,'0') + ':' + p[1].padStart(2,'0') : String(h).trim(); })
+                    : [];
+                if (ocupadosCheck.includes(horario)) {
+                    showToast('O horário ' + horario + ' acabou de ser reservado. Escolha outro.', 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    agenState.horario = null; agenAtualizarResumo(); agenBuscarHorarios();
+                    return;
+                }
+
+                btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
+
+                const [hh, mm] = horario.split(':').map(Number);
+                const startDateTime = data + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
+                const totalMinFim = hh * 60 + mm + 40;
+                const endHh = Math.floor(totalMinFim / 60) % 24;
+                const endMm = totalMinFim % 60;
+                const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(endMm).padStart(2,'0') + ':00';
+
+                const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
-                        action: 'criar', data, horario, nome, telefone,
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nOrigem: Aplicativo CDA${descExames}`
+                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone,
+                        pagamento, startTime: startDateTime, endTime: endDateTime,
+                        usuario: 'APP',
+                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`,
+                        temOrcamento: '1'
                     })
                 });
                 const json = await resp.json();
+                if (json.ocupado) {
+                    showToast('O horário ' + horario + ' acabou de ser reservado. Escolha outro.', 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    agenState.horario = null; agenAtualizarResumo(); agenBuscarHorarios();
+                    return;
+                }
                 if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
-                agenSucesso(nome, data, horario);
+                agenSucesso(nome, data, horario, pagamento);
             } catch(err) {
                 console.error('Erro agendamento:', err);
+                statusEl.innerHTML = `
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-left">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                            <p class="font-extrabold text-red-700 dark:text-red-400">Não foi possível agendar</p>
+                        </div>
+                        <p class="text-xs text-red-600 dark:text-red-300">Vamos abrir o WhatsApp para confirmar seu agendamento diretamente com a equipe.</p>
+                    </div>`;
+                statusEl.classList.remove('hidden');
                 agenFallbackWhatsApp(nome, telefone, data, horario, descExames);
             }
         }
 
-        function agenSucesso(nome, data, horario) {
+        function agenSucesso(nome, data, horario, pagamento) {
             const [y,m,d] = data.split('-').map(Number);
             const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
             showToast('Agendamento confirmado!', 'success', 4000);
@@ -5114,8 +5303,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             btnSalvar.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i>Agendado com sucesso!';
             btnSalvar.classList.add('opacity-50','pointer-events-none');
             if (nome) localStorage.setItem('patient_name', nome);
-            const pgto = document.getElementById('agen-pagamento')?.value || '';
-            salvarAppAgendamento(nome, data, horario, pgto);
+            salvarAppAgendamento(nome, data, horario, pagamento);
         }
 
         function agenFallbackWhatsApp(nome, telefone, data, horario, descExames) {
