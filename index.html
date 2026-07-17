@@ -2008,7 +2008,10 @@
         </section>
 
         <section id="page-resultados" class="page h-[600px]">
-            <iframe id="iframe-resultados" src="https://portal.worklabweb.com.br/resultados-on-line/1824" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
+            <!-- src vazio de propósito: o portal (site de terceiro, às vezes lento) só é
+                 carregado quando o paciente abre esta aba — senão ele segura o evento
+                 "load" da página inteira e o splash fica preso na abertura do app -->
+            <iframe id="iframe-resultados" src="about:blank" class="w-full h-full rounded-3xl border-none shadow-sm"></iframe>
         </section>
 
         <section id="page-agendar" class="page space-y-5">
@@ -5745,18 +5748,32 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const nome  = localStorage.getItem('patient_name');
             const chave = localStorage.getItem('patient_key');
             const senha = localStorage.getItem('patient_password');
-            if (!chave && !senha) { iframe.src = base; return; }
-            const params = new URLSearchParams();
-            if (chave) params.set('chave', chave);
-            if (senha) params.set('senha', senha);
-            if (nome)  params.set('nome', nome);
-            iframe.src = base + '?' + params.toString();
+            let destino = base;
+            if (chave || senha) {
+                const params = new URLSearchParams();
+                if (chave) params.set('chave', chave);
+                if (senha) params.set('senha', senha);
+                if (nome)  params.set('nome', nome);
+                destino = base + '?' + params.toString();
+            }
+            // Só (re)carrega se o destino mudou — evita recarregar o portal a
+            // cada visita à aba (perderia a sessão que o paciente já abriu lá).
+            if (iframe.dataset.destinoAtual !== destino) {
+                iframe.dataset.destinoAtual = destino;
+                iframe.src = destino;
+            }
         }
 
         // INITIAL LOAD - VERSÃO ESTÁVEL
-        window.addEventListener('load', () => {
+        // A inicialização roda no "load" da página, mas com um seguro de 6s: se
+        // algum recurso externo travar o "load" (CDN lento, conexão ruim), o app
+        // abre mesmo assim em vez de ficar preso no splash.
+        let __appIniciado = false;
+        function iniciarApp() {
+            if (__appIniciado) return;
+            __appIniciado = true;
             console.log('App carregado. Iniciando transição...');
-            
+
             // 1. Garante que a Home esteja ativa (ID correto é page-home)
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const home = document.getElementById('page-home');
@@ -5767,7 +5784,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             // 2. Anima barra e remove splash
             if (bar) bar.style.width = '100%';
-            
+
             setTimeout(() => {
                 if (splash) {
                     splash.style.opacity = '0';
@@ -5788,7 +5805,9 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             } catch(e) {
                 console.warn('Erro na inicialização:', e);
             }
-        });
+        }
+        window.addEventListener('load', iniciarApp);
+        document.addEventListener('DOMContentLoaded', () => setTimeout(iniciarApp, 6000));
 
         // TERMO DE USO E PRIVACIDADE (LGPD)
         function verificarTermosAceitos() {
