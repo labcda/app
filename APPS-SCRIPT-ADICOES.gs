@@ -4,9 +4,10 @@
 // Feito sob medida para o script atual (o que tem doGet/doPost com
 // resposta(), getSheet(), TOKEN etc.). São 3 passos:
 //
-// PASSO 1 — no doGet, adicione esta linha junto das outras actions:
+// PASSO 1 — no doGet, adicione estas linhas junto das outras actions:
 //
 //   if (action === 'resumoNPS')              return resposta(resumoNPS());
+//   if (action === 'listarNPS')               return resposta(listarNPS());
 //
 // PASSO 2 — no doPost, adicione estas duas linhas junto das outras:
 //
@@ -70,6 +71,28 @@ function resumoNPS() {
       media: Math.round((soma / total) * 10) / 10
     };
   } catch(e) { return { ok: false, erro: e.message }; }
+}
+
+// Lista as últimas avaliações (nota + comentário) para o painel exibir —
+// mais recentes primeiro, limitado a 50 para não sobrecarregar a resposta.
+function listarNPS() {
+  try {
+    var sh = getNPSSheet();
+    var rows = sh.getDataRange().getValues();
+    var lista = [];
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][3] === '' || rows[i][3] === null) continue;
+      lista.push({
+        data:       rows[i][0] ? rows[i][0].toString() : '',
+        hora:       rows[i][1] ? rows[i][1].toString() : '',
+        paciente:   rows[i][2] ? rows[i][2].toString() : '',
+        nota:       rows[i][3],
+        comentario: rows[i][4] ? rows[i][4].toString() : ''
+      });
+    }
+    lista.reverse();
+    return { ok: true, avaliacoes: lista.slice(0, 50) };
+  } catch(e) { return { ok: false, avaliacoes: [], erro: e.message }; }
 }
 
 // ==================== CANCELAMENTO PELO APP DO PACIENTE ====================
