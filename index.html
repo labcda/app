@@ -6636,6 +6636,11 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
         async function enviarNPS() {
             if (_npsNota === null) return;
+            const btnEnviar = document.getElementById('nps-btn-enviar');
+            // Trava contra duplo toque/clique — sem isso, um segundo toque
+            // durante o envio (comum no celular) grava a mesma nota duas vezes.
+            if (btnEnviar && btnEnviar.dataset.enviando === '1') return;
+            if (btnEnviar) { btnEnviar.dataset.enviando = '1'; btnEnviar.classList.add('opacity-50', 'pointer-events-none'); }
             const comentario = document.getElementById('nps-comentario')?.value?.trim() || '';
             const agora = new Date();
             try {
@@ -6653,6 +6658,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 });
             } catch(e) { console.warn('[CDA] Falha ao enviar NPS:', e); }
             try { localStorage.setItem('cda_nps_ultimo', new Date().toISOString()); } catch(e) {}
+            if (btnEnviar) { btnEnviar.dataset.enviando = ''; btnEnviar.classList.remove('opacity-50', 'pointer-events-none'); }
             fecharNPS(false);
             showToast('Obrigado pela sua avaliação! 💙', 'success', 4000);
         }
