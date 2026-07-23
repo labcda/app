@@ -1382,6 +1382,27 @@
         </div>
     </div>
 
+    <!-- MODAL RESPONSÁVEL LEGAL (paciente menor de idade) -->
+    <div id="modal-responsavel-app" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;">
+        <div class="termos-box" style="background:#fff;border-radius:24px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
+            <div style="padding:24px 24px 8px;">
+                <div style="width:56px;height:56px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                    <i class="fa-solid fa-user-shield" style="font-size:1.3rem;color:#D97706;"></i>
+                </div>
+                <p class="termos-texto" style="font-weight:800;font-size:1.05rem;color:#1E293B;margin-bottom:4px;">Paciente menor de idade</p>
+                <p class="termos-texto" style="font-size:0.8rem;color:#64748B;">Informe o nome completo do responsável legal que acompanhará a coleta.</p>
+            </div>
+            <div style="padding:12px 24px 4px;">
+                <input type="text" id="modal-responsavel-app-input" placeholder="Nome completo do responsável" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary">
+                <p id="modal-responsavel-app-error" style="display:none;color:#EF4444;font-size:0.75rem;margin-top:6px;">Informe o nome do responsável.</p>
+            </div>
+            <div style="padding:16px 24px 24px;display:flex;gap:8px;">
+                <button onclick="cancelarResponsavelApp()" class="flex-1 bg-slate-100 text-slate-500 py-3 rounded-2xl font-bold text-sm">Cancelar</button>
+                <button onclick="confirmarResponsavelApp()" class="flex-1 btn-cda-primary py-3 rounded-2xl font-bold text-sm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL HISTÓRICO DE ORÇAMENTOS/AGENDAMENTOS -->
     <div id="historicoOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)fecharHistorico()">
         <div class="termos-box" style="background:#fff;border-radius:24px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
@@ -1518,6 +1539,20 @@
                     </div>
                 </div>
 
+                <!-- BOTÃO INSTALAR APP — some sozinho se o app já estiver instalado -->
+                <button id="home-install-btn" onclick="abrirModalInstalar()" class="anim-in w-full flex items-center justify-between gap-3 px-5 py-4 rounded-2xl text-left mt-4" style="animation-delay:0.15s;background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);box-shadow:0 12px 28px rgba(15,76,92,0.25);">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-white/20 border border-white/25 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-mobile-screen-button text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="font-extrabold text-white text-sm">Instale o app do Lab CDA</p>
+                            <p class="text-xs text-white/80 font-medium">Acesso rápido direto da tela inicial do celular</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-white text-xs"></i>
+                </button>
+
                 <h2 class="section-title anim-in" style="animation-delay: 0.2s">Cuide da saúde</h2>
 
                 <!-- GRID DE AÇÕES -->
@@ -1555,6 +1590,13 @@
                         <div>
                             <p class="action-item-title">Convênios</p>
                             <p class="action-item-sub">Veja quem atendemos</p>
+                        </div>
+                    </div>
+                    <div onclick="abrirHistorico()" class="action-item">
+                        <i class="fa-solid fa-clock-rotate-left text-cda-primary"></i>
+                        <div>
+                            <p class="action-item-title">Meus orçamentos</p>
+                            <p class="action-item-sub">Histórico e agendamentos</p>
                         </div>
                     </div>
 
@@ -1646,21 +1688,6 @@
                     <button type="button" class="carousel-dot" aria-label="Aviso 4"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 5"></button>
                     <button type="button" class="carousel-dot" aria-label="Aviso 6"></button>
-                </div>
-                <!-- BOTÃO INSTALAR APP (REPOSICIONADO) -->
-                <div class="mt-8 anim-in" style="animation-delay:0.7s">
-                    <button onclick="abrirModalInstalar()" class="home-install-btn w-full flex items-center justify-between gap-4 px-6 py-4 rounded-2xl text-left border border-cda-primary/20 dark:border-slate-700 bg-gradient-to-r from-cda-light to-white dark:from-slate-800 dark:to-slate-800">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-cda-primary/10 flex items-center justify-center">
-                                <i class="fa-solid fa-mobile-screen-button text-cda-primary text-lg"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Instalar aplicativo</p>
-                                <p class="text-xs text-slate-400 dark:text-slate-500 font-medium">Acesse direto da tela inicial</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-cda-primary text-xs"></i>
-                    </button>
                 </div>
             </div>
         </section>
@@ -2199,6 +2226,14 @@
                         <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" oninput="agenAtualizarResumo()"
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-regular fa-id-card text-cda-primary mr-1"></i> Data de nascimento
+                        </label>
+                        <input type="date" id="agen-nascimento" oninput="agenAtualizarResumo()"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        <p class="text-[10px] text-slate-400 mt-1 ml-1">Exigida pelo sistema do laboratório para o cadastro do paciente.</p>
+                    </div>
                 </div>
             </div>
 
@@ -2267,6 +2302,24 @@
                     <p class="text-xs text-slate-400 mt-1">Tente outra data ou entre em contato</p>
                     <a href="https://wa.me/5527998980658" target="_blank" class="mt-3 text-xs font-bold text-cda-primary underline">Falar pelo WhatsApp →</a>
                 </div>
+            </div>
+
+            <!-- AVISO: O QUE LEVAR NO DIA DA COLETA -->
+            <div class="card-cda p-5" style="border-left:4px solid #49BCBE;">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-2xl bg-cda-light dark:bg-slate-700 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-bag-shopping text-cda-primary"></i>
+                    </div>
+                    <div>
+                        <p class="font-extrabold text-sm text-slate-800 dark:text-white">O que levar no dia da coleta</p>
+                        <p class="text-xs text-slate-400">Confira antes de vir ao laboratório</p>
+                    </div>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-id-card text-cda-primary mt-0.5 text-xs"></i> Documento oficial com foto</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-file-medical text-cda-primary mt-0.5 text-xs"></i> Pedido médico, se tiver, para conferência dos exames</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-flask-vial text-cda-primary mt-0.5 text-xs"></i> Exame de <strong>urina</strong> ou <strong>fezes</strong> no pedido? Retire os coletores no laboratório com antecedência</li>
+                </ul>
             </div>
 
             <!-- ETAPA 4 — RESUMO E CONFIRMAÇÃO -->
@@ -5381,6 +5434,18 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             mostrarTab(isIOS ? 'ios' : 'android');
         }
 
+        // Esconde o botão "Instalar app" quando o PWA já está instalado —
+        // detecta tanto Android/desktop (display-mode: standalone) quanto
+        // iOS (navigator.standalone), e reage ao evento 'appinstalled'.
+        function appJaInstalado() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+        function atualizarVisibilidadeBotaoInstalar() {
+            const btn = document.getElementById('home-install-btn');
+            if (btn) btn.classList.toggle('hidden', appJaInstalado());
+        }
+        window.addEventListener('appinstalled', atualizarVisibilidadeBotaoInstalar);
+
         function fecharModalInstalarBtn() {
             const modal = document.getElementById('modalInstalar');
             const sheet = document.getElementById('modalSheet');
@@ -5579,6 +5644,16 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (nome) document.getElementById('agen-nome').value = nome;
         }
 
+        // Mesmo cálculo usado no painel ADM.
+        function calcularIdade(dataNasc) {
+            const hoje = new Date();
+            const nasc = new Date(dataNasc);
+            let idade = hoje.getFullYear() - nasc.getFullYear();
+            const m = hoje.getMonth() - nasc.getMonth();
+            if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) idade--;
+            return idade;
+        }
+
         function agenIsDiaUtil(dataStr) {
             const [y,m,d] = dataStr.split('-').map(Number);
             const dia = new Date(y, m-1, d).getDay();
@@ -5710,6 +5785,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const { data, periodo, horario } = agenState;
             const nome = document.getElementById('agen-nome')?.value?.trim() || '';
             const telefoneResumo = document.getElementById('agen-telefone')?.value?.trim() || '';
+            const nascimentoResumo = document.getElementById('agen-nascimento')?.value || '';
             const resumo = document.getElementById('agen-resumo');
             const placeholder = document.getElementById('agen-resumo-placeholder');
             const btnSalvar = document.getElementById('agen-btn-salvar');
@@ -5742,7 +5818,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 pagamentoWrap?.classList.add('hidden');
             }
 
-            const pronto = data && periodo && horario && nome && telefoneResumo && validarTelefoneBR(telefoneResumo) && temExames && pagamento;
+            const pronto = data && periodo && horario && nome && telefoneResumo && validarTelefoneBR(telefoneResumo) && nascimentoResumo && temExames && pagamento;
 
             if (pronto) {
                 const [y,m,d] = data.split('-').map(Number);
@@ -5775,23 +5851,54 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
         }
 
+        let _agenSalvarCallbackApp = null;
+
+        function cancelarResponsavelApp() {
+            document.getElementById('modal-responsavel-app').style.display = 'none';
+            _agenSalvarCallbackApp = null;
+        }
+
+        function confirmarResponsavelApp() {
+            const nome = document.getElementById('modal-responsavel-app-input').value.trim();
+            const err = document.getElementById('modal-responsavel-app-error');
+            if (!nome) { err.style.display = 'block'; return; }
+            err.style.display = 'none';
+            document.getElementById('modal-responsavel-app').style.display = 'none';
+            if (_agenSalvarCallbackApp) _agenSalvarCallbackApp(nome);
+        }
+
         async function agenSalvar() {
             const { data, periodo, horario } = agenState;
             const nome     = document.getElementById('agen-nome')?.value?.trim();
             const telefone = document.getElementById('agen-telefone')?.value?.trim();
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            const statusEl  = document.getElementById('agen-status');
+            const nascimento = document.getElementById('agen-nascimento')?.value;
             const pagamento = agenPagamentoSelecionado();
             const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
 
             if (!nome)      { showToast('Informe seu nome.', 'error'); return; }
             if (!telefone)  { showToast('Informe seu telefone.', 'error'); return; }
             if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD (ex: 27 99999-9999).', 'error', 4000); return; }
+            if (!nascimento) { showToast('A data de nascimento é obrigatória.', 'error'); return; }
             if (!data)      { showToast('Selecione a data.', 'error'); return; }
             if (!periodo)   { showToast('Selecione o período.', 'error'); return; }
             if (!horario)   { showToast('Selecione o horário.', 'error'); return; }
             if (!temExames) { showToast('Faça o orçamento antes de agendar — selecione os exames na aba Orçamento.', 'error', 5000); return; }
             if (!pagamento) { showToast('Escolha a forma de pagamento.', 'error'); return; }
+
+            const idade = calcularIdade(nascimento);
+            if (idade < 18) {
+                document.getElementById('modal-responsavel-app-input').value = '';
+                document.getElementById('modal-responsavel-app-error').style.display = 'none';
+                document.getElementById('modal-responsavel-app').style.display = 'flex';
+                _agenSalvarCallbackApp = (nomeResponsavel) => _executarAgendamentoApp(data, periodo, horario, nome, telefone, nascimento, pagamento, nomeResponsavel);
+                return;
+            }
+            _executarAgendamentoApp(data, periodo, horario, nome, telefone, nascimento, pagamento, null);
+        }
+
+        async function _executarAgendamentoApp(data, periodo, horario, nome, telefone, nascimento, pagamento, nomeResponsavel) {
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const statusEl  = document.getElementById('agen-status');
 
             const totalBruto = orcSelecionados.reduce((s,e) => s + (parseFloat(e.preco) || 0), 0);
             const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
@@ -5833,6 +5940,12 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const endMm = totalMinFim % 60;
                 const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(endMm).padStart(2,'0') + ':00';
 
+                const [ny, nm, nd] = nascimento.split('-').map(Number);
+                const nascFormatado = new Date(ny, nm - 1, nd).toLocaleDateString('pt-BR');
+                const idadeInfo = `\nData de nascimento: ${nascFormatado}\nIdade: ${calcularIdade(nascimento)} anos`;
+                const responsavelInfo = nomeResponsavel ? `\nResponsavel legal: ${nomeResponsavel.toUpperCase()}` : '';
+                const levarInfo = '\nLevar: documento com foto e pedido medico (se tiver). Exame de urina/fezes: retirar coletores no laboratorio com antecedencia.';
+
                 const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
@@ -5840,7 +5953,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                         action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone,
                         pagamento, startTime: startDateTime, endTime: endDateTime,
                         usuario: 'APP',
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA\nCodigo de cancelamento: ${_agenUltimoCodigoCancel}${descExames}`,
+                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA\nCodigo de cancelamento: ${_agenUltimoCodigoCancel}${idadeInfo}${responsavelInfo}${levarInfo}${descExames}`,
                         temOrcamento: '1'
                     })
                 });
@@ -5879,6 +5992,10 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 corpo.innerHTML = `
                     <p><strong>${nome}</strong></p>
                     <p>${dataExt} às ${horario}</p>
+                    <div style="margin-top:12px;padding:12px;background:#F0FBFB;border-radius:14px;text-align:left;">
+                        <p style="font-weight:800;font-size:0.75rem;color:#0F4C5C;margin-bottom:6px;"><i class="fa-solid fa-bag-shopping mr-1"></i>Não esqueça de levar:</p>
+                        <p style="font-size:0.75rem;color:#475569;line-height:1.5;">• Documento oficial com foto<br>• Pedido médico, se tiver<br>• Se tiver exame de urina/fezes, retire os coletores no laboratório com antecedência</p>
+                    </div>
                     <p style="margin-top:8px;font-size:0.78rem;color:#94A3B8;">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>`;
             }
             const overlay = document.getElementById('agendamentoSucessoOverlay');
@@ -5958,6 +6075,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (pageId === 'home') {
                 loadProfile();
                 setupImportantCarousel();
+                atualizarVisibilidadeBotaoInstalar();
                 // Re-dispara animações dos elementos anim-in
                 const animItems = target.querySelectorAll('.anim-in');
                 animItems.forEach(el => {
@@ -6048,6 +6166,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 renderGuiaExames();
                 verificarTermosAceitos();
                 verificarLembretes();
+                atualizarVisibilidadeBotaoInstalar();
             } catch(e) {
                 console.warn('Erro na inicialização:', e);
             }
@@ -6400,7 +6519,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 'UID:' + (ag.codigoCancel || Date.now()) + '@laboratoriocda\r\n' +
                 'DTSTART:' + dtStart + '\r\nDTEND:' + dtEnd + '\r\n' +
                 'SUMMARY:Coleta de exames - Laboratorio CDA\r\n' +
-                'DESCRIPTION:Paciente: ' + (ag.nome || '') + '\\nHorario: ' + (ag.horario || '') + '\\nLeve documento com foto e pedido medico.\r\n' +
+                'DESCRIPTION:Paciente: ' + (ag.nome || '') + '\\nHorario: ' + (ag.horario || '') + '\\nLeve documento com foto e pedido medico (se tiver). Exame de urina/fezes: retire os coletores no laboratorio com antecedencia.\r\n' +
                 'LOCATION:Laboratorio CDA - Rua Jose Giestas 46 - Centro - Afonso Claudio ES\r\n' +
                 'BEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Amanha: coleta no Laboratorio CDA\r\nEND:VALARM\r\n' +
                 'BEGIN:VALARM\r\nTRIGGER:-PT2H\r\nACTION:DISPLAY\r\nDESCRIPTION:Hoje: coleta no Laboratorio CDA\r\nEND:VALARM\r\n' +
