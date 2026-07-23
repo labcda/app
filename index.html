@@ -2050,14 +2050,14 @@
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo
                         </label>
-                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo"
+                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo" oninput="agenAtualizarResumo()"
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp
                         </label>
-                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999"
+                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" oninput="agenAtualizarResumo()"
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                 </div>
@@ -4423,9 +4423,9 @@
         let orcArquivoAtual  = null;
         let orcDropdownIdx   = -1;
 
-        // ---- CHAVE CLAUDE API ----
-        const CLAUDE_API_KEY = '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';
-        // Proxy Cloudflare Worker — evita bloqueio CORS do browser
+        // ---- IA VIA PROXY (Cloudflare Worker) ----
+        // A chave da API fica guardada SOMENTE no Worker (variável de ambiente
+        // ANTHROPIC_API_KEY) — nunca no código do app, que é público no navegador.
         const CLAUDE_PROXY_URL = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
         const CLAUDE_ENDPOINT = CLAUDE_PROXY_URL;
 
@@ -4440,6 +4440,12 @@
                 .replace(/[^A-Z0-9]+/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.innerText = str == null ? '' : String(str);
+            return div.innerHTML;
         }
 
         function formatCurrency(value) {
@@ -4494,7 +4500,7 @@
             const resultados = orcTabelaExames.filter(ex => ex.busca.includes(term)).slice(0, 12);
 
             if (!resultados.length) {
-                dropdown.innerHTML = `<div class="px-4 py-3 text-sm text-slate-400 dark:text-slate-500">Nenhum exame encontrado para "<strong>${input.value}</strong>"</div>`;
+                dropdown.innerHTML = `<div class="px-4 py-3 text-sm text-slate-400 dark:text-slate-500">Nenhum exame encontrado para "<strong>${escapeHtml(input.value)}</strong>"</div>`;
                 dropdown.classList.remove('hidden');
                 return;
             }
@@ -4702,8 +4708,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
                 const resp = await fetch(CLAUDE_ENDPOINT, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-version': '2023-06-01' },
-                    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000, messages:[{ role:'user', content: contentBlock }] })
+                    headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+                    body: JSON.stringify({ model:'claude-sonnet-5', max_tokens:2000, messages:[{ role:'user', content: contentBlock }] })
                 });
 
                 if (!resp.ok) {
@@ -4719,7 +4725,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             } catch (err) {
                 console.error('Erro IA:', err);
-                const ehChave = CLAUDE_API_KEY === 'SUA_CHAVE_AQUI' || String(err.message).toLowerCase().includes('api key') || String(err.message).includes('401') || String(err.message).includes('invalid x-api-key');
+                const ehChave = String(err.message).toLowerCase().includes('api key') || String(err.message).includes('401') || String(err.message).includes('invalid x-api-key');
                 statusEl.innerHTML = ehChave
                     ? `<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>Serviço de IA temporariamente indisponível. <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-primary font-bold underline">Fale com um atendente</a>.`
                     : `<i class="fa-solid fa-triangle-exclamation text-red-500 mr-1"></i>Erro ao analisar: ${err.message}. <a href="https://wa.me/5527998980658" target="_blank" class="text-cda-primary font-bold underline">Fale com um atendente</a>.`;
@@ -4741,8 +4747,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     div.className = 'flex items-center justify-between gap-3 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-2xl px-4 py-3 mb-2';
                     div.innerHTML = `
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-slate-800 dark:text-white truncate">${ex.nome}</p>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Pedido: "${ex.nome_pedido}"</p>
+                            <p class="text-sm font-bold text-slate-800 dark:text-white truncate">${escapeHtml(ex.nome)}</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Pedido: "${escapeHtml(ex.nome_pedido)}"</p>
                         </div>
                         <span class="text-sm font-extrabold text-cda-primary whitespace-nowrap">${formatCurrency(ex.preco)}</span>
                         <button onclick="orcAdicionarDaIA(${ex.id})" class="w-8 h-8 rounded-full bg-cda-primary text-white flex items-center justify-center hover:opacity-80 transition flex-shrink-0">
@@ -4766,7 +4772,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 resultado.duvidas.forEach(ex => {
                     const div = document.createElement('div');
                     div.className = 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-3 mb-2';
-                    div.innerHTML = `<p class="text-sm font-bold text-slate-800 dark:text-white">"${ex.nome_pedido}"</p><p class="text-xs text-amber-700 dark:text-amber-300 mt-1"><i class="fa-solid fa-circle-info mr-1"></i>${ex.motivo}</p>`;
+                    div.innerHTML = `<p class="text-sm font-bold text-slate-800 dark:text-white">"${escapeHtml(ex.nome_pedido)}"</p><p class="text-xs text-amber-700 dark:text-amber-300 mt-1"><i class="fa-solid fa-circle-info mr-1"></i>${escapeHtml(ex.motivo)}</p>`;
                     sec.appendChild(div);
                 });
                 resultEl.appendChild(sec);
@@ -4778,7 +4784,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 resultado.nao_encontrados.forEach(ex => {
                     const div = document.createElement('div');
                     div.className = 'bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-2xl px-4 py-3 mb-2';
-                    div.innerHTML = `<p class="text-sm font-bold text-slate-800 dark:text-white">"${ex.nome_pedido}"</p>`;
+                    div.innerHTML = `<p class="text-sm font-bold text-slate-800 dark:text-white">"${escapeHtml(ex.nome_pedido)}"</p>`;
                     sec.appendChild(div);
                 });
                 resultEl.appendChild(sec);
@@ -5469,9 +5475,19 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             return checked ? checked.value : '';
         }
 
+        // Mesma validação usada no painel ADM: telefone fixo (10 dígitos) ou
+        // celular (11 dígitos com 9), sempre com DDD válido.
+        function validarTelefoneBR(valor) {
+            const digitos = String(valor || '').replace(/\D/g, '');
+            if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
+            if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
+            return false;
+        }
+
         function agenAtualizarResumo() {
             const { data, periodo, horario } = agenState;
             const nome = document.getElementById('agen-nome')?.value?.trim() || '';
+            const telefoneResumo = document.getElementById('agen-telefone')?.value?.trim() || '';
             const resumo = document.getElementById('agen-resumo');
             const placeholder = document.getElementById('agen-resumo-placeholder');
             const btnSalvar = document.getElementById('agen-btn-salvar');
@@ -5504,7 +5520,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 pagamentoWrap?.classList.add('hidden');
             }
 
-            const pronto = data && periodo && horario && nome && temExames && pagamento;
+            const pronto = data && periodo && horario && nome && telefoneResumo && validarTelefoneBR(telefoneResumo) && temExames && pagamento;
 
             if (pronto) {
                 const [y,m,d] = data.split('-').map(Number);
@@ -5546,6 +5562,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             if (!nome)      { showToast('Informe seu nome.', 'error'); return; }
             if (!telefone)  { showToast('Informe seu telefone.', 'error'); return; }
+            if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD (ex: 27 99999-9999).', 'error', 4000); return; }
             if (!data)      { showToast('Selecione a data.', 'error'); return; }
             if (!periodo)   { showToast('Selecione o período.', 'error'); return; }
             if (!horario)   { showToast('Selecione o horário.', 'error'); return; }
@@ -5732,31 +5749,17 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
         }
 
-        // Tenta pré-preencher o login do portal de resultados (WorkLab) passando
-        // os dados salvos no perfil como parâmetros de URL. IMPORTANTE: por ser
-        // um site de terceiro dentro de um iframe, não é possível preencher os
-        // campos por JavaScript (bloqueio de segurança do navegador entre
-        // origens diferentes) — isso só funciona SE o próprio WorkLab aceitar
-        // login via parâmetros na URL. Os nomes de parâmetro abaixo (chave,
-        // senha, nome) são uma tentativa com os nomes mais comuns nesse tipo de
-        // portal; se não funcionar, é preciso confirmar com o suporte do
-        // WorkLab quais parâmetros (se algum) o link de fato aceita.
+        // Portal de resultados (WorkLab) num iframe de terceiro: NUNCA enviar a
+        // senha/chave do paciente como parâmetro de URL — query strings ficam
+        // registradas em logs do servidor e histórico do navegador, e o portal
+        // nem aceita login por URL. O paciente digita as credenciais no próprio
+        // portal (os campos Chave/Senha do perfil servem apenas de anotação
+        // local para consulta rápida).
         function atualizarIframeResultados() {
             const iframe = document.getElementById('iframe-resultados');
             if (!iframe) return;
-            const base = 'https://portal.worklabweb.com.br/resultados-on-line/1824';
-            const nome  = localStorage.getItem('patient_name');
-            const chave = localStorage.getItem('patient_key');
-            const senha = localStorage.getItem('patient_password');
-            let destino = base;
-            if (chave || senha) {
-                const params = new URLSearchParams();
-                if (chave) params.set('chave', chave);
-                if (senha) params.set('senha', senha);
-                if (nome)  params.set('nome', nome);
-                destino = base + '?' + params.toString();
-            }
-            // Só (re)carrega se o destino mudou — evita recarregar o portal a
+            const destino = 'https://portal.worklabweb.com.br/resultados-on-line/1824';
+            // Só (re)carrega se ainda não carregou — evita recarregar o portal a
             // cada visita à aba (perderia a sessão que o paciente já abriu lá).
             if (iframe.dataset.destinoAtual !== destino) {
                 iframe.dataset.destinoAtual = destino;
