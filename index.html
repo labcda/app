@@ -1330,8 +1330,52 @@
                 <p class="termos-texto" style="font-weight:800;font-size:1.15rem;color:#1E293B;margin-bottom:6px;">Agendamento confirmado!</p>
                 <div id="agendamento-sucesso-corpo" class="termos-texto" style="font-size:0.85rem;color:#475569;line-height:1.6;"></div>
             </div>
-            <div style="padding:0 24px 24px;">
+            <div style="padding:0 24px 24px;" class="space-y-2">
+                <button onclick="baixarLembreteICS()" class="w-full bg-slate-100 text-slate-700 py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                    <i class="fa-regular fa-calendar-plus"></i> Adicionar ao meu calendário
+                </button>
                 <button onclick="fecharModalSucessoAgendamento()" class="w-full btn-cda-primary py-3.5 rounded-2xl font-bold">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTÓRICO DE ORÇAMENTOS/AGENDAMENTOS -->
+    <div id="historicoOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)fecharHistorico()">
+        <div class="termos-box" style="background:#fff;border-radius:24px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);padding:18px 22px;color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <i class="fa-solid fa-clock-rotate-left" style="font-size:1.3rem;"></i>
+                    <p style="font-weight:800;font-size:1rem;">Meu Histórico</p>
+                </div>
+                <button onclick="fecharHistorico()" style="color:#fff;font-size:1.2rem;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="display:flex;gap:8px;padding:12px 18px 0;flex-shrink:0;">
+                <button id="hist-aba-orc" onclick="histMostrarAba('orcamentos')" class="flex-1 py-2 rounded-xl font-bold text-xs" style="background:#0F4C5C;color:#fff;">Orçamentos</button>
+                <button id="hist-aba-agen" onclick="histMostrarAba('agendamentos')" class="flex-1 py-2 rounded-xl font-bold text-xs" style="background:#F1F5F9;color:#64748B;">Agendamentos</button>
+            </div>
+            <div id="hist-lista" style="padding:14px 18px 18px;overflow-y:auto;" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- MODAL NPS (PESQUISA DE SATISFAÇÃO) -->
+    <div id="npsOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;">
+        <div class="termos-box" style="background:#fff;border-radius:24px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
+            <div style="padding:24px 24px 8px;text-align:center;">
+                <div style="width:56px;height:56px;border-radius:50%;background:#E8F8F8;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                    <i class="fa-solid fa-star" style="font-size:1.4rem;color:#49BCBE;"></i>
+                </div>
+                <p class="termos-texto" style="font-weight:800;font-size:1.05rem;color:#1E293B;margin-bottom:4px;">Como foi sua experiência?</p>
+                <p class="termos-texto" style="font-size:0.8rem;color:#64748B;">De 0 a 10, o quanto você recomendaria o Laboratório CDA a um amigo?</p>
+            </div>
+            <div style="padding:14px 20px 6px;">
+                <div id="nps-notas" style="display:grid;grid-template-columns:repeat(11,1fr);gap:4px;"></div>
+            </div>
+            <div style="padding:8px 20px;">
+                <textarea id="nps-comentario" rows="2" placeholder="Quer deixar um comentário? (opcional)" class="w-full bg-slate-50 border-none rounded-xl px-3 py-2.5 text-sm" style="resize:none;"></textarea>
+            </div>
+            <div style="padding:8px 20px 20px;display:flex;gap:8px;">
+                <button onclick="fecharNPS(true)" class="flex-1 bg-slate-100 text-slate-500 py-3 rounded-2xl font-bold text-sm">Agora não</button>
+                <button id="nps-btn-enviar" onclick="enviarNPS()" class="flex-1 btn-cda-primary py-3 rounded-2xl font-bold text-sm opacity-50 pointer-events-none">Enviar</button>
             </div>
         </div>
     </div>
@@ -1372,6 +1416,9 @@
                     <h2><span id="home-greeting-text">Olá!</span> <span class="wave-emoji">👋</span></h2>
                     <p class="sub">Como podemos cuidar da sua saúde hoje?</p>
                 </div>
+
+                <!-- LEMBRETE DE COLETA (aparece só quando há agendamento hoje/amanhã) -->
+                <div id="home-lembrete" class="hidden"></div>
 
                 <!-- CARD ACESSE A CONTA -->
                 <div class="main-card-promo anim-in" style="animation-delay: 0.1s">
@@ -1907,6 +1954,9 @@
                     <button onclick="orcGerarPDF()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-file-pdf text-red-500 text-sm"></i> Baixar orçamento em PDF
                     </button>
+                    <button onclick="abrirHistorico()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-clock-rotate-left text-sm"></i> Meus orçamentos e agendamentos
+                    </button>
                 </div>
             </div>
 
@@ -1970,6 +2020,35 @@
                         <i class="fa-solid fa-floppy-disk"></i> Salvar Dados
                     </button>
                 </form>
+            </div>
+
+            <!-- CARTÃO FIDELIDADE DIGITAL -->
+            <div class="card-cda p-0 overflow-hidden">
+                <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 55%,#49BCBE 100%);padding:22px;color:#fff;position:relative;overflow:hidden;">
+                    <div style="position:absolute;right:-40px;bottom:-60px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,0.10);pointer-events:none;"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+                                <i class="fa-solid fa-heart"></i> Cartão Fidelidade CDA
+                            </span>
+                            <i class="fa-solid fa-flask text-white/40 text-xl"></i>
+                        </div>
+                        <div class="flex items-end justify-between gap-4">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-0.5">Titular</p>
+                                <p id="fid-nome" class="font-extrabold text-base leading-tight">—</p>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mt-3 mb-0.5">Código do cartão</p>
+                                <p id="fid-codigo" class="font-extrabold text-lg tracking-widest">—</p>
+                            </div>
+                            <div style="background:#fff;border-radius:12px;padding:6px;flex-shrink:0;">
+                                <img id="fid-qr" src="" alt="QR Code do cartão" style="width:84px;height:84px;display:block;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 bg-white dark:bg-slate-800">
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug"><i class="fa-solid fa-circle-info text-cda-primary mr-1"></i>Apresente este cartão na recepção para acumular benefícios e garantir seus descontos especiais (40% no Pix/débito, 35% no crédito).</p>
+                </div>
             </div>
         </section>
 
@@ -2194,6 +2273,10 @@
                         <div id="agen-resumo-exames" class="text-xs text-slate-500 dark:text-slate-400 space-y-0.5"></div>
                         <p id="agen-resumo-total" class="text-sm font-extrabold text-cda-primary mt-2"></p>
                         <p id="agen-resumo-pagamento" class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1"></p>
+                    </div>
+                    <div id="agen-resumo-preparo-wrap" class="hidden pt-2 border-t border-slate-200 dark:border-slate-600">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5"><i class="fa-solid fa-utensils text-cda-primary mr-1"></i>Seu preparo para esta coleta</p>
+                        <div id="agen-resumo-preparo" class="text-xs text-slate-500 dark:text-slate-400 space-y-1.5"></div>
                     </div>
                 </div>
                 <div id="agen-resumo-placeholder" class="flex flex-col items-center py-4 text-center mb-4">
@@ -4917,6 +5000,31 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 doc.text('  Cobrimos qualquer orcamento! Apresente uma proposta e faremos questao de superar.', margin+8, y+50);
                 y += 62;
 
+                // ── PREPARO DOS EXAMES ──
+                const preparosPDF = preparoParaSelecionados();
+                if (preparosPDF.length) {
+                    const linhasPreparo = [];
+                    preparosPDF.slice(0, 8).forEach(p => {
+                        linhasPreparo.push({ negrito: true, txt: p.nome + ' — ' + p.jejum });
+                        doc.splitTextToSize(p.preparo, cw - 16).forEach(l => linhasPreparo.push({ negrito: false, txt: l }));
+                    });
+                    const hPrep = 14 + linhasPreparo.length * 4.2;
+                    if (y + hPrep > H - 24) { doc.addPage(); y = 16; }
+                    doc.setFillColor(...cLight); doc.roundedRect(margin, y, cw, hPrep, 4, 4, 'F');
+                    doc.setFillColor(...cMid); doc.roundedRect(margin, y, 3, hPrep, 1.5, 1.5, 'F');
+                    doc.setTextColor(...cDark); doc.setFontSize(9); doc.setFont('helvetica','bold');
+                    doc.text('Seu preparo para esta coleta', margin + 8, y + 8);
+                    let py = y + 14;
+                    linhasPreparo.forEach(l => {
+                        doc.setFont('helvetica', l.negrito ? 'bold' : 'normal');
+                        doc.setFontSize(l.negrito ? 7.5 : 7);
+                        doc.setTextColor(...(l.negrito ? cDark : cMuted));
+                        doc.text(l.txt, margin + 8, py);
+                        py += 4.2;
+                    });
+                    y += hPrep + 6;
+                }
+
                 // ── AGENDAMENTO VIP ──
                 if (y < 232) {
                     doc.setFillColor(232,248,248); doc.roundedRect(margin,y,cw,28,4,4,'F');
@@ -5054,13 +5162,58 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             return 'Não encontrei uma orientação específica para esse exame. Me envie o nome como está no pedido, ou chame o laboratório pelo WhatsApp para confirmar preparo, jejum e horário de coleta.';
         }
 
-        function enviarMensagemPreparo() {
+        // Chat com IA de verdade: envia a pergunta ao proxy Claude com o guia
+        // completo de preparo como contexto. Se a IA estiver indisponível
+        // (offline, Worker fora do ar), cai no responderPreparo por palavra-chave.
+        let _chatIAOcupado = false;
+        function _chatMontarContextoGuia() {
+            return guiaExamesData.map(e =>
+                e.nome + ' | Material: ' + e.material + ' | Jejum: ' + e.jejum + ' | Preparo: ' + e.preparo + (e.obs ? ' | Obs: ' + e.obs : '')
+            ).join('\n');
+        }
+
+        async function enviarMensagemPreparo() {
             const input = document.getElementById('chatInput');
             const pergunta = (input?.value || '').trim();
-            if (!pergunta) return;
+            if (!pergunta || _chatIAOcupado) return;
             adicionarMensagemChat('user', pergunta);
             input.value = '';
-            setTimeout(() => adicionarMensagemChat('bot', responderPreparo(pergunta)), 180);
+
+            // Indicador de "digitando..."
+            const messages = document.getElementById('chatMessages');
+            const typing = document.createElement('div');
+            typing.className = 'flex justify-start';
+            typing.innerHTML = '<div class="max-w-[86%] bg-slate-100 dark:bg-slate-700 text-slate-400 rounded-2xl rounded-bl-md px-4 py-3 text-sm"><i class="fa-solid fa-ellipsis fa-fade"></i></div>';
+            messages.appendChild(typing);
+            messages.scrollTop = messages.scrollHeight;
+            _chatIAOcupado = true;
+
+            try {
+                const prompt = 'Você é o assistente de preparo de exames do Laboratório CDA (Afonso Cláudio-ES). ' +
+                    'Responda APENAS sobre preparo, jejum, coleta e orientações pré-exame, em português, de forma curta e amigável (máx. 5 frases). ' +
+                    'Use SOMENTE as informações do guia abaixo. Se o exame não estiver no guia ou a pergunta fugir de preparo de exames ' +
+                    '(diagnóstico, interpretação de resultado, conduta médica), diga que não pode ajudar com isso e oriente a falar com o laboratório pelo WhatsApp (27) 99898-0658. ' +
+                    'Nunca invente preparo. Sempre finalize lembrando de confirmar com o laboratório se o pedido tiver vários exames.\n\n' +
+                    'GUIA DE PREPARO:\n' + _chatMontarContextoGuia() + '\n\nPERGUNTA DO PACIENTE: ' + pergunta;
+
+                const resp = await fetch(CLAUDE_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+                    body: JSON.stringify({ model: 'claude-sonnet-5', max_tokens: 500, messages: [{ role: 'user', content: prompt }] })
+                });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                const texto = (data.content || []).map(b => b.text || '').join('').trim();
+                if (!texto) throw new Error('resposta vazia');
+                typing.remove();
+                adicionarMensagemChat('bot', texto);
+            } catch (err) {
+                console.warn('[CDA] Chat IA indisponível, usando resposta local:', err);
+                typing.remove();
+                adicionarMensagemChat('bot', responderPreparo(pergunta));
+            } finally {
+                _chatIAOcupado = false;
+            }
         }
 
         function iniciarChatPreparo() {
@@ -5302,6 +5455,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     })
                 });
             } catch(e) { console.warn('[CDA] Erro ao registrar orçamento do app:', e); }
+            // Histórico local (independe do sucesso do registro na planilha)
+            try {
+                histAdd('orcamento', {
+                    paciente: localStorage.getItem('patient_name') || '',
+                    acao: acao || 'BAIXADO',
+                    total: orcSelecionados.reduce((s, e) => s + (parseFloat(e.preco) || 0), 0),
+                    exames: orcSelecionados.map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
+                });
+            } catch(e) {}
         }
 
         async function salvarAppAgendamento(nome, data, horario, pagamento) {
@@ -5541,6 +5703,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const pagamentoEl = document.getElementById('agen-resumo-pagamento');
                 if (pagamentoEl) pagamentoEl.textContent = `Forma de pagamento: ${nomePagamento} — ${formatCurrencyArredondado(valorComDesconto)}`;
 
+                renderPreparoResumo();
+
                 resumo.classList.remove('hidden');
                 placeholder.classList.add('hidden');
                 btnSalvar.classList.remove('opacity-50','pointer-events-none');
@@ -5598,6 +5762,10 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
                 btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
 
+                // Código de cancelamento: fica na descrição do evento (visível para a
+                // equipe) e no histórico local, permitindo cancelar/reagendar pelo app.
+                _agenUltimoCodigoCancel = 'CDA-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+
                 const [hh, mm] = horario.split(':').map(Number);
                 const startDateTime = data + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
                 const totalMinFim = hh * 60 + mm + 40;
@@ -5612,7 +5780,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                         action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone,
                         pagamento, startTime: startDateTime, endTime: endDateTime,
                         usuario: 'APP',
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`,
+                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA\nCodigo de cancelamento: ${_agenUltimoCodigoCancel}${descExames}`,
                         temOrcamento: '1'
                     })
                 });
@@ -5660,11 +5828,25 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             btnSalvar.classList.add('opacity-50','pointer-events-none');
             if (nome) localStorage.setItem('patient_name', nome);
             salvarAppAgendamento(nome, data, horario, pagamento);
+
+            // Histórico local + lembrete + pesquisa de satisfação
+            const telefoneHist = document.getElementById('agen-telefone')?.value?.trim() || '';
+            _agenUltimoAgendamento = {
+                nome, data, horario, pagamento,
+                telefone: telefoneHist,
+                codigoCancel: _agenUltimoCodigoCancel,
+                exames: (orcSelecionados || []).map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
+            };
+            histAdd('agendamento', _agenUltimoAgendamento);
+            pedirPermissaoNotificacao();
+            verificarLembretes();
+            _npsPendente = true;
         }
 
         function fecharModalSucessoAgendamento() {
             const overlay = document.getElementById('agendamentoSucessoOverlay');
             if (overlay) overlay.style.display = 'none';
+            if (_npsPendente) { _npsPendente = false; setTimeout(abrirNPS, 400); }
         }
 
         function agenFallbackWhatsApp(nome, telefone, data, horario, descExames) {
@@ -5805,6 +5987,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 iniciarChatPreparo();
                 renderGuiaExames();
                 verificarTermosAceitos();
+                verificarLembretes();
             } catch(e) {
                 console.warn('Erro na inicialização:', e);
             }
@@ -5859,6 +6042,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
         function loadProfile() {
             atualizarSaudacaoHome();
+            atualizarCartaoFidelidade();
             const nome = localStorage.getItem('patient_name');
             if (nome) {
                 const nameDisplay = document.getElementById('patient-name-display');
@@ -5888,6 +6072,391 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             loadProfile();
             showToast('Dados salvos com sucesso!', 'success');
             navigateTo('home');
+        }
+
+        // =====================================================
+        // PREPARO AUTOMÁTICO DOS EXAMES DO ORÇAMENTO
+        // =====================================================
+        // Cruza os exames selecionados no orçamento com o guia de preparo
+        // (guiaExamesData) por nome normalizado. Dedup por entrada do guia.
+        function preparoParaSelecionados() {
+            if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) return [];
+            const achados = [];
+            const usados = new Set();
+            orcSelecionados.forEach(ex => {
+                const exN = normalizarTexto(ex.nome);
+                if (!exN) return;
+                const guia = guiaExamesData.find(g => {
+                    const gN = normalizarTexto(g.nome);
+                    return gN === exN || (gN.length >= 5 && exN.includes(gN)) || (exN.length >= 5 && gN.includes(exN));
+                });
+                if (guia && !usados.has(guia.id)) {
+                    usados.add(guia.id);
+                    achados.push({ nome: ex.nome, jejum: guia.jejum, preparo: guia.preparo, obs: guia.obs });
+                }
+            });
+            return achados;
+        }
+
+        function renderPreparoResumo() {
+            const wrap = document.getElementById('agen-resumo-preparo-wrap');
+            const cont = document.getElementById('agen-resumo-preparo');
+            if (!wrap || !cont) return;
+            const preparos = preparoParaSelecionados();
+            if (!preparos.length) { wrap.classList.add('hidden'); return; }
+            wrap.classList.remove('hidden');
+            cont.innerHTML = preparos.map(p =>
+                '<div><span class="font-bold text-slate-600 dark:text-slate-300">' + escapeHtml(p.nome) + '</span> — ' +
+                '<span class="text-cda-primary font-bold">' + escapeHtml(p.jejum) + '</span><br>' +
+                escapeHtml(p.preparo) + '</div>'
+            ).join('') +
+            '<p class="text-[10px] text-slate-400 mt-1">Orientações gerais — confirme com o laboratório se tiver dúvidas.</p>';
+        }
+
+        // =====================================================
+        // HISTÓRICO LOCAL DE ORÇAMENTOS E AGENDAMENTOS
+        // =====================================================
+        let _agenUltimoCodigoCancel = null;
+        let _agenUltimoAgendamento = null;
+        let _histAbaAtual = 'orcamentos';
+
+        function histLer() {
+            try { return JSON.parse(localStorage.getItem('cda_historico') || '[]'); } catch(e) { return []; }
+        }
+
+        function histSalvar(lista) {
+            try { localStorage.setItem('cda_historico', JSON.stringify(lista.slice(0, 30))); } catch(e) {}
+        }
+
+        function histAdd(tipo, dados) {
+            const lista = histLer();
+            lista.unshift({ tipo: tipo, quando: new Date().toISOString(), ...dados });
+            histSalvar(lista);
+        }
+
+        function abrirHistorico() {
+            document.getElementById('historicoOverlay').style.display = 'flex';
+            histMostrarAba(_histAbaAtual);
+        }
+
+        function fecharHistorico() {
+            document.getElementById('historicoOverlay').style.display = 'none';
+        }
+
+        function histMostrarAba(aba) {
+            _histAbaAtual = aba;
+            const btnOrc = document.getElementById('hist-aba-orc');
+            const btnAgen = document.getElementById('hist-aba-agen');
+            const ativo = 'background:#0F4C5C;color:#fff;';
+            const inativo = 'background:#F1F5F9;color:#64748B;';
+            btnOrc.style.cssText = aba === 'orcamentos' ? ativo : inativo;
+            btnAgen.style.cssText = aba === 'agendamentos' ? ativo : inativo;
+            renderHistorico();
+        }
+
+        function histFormatarQuando(iso) {
+            try { return new Date(iso).toLocaleDateString('pt-BR') + ' ' + new Date(iso).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}); }
+            catch(e) { return ''; }
+        }
+
+        function renderHistorico() {
+            const cont = document.getElementById('hist-lista');
+            const lista = histLer();
+            const itens = lista.map((item, idx) => ({ item, idx }))
+                .filter(x => (_histAbaAtual === 'orcamentos' ? x.item.tipo === 'orcamento' : x.item.tipo === 'agendamento'));
+            if (!itens.length) {
+                cont.innerHTML = '<p class="text-sm text-slate-400 text-center py-8">Nenhum registro ainda.<br><span class="text-xs">' +
+                    (_histAbaAtual === 'orcamentos' ? 'Seus orçamentos gerados aparecerão aqui.' : 'Seus agendamentos feitos pelo app aparecerão aqui.') + '</span></p>';
+                return;
+            }
+            cont.innerHTML = itens.map(({ item, idx }) => {
+                if (item.tipo === 'orcamento') {
+                    const n = (item.exames || []).length;
+                    return '<div class="bg-slate-50 rounded-2xl p-4">' +
+                        '<div class="flex items-center justify-between mb-1">' +
+                            '<p class="text-xs font-extrabold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-calculator text-cda-primary mr-1"></i>Orçamento</p>' +
+                            '<span class="text-[10px] text-slate-400">' + histFormatarQuando(item.quando) + '</span>' +
+                        '</div>' +
+                        '<p class="text-sm font-bold text-slate-700">' + n + ' exame' + (n !== 1 ? 's' : '') + ' — ' + formatCurrency(item.total || 0) + '</p>' +
+                        '<p class="text-[11px] text-slate-400 truncate mb-2">' + escapeHtml((item.exames || []).map(e => e.nome).join(', ')) + '</p>' +
+                        '<button onclick="histReabrirOrcamento(' + idx + ')" class="w-full bg-cda-primary/10 text-cda-primary py-2 rounded-xl font-bold text-xs"><i class="fa-solid fa-rotate-left mr-1"></i> Reabrir este orçamento</button>' +
+                    '</div>';
+                }
+                const cancelado = item.status === 'CANCELADO';
+                const [y, m, d] = (item.data || '').split('-').map(Number);
+                const dataBR = y ? String(d).padStart(2,'0') + '/' + String(m).padStart(2,'0') + '/' + y : '';
+                const futuro = y ? new Date(y, m - 1, d, 23, 59) >= new Date() : false;
+                return '<div class="bg-slate-50 rounded-2xl p-4' + (cancelado ? ' opacity-60' : '') + '">' +
+                    '<div class="flex items-center justify-between mb-1">' +
+                        '<p class="text-xs font-extrabold text-slate-500 uppercase tracking-wider"><i class="fa-regular fa-calendar-check text-cda-primary mr-1"></i>Agendamento</p>' +
+                        (cancelado ? '<span class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">Cancelado</span>' : '<span class="text-[10px] text-slate-400">' + histFormatarQuando(item.quando) + '</span>') +
+                    '</div>' +
+                    '<p class="text-sm font-bold text-slate-700">' + escapeHtml(dataBR) + ' às ' + escapeHtml(item.horario || '') + '</p>' +
+                    '<p class="text-[11px] text-slate-400 mb-2">' + escapeHtml(item.nome || '') + (item.codigoCancel ? ' · Código: ' + escapeHtml(item.codigoCancel) : '') + '</p>' +
+                    (!cancelado && futuro
+                        ? '<div class="flex gap-2">' +
+                            '<button onclick="histBaixarICS(' + idx + ')" class="flex-1 bg-slate-200 text-slate-600 py-2 rounded-xl font-bold text-[11px]"><i class="fa-regular fa-calendar-plus mr-1"></i>Lembrete</button>' +
+                            '<button onclick="histCancelarAgendamento(' + idx + ', false)" class="flex-1 bg-red-50 text-red-500 py-2 rounded-xl font-bold text-[11px]"><i class="fa-solid fa-calendar-xmark mr-1"></i>Cancelar</button>' +
+                            '<button onclick="histCancelarAgendamento(' + idx + ', true)" class="flex-1 bg-cda-primary/10 text-cda-primary py-2 rounded-xl font-bold text-[11px]"><i class="fa-solid fa-rotate mr-1"></i>Reagendar</button>' +
+                          '</div>'
+                        : '') +
+                '</div>';
+            }).join('');
+        }
+
+        function histReabrirOrcamento(idx) {
+            const item = histLer()[idx];
+            if (!item || item.tipo !== 'orcamento') return;
+            orcSelecionados = (item.exames || []).map(e => {
+                // Usa o preço atual da tabela quando o exame ainda existe
+                const atual = orcTabelaExames.find(t => t.id === e.id);
+                return atual ? { ...atual } : { id: e.id, nome: e.nome, preco: e.preco, codigo: '' };
+            });
+            orcRenderSelecionados();
+            fecharHistorico();
+            navigateTo('orcamento');
+            showToast('Orçamento reaberto com ' + orcSelecionados.length + ' exame(s)!', 'success');
+        }
+
+        // =====================================================
+        // CANCELAR / REAGENDAR PELO APP
+        // =====================================================
+        async function histCancelarAgendamento(idx, reagendar) {
+            const lista = histLer();
+            const item = lista[idx];
+            if (!item || item.tipo !== 'agendamento') return;
+            const [y, m, d] = (item.data || '').split('-');
+            const dataBR = d + '/' + m + '/' + y;
+            const msgConfirm = reagendar
+                ? 'Cancelar o agendamento de ' + dataBR + ' às ' + item.horario + ' para escolher um novo horário?'
+                : 'Tem certeza que deseja cancelar o agendamento de ' + dataBR + ' às ' + item.horario + '?';
+            if (!confirm(msgConfirm)) return;
+
+            showToast('Cancelando...', 'info', 8000);
+            let cancelou = false;
+            try {
+                const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'cancelarPorDados', token: CDA_TOKEN,
+                        data: item.data, horario: item.horario,
+                        nome: item.nome, codigo: item.codigoCancel || ''
+                    })
+                });
+                const json = await resp.json();
+                cancelou = json.ok === true;
+            } catch(e) { console.warn('[CDA] Falha ao cancelar via servidor:', e); }
+
+            if (cancelou) {
+                item.status = 'CANCELADO';
+                histSalvar(lista);
+                renderHistorico();
+                verificarLembretes();
+                showToast('Agendamento cancelado — horário liberado!', 'success');
+            } else {
+                // Servidor não conseguiu (ex.: Apps Script ainda sem a action) —
+                // abre o WhatsApp para a equipe cancelar manualmente.
+                const msg = 'Olá! Preciso CANCELAR' + (reagendar ? ' para reagendar' : '') + ' meu agendamento feito pelo app:\n\n' +
+                    '*Nome:* ' + item.nome + '\n*Data:* ' + dataBR + '\n*Horário:* ' + item.horario +
+                    (item.codigoCancel ? '\n*Código:* ' + item.codigoCancel : '');
+                window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
+                showToast('Abrimos o WhatsApp para confirmar o cancelamento com a equipe.', 'info', 5000);
+            }
+            if (reagendar) { fecharHistorico(); navigateTo('agendar'); }
+        }
+
+        // =====================================================
+        // LEMBRETE DE COLETA (banner + notificação + .ics)
+        // =====================================================
+        function pedirPermissaoNotificacao() {
+            try {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+            } catch(e) {}
+        }
+
+        function _lembreteProximo() {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            const amanha = new Date(hoje); amanha.setDate(hoje.getDate() + 1);
+            const chave = dt => dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+            return histLer().find(i => i.tipo === 'agendamento' && i.status !== 'CANCELADO' && (i.data === chave(hoje) || i.data === chave(amanha)));
+        }
+
+        function verificarLembretes() {
+            const banner = document.getElementById('home-lembrete');
+            if (!banner) return;
+            const ag = _lembreteProximo();
+            if (!ag) { banner.classList.add('hidden'); banner.innerHTML = ''; return; }
+            const hoje = new Date();
+            const chaveHoje = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
+            const ehHoje = ag.data === chaveHoje;
+            const rotulo = ehHoje ? 'HOJE' : 'AMANHÃ';
+            // Preparo dos exames do agendamento (se houver)
+            const nomesExames = (ag.exames || []).map(e => normalizarTexto(e.nome));
+            const preparos = guiaExamesData.filter(g => nomesExames.some(n => {
+                const gN = normalizarTexto(g.nome);
+                return gN === n || (gN.length >= 5 && n.includes(gN)) || (n.length >= 5 && gN.includes(n));
+            })).slice(0, 3);
+            banner.classList.remove('hidden');
+            banner.innerHTML =
+                '<div class="anim-in" style="background:linear-gradient(135deg,#0F4C5C,#37A7AA);border-radius:22px;padding:18px;color:#fff;margin-bottom:18px;box-shadow:0 12px 30px rgba(15,76,92,0.25);">' +
+                    '<div class="flex items-center gap-2 mb-2">' +
+                        '<span style="background:rgba(255,255,255,0.2);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;letter-spacing:1px;">' + rotulo + '</span>' +
+                        '<p class="font-extrabold text-sm">Sua coleta às ' + escapeHtml(ag.horario || '') + '</p>' +
+                    '</div>' +
+                    (preparos.length
+                        ? '<p class="text-[11px] text-white/85 leading-snug mb-2"><i class="fa-solid fa-utensils mr-1"></i>' +
+                          preparos.map(p => escapeHtml(p.nome) + ': ' + escapeHtml(p.jejum)).join(' · ') + '</p>'
+                        : '') +
+                    '<button onclick="abrirHistorico()" class="text-[11px] font-bold underline text-white/90">Ver detalhes do agendamento →</button>' +
+                '</div>';
+            // Notificação local (uma por agendamento/dia)
+            try {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    const chaveNotif = 'cda_notif_' + ag.data + '_' + ag.horario;
+                    if (!localStorage.getItem(chaveNotif)) {
+                        localStorage.setItem(chaveNotif, '1');
+                        new Notification('Laboratório CDA — lembrete de coleta', {
+                            body: 'Sua coleta é ' + rotulo.toLowerCase() + ' às ' + ag.horario + '.' +
+                                (preparos.length ? ' Preparo: ' + preparos.map(p => p.jejum).join('; ') : ''),
+                            icon: './icons/icon-192.png'
+                        });
+                    }
+                }
+            } catch(e) {}
+        }
+
+        function _icsGerar(ag) {
+            const [y, m, d] = ag.data.split('-').map(Number);
+            const [hh, mm] = (ag.horario || '07:00').split(':').map(Number);
+            const pad = n => String(n).padStart(2, '0');
+            const dtStart = y + pad(m) + pad(d) + 'T' + pad(hh) + pad(mm) + '00';
+            const fimMin = hh * 60 + mm + 40;
+            const dtEnd = y + pad(m) + pad(d) + 'T' + pad(Math.floor(fimMin / 60)) + pad(fimMin % 60) + '00';
+            return 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Laboratorio CDA//App//PT\r\nBEGIN:VEVENT\r\n' +
+                'UID:' + (ag.codigoCancel || Date.now()) + '@laboratoriocda\r\n' +
+                'DTSTART:' + dtStart + '\r\nDTEND:' + dtEnd + '\r\n' +
+                'SUMMARY:Coleta de exames - Laboratorio CDA\r\n' +
+                'DESCRIPTION:Paciente: ' + (ag.nome || '') + '\\nHorario: ' + (ag.horario || '') + '\\nLeve documento com foto e pedido medico.\r\n' +
+                'LOCATION:Laboratorio CDA - Rua Jose Giestas 46 - Centro - Afonso Claudio ES\r\n' +
+                'BEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Amanha: coleta no Laboratorio CDA\r\nEND:VALARM\r\n' +
+                'BEGIN:VALARM\r\nTRIGGER:-PT2H\r\nACTION:DISPLAY\r\nDESCRIPTION:Hoje: coleta no Laboratorio CDA\r\nEND:VALARM\r\n' +
+                'END:VEVENT\r\nEND:VCALENDAR\r\n';
+        }
+
+        function _icsBaixar(ag) {
+            if (!ag || !ag.data) { showToast('Agendamento não encontrado.', 'error'); return; }
+            const blob = new Blob([_icsGerar(ag)], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'coleta-cda-' + ag.data + '.ics';
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+            showToast('Lembrete baixado! Abra o arquivo para salvar no calendário.', 'success', 4000);
+        }
+
+        function baixarLembreteICS() { _icsBaixar(_agenUltimoAgendamento); }
+        function histBaixarICS(idx) { _icsBaixar(histLer()[idx]); }
+
+        // =====================================================
+        // CARTÃO FIDELIDADE DIGITAL
+        // =====================================================
+        function getFidelidadeCodigo() {
+            let cod = localStorage.getItem('cda_fidelidade_codigo');
+            if (!cod) {
+                cod = 'CDA-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+                try { localStorage.setItem('cda_fidelidade_codigo', cod); } catch(e) {}
+            }
+            return cod;
+        }
+
+        function atualizarCartaoFidelidade() {
+            const nomeEl = document.getElementById('fid-nome');
+            const codEl = document.getElementById('fid-codigo');
+            const qrEl = document.getElementById('fid-qr');
+            if (!nomeEl || !codEl || !qrEl) return;
+            const nome = (localStorage.getItem('patient_name') || '').trim();
+            const cod = getFidelidadeCodigo();
+            nomeEl.textContent = nome || 'Paciente CDA';
+            codEl.textContent = cod;
+            // QR gerado por serviço externo — se estiver offline, o cartão continua
+            // válido pelo código exibido em texto.
+            qrEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=168x168&margin=0&data=' + encodeURIComponent('FIDELIDADE-CDA|' + cod + (nome ? '|' + nome : ''));
+        }
+
+        // =====================================================
+        // NPS — PESQUISA DE SATISFAÇÃO
+        // =====================================================
+        let _npsPendente = false;
+        let _npsNota = null;
+
+        function _npsMontarNotas() {
+            const cont = document.getElementById('nps-notas');
+            if (!cont || cont.dataset.ready) return;
+            cont.dataset.ready = '1';
+            let html = '';
+            for (let n = 0; n <= 10; n++) {
+                html += '<button onclick="npsSelecionarNota(' + n + ')" data-nota="' + n + '" class="nps-nota-btn" style="padding:8px 0;border-radius:8px;background:#F1F5F9;color:#64748B;font-weight:800;font-size:12px;">' + n + '</button>';
+            }
+            cont.innerHTML = html;
+        }
+
+        function npsSelecionarNota(n) {
+            _npsNota = n;
+            document.querySelectorAll('.nps-nota-btn').forEach(btn => {
+                const ativo = Number(btn.dataset.nota) === n;
+                btn.style.background = ativo ? '#49BCBE' : '#F1F5F9';
+                btn.style.color = ativo ? '#fff' : '#64748B';
+            });
+            const btnEnviar = document.getElementById('nps-btn-enviar');
+            if (btnEnviar) btnEnviar.classList.remove('opacity-50', 'pointer-events-none');
+        }
+
+        function abrirNPS() {
+            // No máximo uma pesquisa a cada 30 dias
+            try {
+                const ultimo = localStorage.getItem('cda_nps_ultimo');
+                if (ultimo && (Date.now() - new Date(ultimo).getTime()) < 30 * 24 * 60 * 60 * 1000) return;
+            } catch(e) {}
+            _npsNota = null;
+            _npsMontarNotas();
+            document.querySelectorAll('.nps-nota-btn').forEach(btn => { btn.style.background = '#F1F5F9'; btn.style.color = '#64748B'; });
+            const btnEnviar = document.getElementById('nps-btn-enviar');
+            if (btnEnviar) btnEnviar.classList.add('opacity-50', 'pointer-events-none');
+            const com = document.getElementById('nps-comentario');
+            if (com) com.value = '';
+            document.getElementById('npsOverlay').style.display = 'flex';
+        }
+
+        function fecharNPS(pular) {
+            document.getElementById('npsOverlay').style.display = 'none';
+            if (pular) { try { localStorage.setItem('cda_nps_ultimo', new Date().toISOString()); } catch(e) {} }
+        }
+
+        async function enviarNPS() {
+            if (_npsNota === null) return;
+            const comentario = document.getElementById('nps-comentario')?.value?.trim() || '';
+            const agora = new Date();
+            try {
+                await fetch(CDA_PAINEL_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'salvarNPS', token: CDA_TOKEN,
+                        nota: _npsNota, comentario: comentario,
+                        paciente: (localStorage.getItem('patient_name') || '').toUpperCase(),
+                        data: agora.toLocaleDateString('pt-BR'),
+                        hora: agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0'),
+                        origem: 'APP'
+                    })
+                });
+            } catch(e) { console.warn('[CDA] Falha ao enviar NPS:', e); }
+            try { localStorage.setItem('cda_nps_ultimo', new Date().toISOString()); } catch(e) {}
+            fecharNPS(false);
+            showToast('Obrigado pela sua avaliação! 💙', 'success', 4000);
         }
 
         // DNA ANIMATION
