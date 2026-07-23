@@ -6008,9 +6008,11 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
 
             // Histórico local + lembrete + pesquisa de satisfação
             const telefoneHist = document.getElementById('agen-telefone')?.value?.trim() || '';
+            const nascimentoHist = document.getElementById('agen-nascimento')?.value || '';
             _agenUltimoAgendamento = {
                 nome, data, horario, pagamento,
                 telefone: telefoneHist,
+                nascimento: nascimentoHist,
                 codigoCancel: _agenUltimoCodigoCancel,
                 exames: (orcSelecionados || []).map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
             };
@@ -6443,7 +6445,23 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
                 showToast('Abrimos o WhatsApp para confirmar o cancelamento com a equipe.', 'info', 5000);
             }
-            if (reagendar) { fecharHistorico(); navigateTo('agendar'); }
+            if (reagendar) {
+                // Recarrega o orçamento (exames) e os dados do paciente desse
+                // agendamento — sem isso, a tela de agendamento pede pra fazer
+                // um orçamento do zero antes de deixar escolher a nova data.
+                orcSelecionados = (item.exames || []).map(e => {
+                    const atual = orcTabelaExames.find(t => t.id === e.id);
+                    return atual ? { ...atual } : { id: e.id, nome: e.nome, preco: e.preco, codigo: '' };
+                });
+                orcRenderSelecionados();
+                fecharHistorico();
+                navigateTo('agendar');
+                document.getElementById('agen-nome').value = item.nome || '';
+                if (item.telefone) document.getElementById('agen-telefone').value = item.telefone;
+                if (item.nascimento) document.getElementById('agen-nascimento').value = item.nascimento;
+                agenAtualizarResumo();
+                showToast('Escolha a nova data e horário para reagendar.', 'info', 4000);
+            }
         }
 
         // =====================================================
