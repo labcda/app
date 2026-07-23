@@ -6235,7 +6235,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             showToast('Cancelando...', 'info', 8000);
             let cancelou = false;
             try {
-                const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
+                // Usa a URL do painel: é a implantação que tem a action cancelarPorDados
+                const resp = await fetch(CDA_PAINEL_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
