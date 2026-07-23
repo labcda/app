@@ -81,7 +81,7 @@
 
         /* Novo Estilo Fleury-like */
         .app-header {
-            background: linear-gradient(135deg, #0B4A38 0%, #159957 54%, #49BCBE 100%);
+            background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 54%, #49BCBE 100%);
             color: white;
             padding: 16px 18px;
             border-bottom-left-radius: 28px;
@@ -133,17 +133,39 @@
         }
 
         .main-card-promo {
-            background: #F8F8F8;
+            background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 55%, #49BCBE 100%);
             border-radius: 20px;
             padding: 20px;
             position: relative;
             margin-top: 20px;
-            border: 1px solid #EEEEEE;
+            border: none;
+            box-shadow: 0 14px 32px rgba(15,76,92,0.24);
+        }
+
+        /* Círculo decorativo — clipado pelo próprio raio via um wrapper interno
+           (não pode usar overflow:hidden no card, pois o badge "Acesse a conta"
+           precisa escapar por cima dele). */
+        .main-card-promo-clip {
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .main-card-promo-clip::before {
+            content: '';
+            position: absolute;
+            right: -30px;
+            top: -45px;
+            width: 170px;
+            height: 170px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 50%;
         }
 
         .dark .main-card-promo {
-            background: #1E293B;
-            border-color: #334155;
+            background: linear-gradient(135deg, #0F4C5C 0%, #1a7a7c 55%, #49BCBE 100%);
+            border: none;
         }
 
         .dark .termos-box {
@@ -154,7 +176,7 @@
         }
 
         .main-card-promo .badge {
-            background: linear-gradient(135deg, #0B4A38, #159957);
+            background: linear-gradient(135deg, #0F4C5C, #49BCBE);
             color: white;
             font-size: 10px;
             font-weight: 700;
@@ -226,6 +248,27 @@
 
         .dark .action-item:active {
             background: #273549;
+        }
+
+        /* Card de ação em destaque (ação principal) — fundo turquesa sólido,
+           ícone e texto em branco, igual ao cartão de destaque da referência. */
+        .action-item-featured {
+            background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 55%, #49BCBE 100%) !important;
+            border: none !important;
+            box-shadow: 0 12px 28px rgba(15,76,92,0.30) !important;
+        }
+        .action-item-featured .action-item-title { color: #fff !important; }
+        .action-item-featured .action-item-sub { color: rgba(255,255,255,0.78) !important; }
+        .action-item-featured i {
+            background: rgba(255,255,255,0.18) !important;
+            color: #fff !important;
+        }
+        .action-item-featured:hover i,
+        .action-item-featured:focus-visible i {
+            background: rgba(255,255,255,0.28) !important;
+        }
+        .dark .action-item-featured {
+            background: linear-gradient(135deg, #0F4C5C 0%, #1a7a7c 55%, #49BCBE 100%) !important;
         }
 
         .action-item-title {
@@ -457,7 +500,7 @@
 
         /* ===== HERO MODERNO ===== */
         .hero-modern {
-            background: linear-gradient(135deg, #0B4A38 0%, #159957 40%, #49BCBE 100%);
+            background: linear-gradient(135deg, #0F4C5C 0%, #1a7a7c 40%, #49BCBE 100%);
             border-radius: 32px;
             position: relative;
             overflow: hidden;
@@ -719,7 +762,7 @@
 
         /* Cabeçalho: gradiente vivo + brilho varrendo */
         .app-header {
-            background: linear-gradient(120deg, #0B4A38 0%, #159957 40%, #49BCBE 70%, #0B4A38 100%);
+            background: linear-gradient(120deg, #0F4C5C 0%, #37A7AA 40%, #49BCBE 70%, #0F4C5C 100%);
             background-size: 240% 240%;
             animation: headerGradient 16s ease-in-out infinite;
         }
@@ -908,7 +951,7 @@
 
         /* Guia de Exames CDA */
         .guia-hero {
-            background: linear-gradient(135deg, #0B4A38 0%, #159957 62%, #49BCBE 100%);
+            background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 62%, #49BCBE 100%);
             border-radius: 26px;
             padding: 22px;
             color: white;
@@ -983,7 +1026,7 @@
         }
         /* ===== BOTÃO INSTALAR APP ===== */
         .instalar-btn {
-            background: linear-gradient(135deg, #0B4A38 0%, #159957 50%, #49BCBE 100%);
+            background: linear-gradient(135deg, #0F4C5C 0%, #1a7a7c 50%, #49BCBE 100%);
             border: none;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1272,7 +1315,7 @@
     <!-- TERMO DE USO E PRIVACIDADE (LGPD) — exibido na primeira abertura -->
     <div id="termosOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;">
         <div class="termos-box" style="background:#fff;border-radius:24px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
-            <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%);padding:20px 24px;color:#fff;flex-shrink:0;">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);padding:20px 24px;color:#fff;flex-shrink:0;">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <i class="fa-solid fa-shield-halved" style="font-size:1.5rem;"></i>
                     <div>
@@ -1342,7 +1385,7 @@
     <!-- MODAL HISTÓRICO DE ORÇAMENTOS/AGENDAMENTOS -->
     <div id="historicoOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(15,23,42,0.72);align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)fecharHistorico()">
         <div class="termos-box" style="background:#fff;border-radius:24px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
-            <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%);padding:18px 22px;color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);padding:18px 22px;color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <i class="fa-solid fa-clock-rotate-left" style="font-size:1.3rem;"></i>
                     <p style="font-weight:800;font-size:1rem;">Meu Histórico</p>
@@ -1422,11 +1465,12 @@
 
                 <!-- CARD ACESSE A CONTA -->
                 <div class="main-card-promo anim-in" style="animation-delay: 0.1s">
+                    <div class="main-card-promo-clip"></div>
                     <span class="badge">Acesse a conta</span>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between relative">
                         <div class="flex-1">
-                            <h3 class="text-slate-700 dark:text-slate-300 font-bold text-lg leading-tight">Acompanhe exames, resultados e mais</h3>
-                            <button onclick="navigateTo('perfil')" class="text-cda-primary font-bold mt-2 flex items-center gap-1">
+                            <h3 class="text-white font-bold text-lg leading-tight">Acompanhe exames, resultados e mais</h3>
+                            <button onclick="navigateTo('perfil')" class="text-white font-bold mt-3 flex items-center gap-1.5 bg-white/15 border border-white/25 px-3.5 py-1.5 rounded-full text-sm w-fit">
                                 Entrar <i class="fa-solid fa-chevron-right text-[10px]"></i>
                             </button>
                         </div>
@@ -1435,10 +1479,10 @@
                             <style>
                                 .dna-helix { position: relative; width: 56px; height: 92px; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 0; }
                                 .dna-par { position: relative; height: 8px; }
-                                .dna-fio { position: absolute; top: 3px; left: 4px; right: 4px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #49BCBE, #0F4C5C); opacity: 0.45; animation: dnaFio 2.4s ease-in-out infinite; }
+                                .dna-fio { position: absolute; top: 3px; left: 4px; right: 4px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.35)); opacity: 0.55; animation: dnaFio 2.4s ease-in-out infinite; }
                                 .dna-b1, .dna-b2 { position: absolute; top: 0; left: 0; width: 8px; height: 8px; border-radius: 50%; animation: dnaBase 2.4s ease-in-out infinite; }
-                                .dna-b1 { background: #49BCBE; }
-                                .dna-b2 { background: #0F4C5C; animation-name: dnaBase2; }
+                                .dna-b1 { background: #FFFFFF; }
+                                .dna-b2 { background: #A7F3F4; animation-name: dnaBase2; }
                                 @keyframes dnaBase {
                                     0%, 100% { transform: translateX(0) scale(1); z-index: 2; }
                                     25%      { transform: translateX(24px) scale(0.62); opacity: 0.55; }
@@ -1478,7 +1522,7 @@
 
                 <!-- GRID DE AÇÕES -->
                 <div class="grid-actions anim-in" style="animation-delay: 0.3s">
-                    <div onclick="navigateTo('orcamento')" class="action-item">
+                    <div onclick="navigateTo('orcamento')" class="action-item action-item-featured">
                         <i class="fa-regular fa-calendar-check text-cda-primary"></i>
                         <div>
                             <p class="action-item-title">Agendamento/Orçamento</p>
@@ -1792,7 +1836,7 @@
         <section id="page-orcamento" class="page space-y-5">
 
             <!-- HERO -->
-            <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10">
                     <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
@@ -1902,7 +1946,7 @@
                 <!-- CARD DE DESCONTOS -->
                 <div id="orc-desconto-card" class="hidden mb-4 rounded-2xl overflow-hidden border border-cda-primary/20">
                     <!-- Header do card -->
-                    <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%)" class="px-4 py-3 text-white">
+                    <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%)" class="px-4 py-3 text-white">
                         <p class="text-xs font-extrabold uppercase tracking-wider opacity-80 mb-1">💙 Laboratório CDA</p>
                         <p class="text-sm font-bold leading-snug">Pacientes com convênio ou Cartão Fidelidade CDA têm descontos especiais!</p>
                     </div>
@@ -1997,7 +2041,7 @@
         <!-- OUTRAS PÁGINAS (Mantidas as correções anteriores) -->
         <section id="page-perfil" class="page space-y-6">
             <!-- HERO PERFIL -->
-            <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10 flex items-center gap-4">
                     <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -2040,7 +2084,7 @@
 
             <!-- CARTÃO FIDELIDADE DIGITAL -->
             <div class="card-cda p-0 overflow-hidden">
-                <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 55%,#49BCBE 100%);padding:22px;color:#fff;position:relative;overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 55%,#49BCBE 100%);padding:22px;color:#fff;position:relative;overflow:hidden;">
                     <div style="position:absolute;right:-40px;bottom:-60px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,0.10);pointer-events:none;"></div>
                     <div class="relative z-10">
                         <div class="flex items-center justify-between mb-4">
@@ -2083,7 +2127,7 @@
 
         <section id="page-preparo" class="page space-y-6">
             <!-- HERO PREPARO -->
-            <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10">
                     <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
@@ -2112,7 +2156,7 @@
         <section id="page-agendar" class="page space-y-5">
 
             <!-- HERO -->
-            <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10">
                     <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
@@ -2397,7 +2441,7 @@
         <!-- CONVÊNIOS -->
         <section id="page-convenios" class="page space-y-5">
             <!-- HERO -->
-            <div style="background:linear-gradient(135deg,#0B4A38 0%,#159957 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10">
                     <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
@@ -6318,7 +6362,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             })).slice(0, 3);
             banner.classList.remove('hidden');
             banner.innerHTML =
-                '<div class="anim-in" style="background:linear-gradient(135deg,#0B4A38,#159957);border-radius:22px;padding:18px;color:#fff;margin-bottom:18px;box-shadow:0 12px 30px rgba(15,76,92,0.25);">' +
+                '<div class="anim-in" style="background:linear-gradient(135deg,#0F4C5C,#37A7AA);border-radius:22px;padding:18px;color:#fff;margin-bottom:18px;box-shadow:0 12px 30px rgba(15,76,92,0.25);">' +
                     '<div class="flex items-center gap-2 mb-2">' +
                         '<span style="background:rgba(255,255,255,0.2);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;letter-spacing:1px;">' + rotulo + '</span>' +
                         '<p class="font-extrabold text-sm">Sua coleta às ' + escapeHtml(ag.horario || '') + '</p>' +
