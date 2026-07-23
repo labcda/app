@@ -1431,29 +1431,45 @@
                             </button>
                         </div>
                         <div class="w-24 flex items-center justify-center">
-                            <!-- Ilustração própria Lab CDA — microscópio vetorial -->
-                            <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 float-slow" aria-hidden="true">
-                                <!-- base -->
-                                <ellipse cx="48" cy="82" rx="28" ry="6" fill="#D1F5F5" opacity="0.7"/>
-                                <!-- haste vertical -->
-                                <rect x="44" y="34" width="8" height="38" rx="4" fill="#37A7AA"/>
-                                <!-- braço horizontal -->
-                                <rect x="30" y="34" width="36" height="8" rx="4" fill="#49BCBE"/>
-                                <!-- ocular (topo) -->
-                                <rect x="44" y="16" width="8" height="22" rx="4" fill="#0F4C5C"/>
-                                <circle cx="48" cy="14" r="6" fill="#0F4C5C"/>
-                                <circle cx="48" cy="14" r="3" fill="#7EE8EA"/>
-                                <!-- lente objetiva -->
-                                <rect x="42" y="58" width="12" height="14" rx="4" fill="#0F4C5C"/>
-                                <circle cx="48" cy="74" r="5" fill="#49BCBE"/>
-                                <circle cx="48" cy="74" r="2.5" fill="#7EE8EA" opacity="0.7"/>
-                                <!-- platina / amostra -->
-                                <rect x="28" y="52" width="20" height="4" rx="2" fill="#37A7AA"/>
-                                <!-- brilhos decorativos -->
-                                <circle cx="70" cy="28" r="3" fill="#49BCBE" opacity="0.4"/>
-                                <circle cx="76" cy="42" r="2" fill="#49BCBE" opacity="0.25"/>
-                                <circle cx="22" cy="60" r="2" fill="#49BCBE" opacity="0.3"/>
-                            </svg>
+                            <!-- DNA dupla hélice animada — Lab CDA -->
+                            <style>
+                                .dna-helix { position: relative; width: 56px; height: 92px; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 0; }
+                                .dna-par { position: relative; height: 8px; }
+                                .dna-fio { position: absolute; top: 3px; left: 4px; right: 4px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #49BCBE, #0F4C5C); opacity: 0.45; animation: dnaFio 2.4s ease-in-out infinite; }
+                                .dna-b1, .dna-b2 { position: absolute; top: 0; left: 0; width: 8px; height: 8px; border-radius: 50%; animation: dnaBase 2.4s ease-in-out infinite; }
+                                .dna-b1 { background: #49BCBE; }
+                                .dna-b2 { background: #0F4C5C; animation-name: dnaBase2; }
+                                @keyframes dnaBase {
+                                    0%, 100% { transform: translateX(0) scale(1); z-index: 2; }
+                                    25%      { transform: translateX(24px) scale(0.62); opacity: 0.55; }
+                                    50%      { transform: translateX(48px) scale(1); }
+                                    75%      { transform: translateX(24px) scale(1.18); opacity: 1; }
+                                }
+                                @keyframes dnaBase2 {
+                                    0%, 100% { transform: translateX(48px) scale(1); }
+                                    25%      { transform: translateX(24px) scale(1.18); opacity: 1; }
+                                    50%      { transform: translateX(0) scale(1); }
+                                    75%      { transform: translateX(24px) scale(0.62); opacity: 0.55; }
+                                }
+                                @keyframes dnaFio {
+                                    0%, 50%, 100% { transform: scaleX(1); opacity: 0.45; }
+                                    25%, 75%      { transform: scaleX(0.12); opacity: 0.25; }
+                                }
+                                @media (prefers-reduced-motion: reduce) {
+                                    .dna-b1, .dna-b2, .dna-fio { animation: none; }
+                                    .dna-b2 { transform: translateX(48px); }
+                                }
+                            </style>
+                            <div class="dna-helix" aria-hidden="true">
+                                <div class="dna-par" style="--i:0"><div class="dna-fio" style="animation-delay:-0.00s"></div><div class="dna-b1" style="animation-delay:-0.00s"></div><div class="dna-b2" style="animation-delay:-0.00s"></div></div>
+                                <div class="dna-par"><div class="dna-fio" style="animation-delay:-0.24s"></div><div class="dna-b1" style="animation-delay:-0.24s"></div><div class="dna-b2" style="animation-delay:-0.24s"></div></div>
+                                <div class="dna-par"><div class="dna-fio" style="animation-delay:-0.48s"></div><div class="dna-b1" style="animation-delay:-0.48s"></div><div class="dna-b2" style="animation-delay:-0.48s"></div></div>
+                                <div class="dna-par"><div class="dna-fio" style="animation-delay:-0.72s"></div><div class="dna-b1" style="animation-delay:-0.72s"></div><div class="dna-b2" style="animation-delay:-0.72s"></div></div>
+                                <div class="dna-par"><div class="dna-fio" style="animation-delay:-0.96s"></div><div class="dna-b1" style="animation-delay:-0.96s"></div><div class="dna-b2" style="animation-delay:-0.96s"></div></div>
+                                <div class="dna-par"><div class="dna-fio" style="animation-delay:-1.20s"></div><div class="dna-b1" style="animation-delay:-1.20s"></div><div class="dna-b2" style="animation-delay:-1.20s"></div></div>
+                                <div class="dna-par"><div class="dna-fio" style="animation-delay:-1.44s"></div><div class="dna-b1" style="animation-delay:-1.44s"></div><div class="dna-b2" style="animation-delay:-1.44s"></div></div>
+                                <div class="dna-par"><div class="dna-fio" style="animation-delay:-1.68s"></div><div class="dna-b1" style="animation-delay:-1.68s"></div><div class="dna-b2" style="animation-delay:-1.68s"></div></div>
+                            </div>
                         </div>
                     </div>
                 </div>
