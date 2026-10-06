@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v4'; // Incrementado para forçar atualização
+const CACHE_NAME = 'pwa-cache-v5'; // v5: token novo (segurança) — força a atualização do app
 const ASSETS = [
   './',
   './index.html',
