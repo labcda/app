@@ -5654,6 +5654,24 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             return idade;
         }
 
+        // Leitura da agenda: dispara até 3 tentativas escalonadas e usa a primeira resposta válida (o servidor do Google
+        // às vezes demora 20-30 s). Antes o app desistia em 8-10 s e o paciente via erro mesmo com a agenda funcionando.
+        function agendaGetJSON(url, limiteMs) {
+            limiteMs = limiteMs || 45000;
+            return new Promise((resolve, reject) => {
+                const ctrls = []; let fim = false, pend = 0, lancadas = 0;
+                const encerrar = (fn, vencedor) => { if (fim) return; fim = true; clearTimeout(geral); ctrls.forEach(c => { if (c !== vencedor) { try { c.abort(); } catch (e) {} } }); fn(); };
+                const geral = setTimeout(() => encerrar(() => reject(new Error('tempo esgotado'))), limiteMs);
+                const lancar = () => {
+                    if (fim || lancadas >= 3) return; lancadas++; pend++;
+                    const c = new AbortController(); ctrls.push(c);
+                    fetch(url, { method: 'GET', redirect: 'follow', signal: c.signal }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                        .then(j => { pend--; encerrar(() => resolve(j), c); })
+                        .catch(e => { pend--; if (!fim && pend === 0 && lancadas >= 3) encerrar(() => reject(e)); else if (!fim && pend === 0) lancar(); });
+                };
+                lancar(); setTimeout(lancar, 600); setTimeout(lancar, 1400);
+            });
+        }
         function agenIsDiaUtil(dataStr) {
             const [y,m,d] = dataStr.split('-').map(Number);
             const dia = new Date(y, m-1, d).getDay();
@@ -5711,12 +5729,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             let ocupados = [];
             let agendaOk = false;
             try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 10000);
                 const url = APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
-                const resp = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
-                clearTimeout(timeout);
-                const json = await resp.json();
+                const json = await agendaGetJSON(url);
                 ocupados = Array.isArray(json.ocupados) ? json.ocupados.map(h => String(h).trim()) : [];
                 agendaOk = true;
             } catch(err) { console.warn('Agenda indisponível:', err); }
@@ -5911,11 +5925,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             try {
                 // Confere de novo bem antes de salvar — evita que dois pacientes
                 // reservem o mesmo horário quase ao mesmo tempo.
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 8000);
-                const checkResp = await fetch(APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN), { signal: controller.signal });
-                clearTimeout(timeout);
-                const checkJson = await checkResp.json();
+                const checkJson = await agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN));
                 const ocupadosCheck = Array.isArray(checkJson.ocupados)
                     ? checkJson.ocupados.map(h => { const p = String(h).trim().split(':'); return p.length >= 2 ? String(parseInt(p[0])).padStart(2,'0') + ':' + p[1].padStart(2,'0') : String(h).trim(); })
                     : [];
@@ -6241,15 +6251,14 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
             const chave = localStorage.getItem('patient_key');
             if (chave) { const el = document.getElementById('prof-chave'); if (el) el.value = chave; }
-            const senha = localStorage.getItem('patient_password');
-            if (senha) { const el = document.getElementById('prof-senha'); if (el) el.value = senha; }
+            // A senha dos resultados NÃO fica mais guardada no aparelho (segurança); apaga a que existia de versões anteriores.
+            try { localStorage.removeItem('patient_password'); } catch (e) {}
         }
 
         function saveProfile(e) {
             e.preventDefault();
             localStorage.setItem('patient_name', document.getElementById('prof-nome').value);
             localStorage.setItem('patient_key', document.getElementById('prof-chave').value);
-            localStorage.setItem('patient_password', document.getElementById('prof-senha').value);
             loadProfile();
             showToast('Dados salvos com sucesso!', 'success');
             navigateTo('home');
