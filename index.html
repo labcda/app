@@ -1243,6 +1243,18 @@
         #cda-toast.toast-success { background: #065F46; }
         #cda-toast.toast-info { background: #0F4C5C; }
         /* ===== AGENDAMENTO ===== */
+        .agen-cal { background:#F8FAFC; border-radius:16px; padding:12px; }
+        .dark .agen-cal { background:#334155; }
+        .agen-cal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-weight:800; font-size:.9rem; }
+        .agen-cal-head button { width:34px; height:34px; border-radius:10px; border:0; background:rgba(15,76,92,.08); color:#0F4C5C; cursor:pointer; }
+        .agen-cal-dow, .agen-cal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+        .agen-cal-dow span { text-align:center; font-size:.62rem; font-weight:800; text-transform:uppercase; color:#94A3B8; margin-bottom:4px; }
+        .agen-cal-d { height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.85rem; background:#fff; border:1px solid rgba(0,0,0,.06); cursor:pointer; color:#0F172A; }
+        .dark .agen-cal-d { background:#1E293B; color:#E2E8F0; }
+        .agen-cal-d.vazio { visibility:hidden; cursor:default; }
+        .agen-cal-d.off { background:transparent; color:#CBD5E1; border-color:transparent; cursor:not-allowed; }
+        .agen-cal-d.hoje { box-shadow:0 0 0 2px #37A7AA inset; }
+        .agen-cal-d.sel { background:#0F4C5C; color:#fff; border-color:transparent; }
         .agen-periodo-btn.ativo {
             border-color: #49BCBE;
             background: #E8F8F8;
@@ -1329,6 +1341,7 @@
 
                 <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">1. Sobre os dados armazenados neste aplicativo</p>
                 <p>Para sua conveniência, este aplicativo pode armazenar <strong>localmente, apenas no seu próprio celular ou computador</strong>, dados como nome, telefone, protocolo, chave de acesso e senha de resultados, entre outras informações que você optar por inserir. Esses dados <strong>não ficam salvos em nossos servidores</strong> — permanecem apenas no navegador/dispositivo que você está usando.</p>
+                <p style="margin-top:8px;"><strong>Exceção — agendamento:</strong> quando você agenda uma coleta, seu nome, telefone, data de nascimento (e o endereço, se pedir coleta em casa) são enviados ao Laboratório CDA, <strong>somente para realizar seu atendimento e entrar em contato</strong>. No laboratório esses dados ficam <strong>cifrados</strong>, só a equipe autorizada os acessa e cada consulta é registrada, conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018). Você pode pedir correção ou exclusão pelo WhatsApp (27) 99898-0658.</p>
 
                 <p style="font-weight:800;margin-top:14px;margin-bottom:4px;">2. Você não é obrigado a fornecer seus dados</p>
                 <p>O preenchimento de qualquer campo com dados pessoais é <strong>inteiramente opcional</strong>. Você pode usar as funcionalidades básicas do aplicativo, como o simulador de orçamento, sem informar nome, protocolo, chave ou senha. Se você optar por preencher esses dados, isso é feito por sua conta e risco, para fins de conveniência (preenchimento automático e acesso mais rápido aos seus resultados).</p>
@@ -2234,6 +2247,34 @@
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                         <p class="text-[10px] text-slate-400 mt-1 ml-1">Exigida pelo sistema do laboratório para o cadastro do paciente.</p>
                     </div>
+                    <label class="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 rounded-xl px-3.5 py-3 cursor-pointer">
+                        <input type="checkbox" id="agen-lgpd" class="mt-0.5" onchange="agenAtualizarResumo()">
+                        <span><i class="fa-solid fa-lock text-cda-primary mr-1"></i><b>Privacidade (LGPD):</b> concordo que o Laboratório CDA use meu telefone, data de nascimento e endereço (se houver) somente para realizar meu atendimento e entrar em contato comigo. Esses dados ficam <b>cifrados</b>, só a equipe autorizada acessa e cada consulta é registrada. Posso pedir correção ou exclusão pelo WhatsApp (27) 99898-0658. <a href="#" onclick="lgpdApagarDadosAparelho();return false" class="text-cda-primary underline">Apagar meus dados deste aparelho</a></span>
+                    </label>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                            <i class="fa-solid fa-location-dot text-cda-primary mr-1"></i> Onde será a coleta?
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="agen-tipo-lab" onclick="agenSelecionarTipo('laboratorio')"
+                                class="agen-periodo-btn ativo flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
+                                <i class="fa-solid fa-flask-vial text-xl"></i><span>No laboratório</span>
+                            </button>
+                            <button type="button" id="agen-tipo-dom" onclick="agenSelecionarTipo('domiciliar')"
+                                class="agen-periodo-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
+                                <i class="fa-solid fa-house-medical text-xl"></i><span>Em casa</span>
+                                <span class="text-[10px] font-medium opacity-70">1 por dia · a partir das 9h</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="agen-endereco-wrap" class="hidden">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-solid fa-house text-cda-primary mr-1"></i> Endereço da coleta
+                        </label>
+                        <input type="text" id="agen-endereco" placeholder="Rua, número, bairro e ponto de referência" oninput="agenAtualizarResumo()"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                        <p class="text-[10px] text-slate-400 mt-1 ml-1">A coleta em domicílio é feita em dias úteis, a partir das 9h, e há apenas 1 por dia.</p>
+                    </div>
                 </div>
             </div>
 
@@ -2248,9 +2289,17 @@
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data da coleta
                         </label>
-                        <input type="date" id="agen-data"
-                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
-                            onchange="agenOnDataChange()">
+                        <input type="date" id="agen-data" class="hidden" onchange="agenOnDataChange()">
+                        <div class="agen-cal">
+                            <div class="agen-cal-head">
+                                <button type="button" onclick="agenCalNav(-1)" aria-label="Mês anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                                <span id="agen-cal-mes-label"></span>
+                                <button type="button" onclick="agenCalNav(1)" aria-label="Próximo mês"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                            <div class="agen-cal-dow"><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span></div>
+                            <div class="agen-cal-grid" id="agen-cal-grid"></div>
+                            <p class="text-[10px] text-slate-400 mt-2">Sábado e domingo: sem expediente. Dias em cinza não estão disponíveis.</p>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
@@ -5628,7 +5677,61 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
         const SLOTS_TARDE = ['14:30','15:10','15:50'];
 
-        let agenState = { data: null, periodo: null, horario: null };
+        const SLOTS_DOM_MANHA = ['09:30','10:10','10:50'];   // coleta em casa: somente a partir das 9h
+        const DOM_HORA_MINIMA = '09:00';
+        let agenState = { data: null, periodo: null, horario: null, tipo: 'laboratorio' };
+        let agenCalRef = new Date();
+        let agenDomDias = {};           // 'YYYY-MM-DD' -> true: dias que já têm coleta em casa (só 1 por dia)
+        let _agenReagendandoApp = null; // agendamento antigo que só é cancelado depois que o novo for salvo
+
+        const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+        function agenCalRender() {
+            const grid = document.getElementById('agen-cal-grid'), label = document.getElementById('agen-cal-mes-label');
+            if (!grid || !label) return;
+            const ano = agenCalRef.getFullYear(), mes = agenCalRef.getMonth();
+            label.textContent = MESES_PT[mes] + ' de ' + ano;
+            const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+            const sel = agenState.data ? agenState.data.split('-').map(Number) : null;
+            let html = '', primeiro = true;
+            for (let d = 1; d <= diasNoMes; d++) {
+                const dt = new Date(ano, mes, d), dow = dt.getDay();
+                if (dow === 0 || dow === 6) continue;   // sem expediente no fim de semana
+                if (primeiro) { for (let i = 1; i < dow; i++) html += '<div class="agen-cal-d vazio"></div>'; primeiro = false; }
+                const iso = ano + '-' + String(mes + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+                const feriado = FERIADOS_NACIONAIS.includes(String(mes + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'));
+                const domCheio = agenState.tipo === 'domiciliar' && agenDomDias[iso];
+                const off = dt < hoje || feriado || domCheio;
+                const ehHoje = dt.getTime() === hoje.getTime(), ehSel = sel && sel[0] === ano && sel[1] === mes + 1 && sel[2] === d;
+                html += '<div class="agen-cal-d' + (off ? ' off' : '') + (ehHoje ? ' hoje' : '') + (ehSel ? ' sel' : '') + '"' + (off ? '' : ' onclick="agenCalEscolher(' + ano + ',' + mes + ',' + d + ')"') + (domCheio ? ' title="Já existe uma coleta em casa neste dia"' : '') + '>' + d + '</div>';
+            }
+            grid.innerHTML = html;
+        }
+        function agenCalNav(delta) { agenCalRef = new Date(agenCalRef.getFullYear(), agenCalRef.getMonth() + delta, 1); agenCalRender(); if (agenState.tipo === 'domiciliar') agenCarregarDomiciliares(); }
+        function agenCalEscolher(ano, mes, dia) {
+            const inp = document.getElementById('agen-data');
+            inp.value = ano + '-' + String(mes + 1).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
+            agenOnDataChange(); agenCalRender();
+        }
+        async function agenCarregarDomiciliares() {
+            const mes = agenCalRef.getFullYear() + '-' + String(agenCalRef.getMonth() + 1).padStart(2, '0');
+            try {
+                const json = await agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listarDiasDomiciliar&mes=' + mes + '&token=' + encodeURIComponent(CDA_TOKEN));
+                (json.dias || []).forEach(d => { agenDomDias[d] = true; });
+                agenCalRender();
+            } catch (e) { console.warn('Dias de coleta em casa indisponíveis:', e); }
+        }
+        function agenSelecionarTipo(tipo) {
+            agenState.tipo = tipo;
+            document.getElementById('agen-tipo-lab')?.classList.toggle('ativo', tipo === 'laboratorio');
+            document.getElementById('agen-tipo-dom')?.classList.toggle('ativo', tipo === 'domiciliar');
+            document.getElementById('agen-endereco-wrap')?.classList.toggle('hidden', tipo !== 'domiciliar');
+            const inp = document.getElementById('agen-data'); if (inp) inp.value = '';
+            agenState.data = null; agenState.horario = null;
+            ['manha','tarde'].forEach(p => document.getElementById('agen-btn-' + p)?.classList.remove('ativo')); agenState.periodo = null;
+            agenEsconderHorarios(); agenCalRender(); agenAtualizarResumo();
+            if (tipo === 'domiciliar') agenCarregarDomiciliares();
+        }
 
         function agenInicializar() {
             const inp = document.getElementById('agen-data');
@@ -5636,9 +5739,13 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const hoje = new Date();
             inp.min = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
             inp.value = '';
-            agenState = { data: null, periodo: null, horario: null };
+            agenState = { data: null, periodo: null, horario: null, tipo: 'laboratorio' };
+            agenCalRef = new Date(); agenDomDias = {};
+            document.getElementById('agen-tipo-lab')?.classList.add('ativo'); document.getElementById('agen-tipo-dom')?.classList.remove('ativo');
+            document.getElementById('agen-endereco-wrap')?.classList.add('hidden');
             ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
             agenEsconderHorarios();
+            agenCalRender();
             agenAtualizarResumo();
             const nome = localStorage.getItem('patient_name');
             if (nome) document.getElementById('agen-nome').value = nome;
@@ -5717,7 +5824,8 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         async function agenBuscarHorarios() {
             const { data, periodo } = agenState;
             if (!data || !periodo) return;
-            const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
+            const domiciliar = agenState.tipo === 'domiciliar';
+            const slots = periodo === 'manha' ? (domiciliar ? SLOTS_DOM_MANHA : SLOTS_MANHA) : SLOTS_TARDE;
 
             ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio']
                 .forEach(id => document.getElementById(id)?.classList.add('hidden'));
@@ -5732,6 +5840,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const url = APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
                 const json = await agendaGetJSON(url);
                 ocupados = Array.isArray(json.ocupados) ? json.ocupados.map(h => String(h).trim()) : [];
+                if (json.domiciliarDia) agenDomDias[data] = true;
                 agendaOk = true;
             } catch(err) { console.warn('Agenda indisponível:', err); }
 
@@ -5742,7 +5851,13 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 if (partes.length < 2) return h;
                 return String(parseInt(partes[0])).padStart(2,'0') + ':' + partes[1].padStart(2,'0');
             }
-            const ocupadosNorm = ocupados.map(normalizarHora);
+            // Coleta em casa não usa as vagas do laboratório e só pode haver 1 por dia
+            const ocupadosNorm = domiciliar ? [] : ocupados.map(normalizarHora);
+            if (domiciliar && agenDomDias[data]) {
+                const vz = document.getElementById('agen-horarios-vazio'); vz?.classList.remove('hidden');
+                const tt = vz?.querySelector('p'); if (tt) tt.textContent = 'Já existe uma coleta em casa neste dia';
+                agenCalRender(); return;
+            }
             const agora = new Date();
             const [selY, selM, selD] = data.split('-').map(Number);
             const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
@@ -5760,6 +5875,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 showToast('Não foi possível confirmar a agenda em tempo real agora. Tente novamente em instantes.', 'error', 5000);
             }
 
+            { const vz0 = document.getElementById('agen-horarios-vazio'); const t0 = vz0?.querySelector('p'); if (t0) t0.textContent = 'Sem horários disponíveis'; }
             if (!disponiveis.length) {
                 document.getElementById('agen-horarios-vazio')?.classList.remove('hidden');
                 return;
@@ -5832,13 +5948,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 pagamentoWrap?.classList.add('hidden');
             }
 
-            const pronto = data && periodo && horario && nome && telefoneResumo && validarTelefoneBR(telefoneResumo) && nascimentoResumo && temExames && pagamento;
+            const domOk = agenState.tipo !== 'domiciliar' || !!(document.getElementById('agen-endereco')?.value || '').trim();
+            const lgpdOk = !!document.getElementById('agen-lgpd')?.checked;
+            const pronto = data && periodo && horario && nome && telefoneResumo && validarTelefoneBR(telefoneResumo) && nascimentoResumo && temExames && pagamento && domOk && lgpdOk;
 
             if (pronto) {
                 const [y,m,d] = data.split('-').map(Number);
                 const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
                 document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
-                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario}`;
+                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario}` + (agenState.tipo === 'domiciliar' ? ' · coleta em casa' : '');
                 document.getElementById('agen-resumo-nome').textContent = nome;
 
                 const examesWrap = document.getElementById('agen-resumo-exames-wrap');
@@ -5898,6 +6016,12 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             if (!horario)   { showToast('Selecione o horário.', 'error'); return; }
             if (!temExames) { showToast('Faça o orçamento antes de agendar — selecione os exames na aba Orçamento.', 'error', 5000); return; }
             if (!pagamento) { showToast('Escolha a forma de pagamento.', 'error'); return; }
+            if (!document.getElementById('agen-lgpd')?.checked) { showToast('Para agendar, aceite o aviso de privacidade (LGPD).', 'error', 4500); return; }
+            if (agenState.tipo === 'domiciliar') {
+                if (!(document.getElementById('agen-endereco')?.value || '').trim()) { showToast('Informe o endereço da coleta em casa.', 'error'); return; }
+                if (horario < DOM_HORA_MINIMA) { showToast('A coleta em casa só pode ser agendada a partir das 9h.', 'error'); return; }
+                if (agenDomDias[data]) { showToast('Já existe uma coleta em casa nesse dia (só 1 por dia). Escolha outra data.', 'error', 5000); return; }
+            }
 
             const idade = calcularIdade(nascimento);
             if (idade < 18) {
@@ -5954,20 +6078,33 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 const nascFormatado = new Date(ny, nm - 1, nd).toLocaleDateString('pt-BR');
                 const idadeInfo = `\nData de nascimento: ${nascFormatado}\nIdade: ${calcularIdade(nascimento)} anos`;
                 const responsavelInfo = nomeResponsavel ? `\nResponsavel legal: ${nomeResponsavel.toUpperCase()}` : '';
+                const tipoInfo = agenState.tipo === 'domiciliar'
+                    ? '\nTipo de atendimento: COLETA DOMICILIAR\nEndereco da coleta: ' + (document.getElementById('agen-endereco')?.value || '').trim()
+                    : '\nTipo de atendimento: Laboratorio';
                 const levarInfo = '\nLevar: documento com foto e pedido medico (se tiver). Exame de urina/fezes: retirar coletores no laboratorio com antecedencia.';
 
                 const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
-                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone,
+                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, nascimento: nascFormatado,
                         pagamento, startTime: startDateTime, endTime: endDateTime,
                         usuario: 'APP',
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA\nCodigo de cancelamento: ${_agenUltimoCodigoCancel}${idadeInfo}${responsavelInfo}${levarInfo}${descExames}`,
+                        tipo: agenState.tipo === 'domiciliar' ? 'domiciliar' : 'laboratorio',
+                        endereco: agenState.tipo === 'domiciliar' ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
+                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA\nCodigo de cancelamento: ${_agenUltimoCodigoCancel}${tipoInfo}\nConsentimento LGPD: sim (${new Date().toLocaleString('pt-BR')})${idadeInfo}${responsavelInfo}${levarInfo}${descExames}`,
                         temOrcamento: '1'
                     })
                 });
                 const json = await resp.json();
+                if (json.regra || json.domiciliar_ocupado) {
+                    showToast(json.erro || 'Regra da coleta em casa não atendida.', 'error', 6000);
+                    if (json.domiciliar_ocupado) agenDomDias[data] = true;
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    agenState.horario = null; agenCalRender(); agenAtualizarResumo(); agenBuscarHorarios();
+                    return;
+                }
                 if (json.ocupado) {
                     showToast('O horário ' + horario + ' acabou de ser reservado. Escolha outro.', 'error', 5000);
                     btnSalvar.disabled = false;
@@ -5976,6 +6113,14 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     return;
                 }
                 if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
+                if (_agenReagendandoApp) {   // reagendamento: só agora o horário antigo é liberado
+                    const velho = _agenReagendandoApp; _agenReagendandoApp = null;
+                    try {
+                        const rc = await fetch(CDA_PAINEL_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'cancelarPorDados', token: CDA_TOKEN, data: velho.data, horario: velho.horario, nome: velho.nome, codigo: velho.codigoCancel || '' }) });
+                        const jc = await rc.json();
+                        if (jc.ok) { const lista = histLer(); if (lista[velho.idx]) { lista[velho.idx].status = 'CANCELADO'; histSalvar(lista); } }
+                    } catch (eC) { console.warn('[CDA] Não foi possível liberar o horário antigo:', eC); }
+                }
                 agenSucesso(nome, data, horario, pagamento);
             } catch(err) {
                 console.error('Erro agendamento:', err);
@@ -5990,6 +6135,16 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 statusEl.classList.remove('hidden');
                 agenFallbackWhatsApp(nome, telefone, data, horario, descExames);
             }
+        }
+
+        // LGPD: o paciente pode apagar do aparelho tudo o que o app guardou (nome, histórico com telefone e nascimento, etc.)
+        function lgpdApagarDadosAparelho() {
+            if (!confirm('Apagar do seu aparelho o histórico de agendamentos, o telefone e a data de nascimento guardados pelo app? Isso não cancela agendamentos já feitos.')) return;
+            ['cda_historico', 'patient_name', 'patient_key', 'patient_password', 'cda_ultimo_orcamento'].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+            ['agen-nome', 'agen-telefone', 'agen-nascimento', 'agen-endereco'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            const ck = document.getElementById('agen-lgpd'); if (ck) ck.checked = false;
+            agenAtualizarResumo();
+            showToast('Dados apagados deste aparelho.', 'success');
         }
 
         function agenSucesso(nome, data, horario, pagamento) {
@@ -6024,6 +6179,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 telefone: telefoneHist,
                 nascimento: nascimentoHist,
                 codigoCancel: _agenUltimoCodigoCancel,
+                tipo: agenState.tipo, endereco: agenState.tipo === 'domiciliar' ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
                 exames: (orcSelecionados || []).map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
             };
             histAdd('agendamento', _agenUltimoAgendamento);
@@ -6420,6 +6576,27 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             const msgConfirm = reagendar
                 ? 'Cancelar o agendamento de ' + dataBR + ' às ' + item.horario + ' para escolher um novo horário?'
                 : 'Tem certeza que deseja cancelar o agendamento de ' + dataBR + ' às ' + item.horario + '?';
+            if (reagendar) {
+                // Reagendar: NÃO cancela agora. Carrega os dados e o horário antigo só é liberado quando o novo for salvo.
+                if (!confirm('Vamos abrir o agendamento com seus dados para você escolher a nova data. O horário de ' + dataBR + ' às ' + item.horario + ' só será liberado quando você salvar o novo. Continuar?')) return;
+                _agenReagendandoApp = { idx: idx, data: item.data, horario: item.horario, nome: item.nome, codigoCancel: item.codigoCancel || '' };
+                orcSelecionados = (item.exames || []).map(e => {
+                    const atual = orcTabelaExames.find(t => t.id === e.id);
+                    return atual ? { ...atual } : { id: e.id, nome: e.nome, preco: e.preco, codigo: '' };
+                });
+                orcRenderSelecionados();
+                fecharHistorico();
+                navigateTo('agendar');
+                agenInicializar();
+                document.getElementById('agen-nome').value = item.nome || '';
+                if (item.telefone) document.getElementById('agen-telefone').value = item.telefone;
+                if (item.nascimento) document.getElementById('agen-nascimento').value = item.nascimento;
+                const ck = document.getElementById('agen-lgpd'); if (ck) ck.checked = true;
+                if (item.tipo === 'domiciliar') { agenSelecionarTipo('domiciliar'); const ei = document.getElementById('agen-endereco'); if (ei) ei.value = item.endereco || ''; }
+                agenAtualizarResumo();
+                showToast('Escolha a nova data e horário. O horário anterior continua reservado até você salvar.', 'info', 6000);
+                return;
+            }
             if (!confirm(msgConfirm)) return;
 
             showToast('Cancelando...', 'info', 8000);
