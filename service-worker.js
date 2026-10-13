@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v9'; // v9: histórico com orçamento agendado/em aberto e correção do histórico de agendamentos
+const CACHE_NAME = 'pwa-cache-v10'; // v10: zoom por pinça bloqueado
 const ASSETS = [
   './',
   './index.html',

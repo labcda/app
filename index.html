@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Laboratório CDA - Diagnóstico de Confiança</title>
     <link rel="manifest" href="manifest.webmanifest">
     <!-- Icones PWA: PNG oficial para evitar icone generico no iPhone -->
@@ -464,8 +464,9 @@
         .dark ::-webkit-scrollbar-track { background: #1E293B; }
         ::-webkit-scrollbar-thumb { background: var(--cda-primary); border-radius: 10px; }
         
-        /* Zoom por pinça sempre liberado (acessibilidade): permite rolar e dar zoom, sem travar gestos */
-        html, body { touch-action: pan-x pan-y pinch-zoom; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        /* Sem zoom por pinça nem toque duplo (comportamento de app): só rolagem. Campos com 16px evitam o zoom automático do iPhone ao digitar. */
+        html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        @media (pointer: coarse) { input, select, textarea { font-size: 16px !important; } }
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.5s ease-out; }
 
@@ -6993,5 +6994,11 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
     </script>
 
-    </body>
+        <script>
+        // Bloqueia o zoom por pinça (o iPhone ignora o viewport, por isso também é barrado aqui) e o zoom com Ctrl+rolagem
+        ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (ev) { document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false }); });
+        document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        document.addEventListener('wheel', function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+    </script>
+</body>
 </html>
