@@ -6193,7 +6193,16 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         function fecharModalSucessoAgendamento() {
             const overlay = document.getElementById('agendamentoSucessoOverlay');
             if (overlay) overlay.style.display = 'none';
-            if (_npsPendente) { _npsPendente = false; setTimeout(abrirNPS, 400); }
+            // Depois do agendamento (e da avaliação, se aparecer) o app volta para a tela inicial
+            _voltarInicioDepoisNPS = true;
+            if (_npsPendente) {
+                _npsPendente = false;
+                setTimeout(() => {
+                    abrirNPS();
+                    // abrirNPS não abre quando a pesquisa já foi respondida nos últimos 30 dias: nesse caso volta direto
+                    if (document.getElementById('npsOverlay').style.display !== 'flex') agenFinalizarVoltarInicio();
+                }, 400);
+            } else { agenFinalizarVoltarInicio(); }
         }
 
         function agenFallbackWhatsApp(nome, telefone, data, horario, descExames) {
@@ -6778,6 +6787,21 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         // =====================================================
         let _npsPendente = false;
         let _npsNota = null;
+        let _voltarInicioDepoisNPS = false;
+
+        // Limpa o formulário de agendamento e leva o paciente para a tela inicial
+        function agenFinalizarVoltarInicio() {
+            _voltarInicioDepoisNPS = false;
+            try {
+                const btn = document.getElementById('agen-btn-salvar');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento'; btn.classList.remove('opacity-50','pointer-events-none'); }
+                const ck = document.getElementById('agen-lgpd'); if (ck) ck.checked = false;
+                ['agen-endereco'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                agenInicializar();
+            } catch (e) { console.warn('[CDA] Reinício do agendamento:', e); }
+            navigateTo('home');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         function _npsMontarNotas() {
             const cont = document.getElementById('nps-notas');
@@ -6820,6 +6844,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         function fecharNPS(pular) {
             document.getElementById('npsOverlay').style.display = 'none';
             if (pular) { try { localStorage.setItem('cda_nps_ultimo', new Date().toISOString()); } catch(e) {} }
+            if (_voltarInicioDepoisNPS) agenFinalizarVoltarInicio();
         }
 
         async function enviarNPS() {

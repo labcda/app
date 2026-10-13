@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v7'; // v7: zoom por pinça liberado — força a atualização do app
+const CACHE_NAME = 'pwa-cache-v8'; // v8: volta para a tela inicial depois do agendamento e da avaliação
 const ASSETS = [
   './',
   './index.html',
