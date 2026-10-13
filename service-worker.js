@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v6'; // v6: agendamento novo (calendário, coleta em casa, LGPD) — força a atualização do app
+const CACHE_NAME = 'pwa-cache-v7'; // v7: zoom por pinça liberado — força a atualização do app
 const ASSETS = [
   './',
   './index.html',
