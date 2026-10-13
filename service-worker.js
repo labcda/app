@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v8'; // v8: volta para a tela inicial depois do agendamento e da avaliação
+const CACHE_NAME = 'pwa-cache-v9'; // v9: histórico com orçamento agendado/em aberto e correção do histórico de agendamentos
 const ASSETS = [
   './',
   './index.html',

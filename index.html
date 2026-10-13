@@ -5632,14 +5632,39 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 });
             } catch(e) { console.warn('[CDA] Erro ao registrar orçamento do app:', e); }
             // Histórico local (independe do sucesso do registro na planilha)
+            histGarantirOrcamento(acao || 'BAIXADO');
+        }
+
+        // Guarda o orçamento atual no histórico do aparelho, sem duplicar o mesmo orçamento (mesmos exames) nas últimas 6 horas.
+        function histAssinatura(exames) { return (exames || []).map(e => String(e.id !== undefined ? e.id : e.nome)).sort().join(','); }
+        function histGarantirOrcamento(acao) {
             try {
-                histAdd('orcamento', {
-                    paciente: localStorage.getItem('patient_name') || '',
-                    acao: acao || 'BAIXADO',
-                    total: orcSelecionados.reduce((s, e) => s + (parseFloat(e.preco) || 0), 0),
-                    exames: orcSelecionados.map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
-                });
+                if (!orcSelecionados || !orcSelecionados.length) return;
+                const exames = orcSelecionados.map(e => ({ id: e.id, nome: e.nome, preco: e.preco }));
+                const total = orcSelecionados.reduce((s, e) => s + (parseFloat(e.preco) || 0), 0), sig = histAssinatura(exames);
+                const lista = histLer();
+                const i = lista.findIndex(x => x.tipo === 'orcamento' && histAssinatura(x.exames) === sig && (Date.now() - new Date(x.quando).getTime()) < 6 * 3600 * 1000);
+                if (i >= 0) { lista[i].total = total; lista[i].acao = acao || lista[i].acao; histSalvar(lista); return; }
+                histAdd('orcamento', { paciente: localStorage.getItem('patient_name') || '', acao: acao || 'BAIXADO', total: total, exames: exames });
             } catch(e) {}
+        }
+        // O orçamento já virou agendamento? (agendamento ativo, com os mesmos exames, feito depois do orçamento)
+        function histAgendamentoDoOrcamento(orc, lista) {
+            const sig = histAssinatura(orc.exames), t0 = new Date(orc.quando).getTime() - 60000;
+            return (lista || histLer()).find(x => x.tipo === 'agendamento' && x.status !== 'CANCELADO' && new Date(x.quando).getTime() >= t0 && histAssinatura(x.exames) === sig) || null;
+        }
+        // Do histórico: carrega o orçamento e abre o agendamento
+        function histAgendarOrcamento(idx) {
+            const item = histLer()[idx];
+            if (!item || item.tipo !== 'orcamento') return;
+            orcSelecionados = (item.exames || []).map(e => {
+                const atual = orcTabelaExames.find(t => t.id === e.id);
+                return atual ? { ...atual } : { id: e.id, nome: e.nome, preco: e.preco, codigo: '' };
+            });
+            orcRenderSelecionados();
+            fecharHistorico();
+            orcIrParaAgendamento();
+            showToast('Escolha a data e o horário para agendar este orçamento.', 'info', 4500);
         }
 
         async function salvarAppAgendamento(nome, data, horario, pagamento) {
@@ -6150,6 +6175,19 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         function agenSucesso(nome, data, horario, pagamento) {
+            // 1º de tudo: guarda no histórico do aparelho (orçamento + agendamento), antes de qualquer outra coisa que possa falhar
+            try {
+                histGarantirOrcamento('AGENDAMENTO');
+                const ehDom = agenState.tipo === 'domiciliar';
+                histAdd('agendamento', {
+                    nome, data, horario, pagamento,
+                    telefone: document.getElementById('agen-telefone')?.value?.trim() || '',
+                    nascimento: document.getElementById('agen-nascimento')?.value || '',
+                    codigoCancel: _agenUltimoCodigoCancel,
+                    atendimento: agenState.tipo, endereco: ehDom ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
+                    exames: (orcSelecionados || []).map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
+                });
+            } catch (eH) { console.warn('[CDA] Histórico:', eH); }
             const [y,m,d] = data.split('-').map(Number);
             const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
             const btnSalvar = document.getElementById('agen-btn-salvar');
@@ -6181,10 +6219,9 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 telefone: telefoneHist,
                 nascimento: nascimentoHist,
                 codigoCancel: _agenUltimoCodigoCancel,
-                tipo: agenState.tipo, endereco: agenState.tipo === 'domiciliar' ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
+                atendimento: agenState.tipo, endereco: agenState.tipo === 'domiciliar' ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
                 exames: (orcSelecionados || []).map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
             };
-            histAdd('agendamento', _agenUltimoAgendamento);
             pedirPermissaoNotificacao();
             verificarLembretes();
             _npsPendente = true;
@@ -6216,6 +6253,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         }
 
         function orcIrParaAgendamento() {
+            histGarantirOrcamento('AGENDAMENTO');   // o orçamento fica no histórico, mesmo que a pessoa ainda não conclua o agendamento
             navigateTo('agendar');
             setTimeout(() => {
                 const nome = localStorage.getItem('patient_name');
@@ -6478,7 +6516,12 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         let _histAbaAtual = 'orcamentos';
 
         function histLer() {
-            try { return JSON.parse(localStorage.getItem('cda_historico') || '[]'); } catch(e) { return []; }
+            try {
+                const l = JSON.parse(localStorage.getItem('cda_historico') || '[]');
+                // conserta registros gravados por engano com tipo 'laboratorio'/'domiciliar' (eram agendamentos)
+                l.forEach(x => { if (x && (x.tipo === 'laboratorio' || x.tipo === 'domiciliar')) { x.atendimento = x.tipo; x.tipo = 'agendamento'; } });
+                return l;
+            } catch(e) { return []; }
         }
 
         function histSalvar(lista) {
@@ -6528,15 +6571,25 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             }
             cont.innerHTML = itens.map(({ item, idx }) => {
                 if (item.tipo === 'orcamento') {
-                    const n = (item.exames || []).length;
-                    return '<div class="bg-slate-50 rounded-2xl p-4">' +
+                    const n = (item.exames || []).length, ag = histAgendamentoDoOrcamento(item, lista);
+                    let quandoAg = '';
+                    if (ag) { const [ay, am, ad] = (ag.data || '').split('-'); quandoAg = ad + '/' + am + '/' + ay + ' às ' + (ag.horario || ''); }
+                    const selo = ag
+                        ? '<span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i>Agendado</span>'
+                        : '<span class="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full"><i class="fa-regular fa-clock mr-1"></i>Em aberto</span>';
+                    return '<div class="bg-slate-50 rounded-2xl p-4' + (ag ? ' border border-emerald-200' : ' border border-amber-200') + '">' +
                         '<div class="flex items-center justify-between mb-1">' +
                             '<p class="text-xs font-extrabold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-calculator text-cda-primary mr-1"></i>Orçamento</p>' +
-                            '<span class="text-[10px] text-slate-400">' + histFormatarQuando(item.quando) + '</span>' +
+                            selo +
                         '</div>' +
                         '<p class="text-sm font-bold text-slate-700">' + n + ' exame' + (n !== 1 ? 's' : '') + ' — ' + formatCurrency(item.total || 0) + '</p>' +
-                        '<p class="text-[11px] text-slate-400 truncate mb-2">' + escapeHtml((item.exames || []).map(e => e.nome).join(', ')) + '</p>' +
-                        '<button onclick="histReabrirOrcamento(' + idx + ')" class="w-full bg-cda-primary/10 text-cda-primary py-2 rounded-xl font-bold text-xs"><i class="fa-solid fa-rotate-left mr-1"></i> Reabrir este orçamento</button>' +
+                        '<p class="text-[11px] text-slate-400 truncate mb-1">' + escapeHtml((item.exames || []).map(e => e.nome).join(', ')) + '</p>' +
+                        '<p class="text-[10px] text-slate-400 mb-2">' + histFormatarQuando(item.quando) + (ag ? ' · <b class="text-emerald-700">✓ agendado para ' + escapeHtml(quandoAg) + '</b>' : '') + '</p>' +
+                        (ag
+                            ? '<div class="flex gap-2"><button onclick="histMostrarAba(\'agendamentos\')" class="flex-1 bg-emerald-50 text-emerald-700 py-2 rounded-xl font-bold text-xs"><i class="fa-solid fa-calendar-check mr-1"></i> Ver agendamento</button>' +
+                              '<button onclick="histReabrirOrcamento(' + idx + ')" class="flex-1 bg-cda-primary/10 text-cda-primary py-2 rounded-xl font-bold text-xs"><i class="fa-solid fa-rotate-left mr-1"></i> Reabrir</button></div>'
+                            : '<div class="flex gap-2"><button onclick="histAgendarOrcamento(' + idx + ')" class="flex-1 btn-cda-primary py-2 rounded-xl font-bold text-xs"><i class="fa-regular fa-calendar-check mr-1"></i> Agendar</button>' +
+                              '<button onclick="histReabrirOrcamento(' + idx + ')" class="flex-1 bg-cda-primary/10 text-cda-primary py-2 rounded-xl font-bold text-xs"><i class="fa-solid fa-rotate-left mr-1"></i> Reabrir</button></div>') +
                     '</div>';
                 }
                 const cancelado = item.status === 'CANCELADO';
@@ -6603,7 +6656,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 if (item.telefone) document.getElementById('agen-telefone').value = item.telefone;
                 if (item.nascimento) document.getElementById('agen-nascimento').value = item.nascimento;
                 const ck = document.getElementById('agen-lgpd'); if (ck) ck.checked = true;
-                if (item.tipo === 'domiciliar') { agenSelecionarTipo('domiciliar'); const ei = document.getElementById('agen-endereco'); if (ei) ei.value = item.endereco || ''; }
+                if (item.atendimento === 'domiciliar') { agenSelecionarTipo('domiciliar'); const ei = document.getElementById('agen-endereco'); if (ei) ei.value = item.endereco || ''; }
                 agenAtualizarResumo();
                 showToast('Escolha a nova data e horário. O horário anterior continua reservado até você salvar.', 'info', 6000);
                 return;
