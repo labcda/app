@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v5'; // v5: token novo (segurança) — força a atualização do app
+const CACHE_NAME = 'pwa-cache-v6'; // v6: agendamento novo (calendário, coleta em casa, LGPD) — força a atualização do app
 const ASSETS = [
   './',
   './index.html',
