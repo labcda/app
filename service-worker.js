@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v13'; // v13: formulários públicos em /formularios/ ficam fora do cache
+const CACHE_NAME = 'pwa-cache-v14'; // v14: sem leitura de pedido por IA; v13: formulários públicos em /formularios/ ficam fora do cache
 const ASSETS = [
   './',
   './index.html',
@@ -17,8 +17,7 @@ const ASSETS = [
 function ehRequisicaoDinamica(url) {
   return url.includes('script.google.com') ||
          url.includes('script.googleusercontent.com') ||
-         url.includes('workers.dev') ||
-         url.includes('api.anthropic.com');
+         url.includes('supabase.co');
 }
 
 // Instala o Service Worker e guarda os arquivos no cache
