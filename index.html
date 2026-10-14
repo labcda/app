@@ -2229,7 +2229,7 @@
                             <button type="button" id="agen-tipo-dom" onclick="agenSelecionarTipo('domiciliar')"
                                 class="agen-periodo-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
                                 <i class="fa-solid fa-house-medical text-xl"></i><span>Em casa</span>
-                                <span class="text-[10px] font-medium opacity-70">1 por dia · a partir das 9h</span>
+                                <span class="text-[10px] font-medium opacity-80">Somente com a recepção</span>
                             </button>
                         </div>
                     </div>
@@ -4661,6 +4661,13 @@
             return Math.round(Number(value || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 });
         }
 
+        // Totais do orçamento: sempre em reais inteiros, nunca com centavos (cartão = 10 parcelas inteiras)
+        function orcTotais(bruto) {
+            const total = Math.round(Number(bruto) || 0);
+            const parcela = Math.round(total * 0.65 / 10);
+            return { total: total, pix: Math.round(total * 0.60), parcela: parcela, credito: parcela * 10 };
+        }
+
         function carregarScript(src) {
             return new Promise((resolve, reject) => {
                 if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
@@ -4795,20 +4802,18 @@
                     </button>`;
                 container.appendChild(div);
             });
-            if (totalEl) totalEl.textContent = formatCurrency(total);
+            const tt = orcTotais(total);
+            if (totalEl) totalEl.textContent = formatCurrencyArredondado(tt.total);
 
             // Atualiza card de descontos
             if (descontoCard) {
                 descontoCard.classList.remove('hidden');
-                const totalPix    = total * 0.60;
-                const totalCredit = total * 0.65;
-                const parcela     = totalCredit / 10;
                 const pixEl    = document.getElementById('orc-preco-pix');
                 const credEl   = document.getElementById('orc-preco-credito');
                 const parcText = document.getElementById('orc-parcela-texto');
-                if (pixEl)    pixEl.textContent    = formatCurrency(totalPix);
-                if (credEl)   credEl.textContent   = formatCurrency(totalCredit);
-                if (parcText) parcText.textContent = `10x de ${formatCurrency(parcela)}`;
+                if (pixEl)    pixEl.textContent    = formatCurrencyArredondado(tt.pix);
+                if (credEl)   credEl.textContent   = formatCurrencyArredondado(tt.credito);
+                if (parcText) parcText.textContent = `10x de ${formatCurrencyArredondado(tt.parcela)}`;
             }
         }
 
@@ -4829,8 +4834,8 @@
         function orcFinalizarWhatsApp() {
             if (!orcSelecionados.length) { showToast('Selecione ao menos um exame para continuar.', 'error'); return; }
             const nome  = localStorage.getItem('patient_name') || 'Paciente';
-            const lista = orcSelecionados.map(ex => `• ${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-            const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
+            const lista = orcSelecionados.map(ex => `• ${ex.nome}`).join('\n');
+            const total = formatCurrencyArredondado(orcTotais(orcSelecionados.reduce((s, e) => s + e.preco, 0)).total);
             const msg   = `Olá! Gostaria de confirmar o orçamento feito pelo app.\n\n*Paciente:* ${nome}\n\n*Exames:*\n${lista}\n\n*Total estimado:* ${total}\n\n_Valores da tabela particular. Sujeito a confirmação._`;
             window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
         }
@@ -4885,7 +4890,6 @@
                 doc.setTextColor(...cWhite); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
                 doc.text('#', margin+3, y+6);
                 doc.text('EXAME', margin+10, y+6);
-                doc.text('VALOR', W-margin-3, y+6, {align:'right'});
                 y += 9;
                 let total = 0;
                 orcSelecionados.forEach((ex, i) => {
@@ -4896,19 +4900,18 @@
                     doc.text(String(i+1), margin+3, y+5.5);
                     doc.setTextColor(...cText); doc.setFontSize(8); doc.setFont('helvetica','normal');
                     doc.text(doc.splitTextToSize(ex.nome,140)[0], margin+10, y+5.5);
-                    doc.setFont('helvetica','bold'); doc.setTextColor(...cPrimary);
-                    doc.text(formatCurrency(ex.preco), W-margin-3, y+5.5, {align:'right'});
                     total += ex.preco; y += rowH;
                 });
                 doc.setDrawColor(...cPrimary); doc.setLineWidth(0.4); doc.line(margin,y+1,W-margin,y+1); y+=4;
                 doc.setFillColor(...cDark); doc.roundedRect(margin,y,cw,12,3,3,'F');
                 doc.setTextColor(...cWhite); doc.setFontSize(9); doc.setFont('helvetica','bold');
                 doc.text('TOTAL ESTIMADO (tabela particular)', margin+5, y+8);
-                doc.text(formatCurrency(total), W-margin-5, y+8, {align:'right'});
+                const tt = orcTotais(total);
+                doc.text(formatCurrencyArredondado(tt.total), W-margin-5, y+8, {align:'right'});
                 y += 18;
 
                 // ── DESCONTOS ──
-                const totalPix = total*0.60, totalCredit = total*0.65, parcela = totalCredit/10;
+                const totalPix = tt.pix, parcela = tt.parcela;
                 doc.setFillColor(...cLight); doc.roundedRect(margin,y,cw,56,4,4,'F');
                 doc.setFillColor(...cPrimary); doc.roundedRect(margin,y,3,56,1.5,1.5,'F');
                 doc.setTextColor(...cDark); doc.setFontSize(9); doc.setFont('helvetica','bold');
@@ -4919,12 +4922,12 @@
                 doc.setTextColor(...cText); doc.setFontSize(8); doc.setFont('helvetica','bold');
                 doc.text('Pix, dinheiro ou debito (a vista)', margin+12, y+24.5);
                 doc.setTextColor(...cGreen); doc.setFontSize(9);
-                doc.text('40% OFF -> '+formatCurrency(totalPix), W-margin-6, y+24.5, {align:'right'});
+                doc.text('40% OFF -> '+formatCurrencyArredondado(totalPix), W-margin-6, y+24.5, {align:'right'});
                 doc.setFillColor(...cWhite); doc.roundedRect(margin+8,y+31,cw-10,10,2,2,'F');
                 doc.setTextColor(...cText); doc.setFontSize(8); doc.setFont('helvetica','bold');
                 doc.text('Cartao de credito (parcelado em ate 10x)', margin+12, y+37.5);
                 doc.setTextColor(...cGreen); doc.setFontSize(9);
-                doc.text('35% OFF -> 10x '+formatCurrency(parcela), W-margin-6, y+37.5, {align:'right'});
+                doc.text('35% OFF -> 10x '+formatCurrencyArredondado(parcela), W-margin-6, y+37.5, {align:'right'});
                 doc.setTextColor(...cAmber); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
                 doc.text('  Cobrimos qualquer orcamento! Apresente uma proposta e faremos questao de superar.', margin+8, y+50);
                 y += 62;
@@ -5005,7 +5008,7 @@
                 const { blob, filename } = await orcCriarPDFBlob();
                 const file = new File([blob], filename, { type: 'application/pdf' });
                 const nome = localStorage.getItem('patient_name') || 'Paciente';
-                const total = formatCurrency(orcSelecionados.reduce((s, e) => s + e.preco, 0));
+                const total = formatCurrencyArredondado(orcTotais(orcSelecionados.reduce((s, e) => s + e.preco, 0)).total);
                 const msg = `Olá! Segue meu orçamento do Laboratório CDA.\n\n*Paciente:* ${nome}\n*Total estimado:* ${total}\n\n_Valores da tabela particular. Sujeito a confirmação._`;
 
                 if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
@@ -5380,9 +5383,9 @@
                         exames:           exames,
                         codigos:          codigos,
                         quantidadeExames: orcSelecionados.length,
-                        totalBruto:       total,
-                        totalPix:         total * 0.60,
-                        totalCredito:     total * 0.65,
+                        totalBruto:       orcTotais(total).total,
+                        totalPix:         orcTotais(total).pix,
+                        totalCredito:     orcTotais(total).credito,
                         acao:             acao || 'BAIXADO',
                         usuario:          'APP'
                     })
@@ -5447,7 +5450,7 @@
                         exames:     exames,
                         codigos:    codigos,
                         qtdExames:  orcSelecionados ? orcSelecionados.length : 0,
-                        totalBruto: totalBruto,
+                        totalBruto: orcTotais(totalBruto).total,
                         formaPgto:  formaPgto,
                         status:     'CONFIRMADO',
                         origem:     origem,
@@ -5506,6 +5509,11 @@
             } catch (e) { console.warn('Dias de coleta em casa indisponíveis:', e); }
         }
         function agenSelecionarTipo(tipo) {
+            if (tipo === 'domiciliar') {   // coleta em casa não é marcada pelo app: só pela recepção
+                showToast('A coleta em casa é agendada somente com a recepção: (27) 99898-0658.', 'info', 5000);
+                tipo = 'laboratorio';
+                if (agenState.tipo === 'laboratorio') return;
+            }
             agenState.tipo = tipo;
             document.getElementById('agen-tipo-lab')?.classList.toggle('ativo', tipo === 'laboratorio');
             document.getElementById('agen-tipo-dom')?.classList.toggle('ativo', tipo === 'domiciliar');
@@ -5718,15 +5726,13 @@
 
             if (data && periodo && horario && temExames) {
                 pagamentoWrap?.classList.remove('hidden');
-                const totalPix = totalBruto * 0.60;
-                const totalCredito = totalBruto * 0.65;
-                const parcela = totalCredito / 10;
+                const tAg = orcTotais(totalBruto), totalPix = tAg.pix, totalCredito = tAg.credito, parcela = tAg.parcela;
                 const pixEl = document.getElementById('agen-preco-pix');
                 const credEl = document.getElementById('agen-preco-credito');
                 const parcText = document.getElementById('agen-parcela-texto');
-                if (pixEl)    pixEl.textContent    = formatCurrency(totalPix);
-                if (credEl)   credEl.textContent   = formatCurrency(totalCredito);
-                if (parcText) parcText.textContent = `10x de ${formatCurrency(parcela)}`;
+                if (pixEl)    pixEl.textContent    = formatCurrencyArredondado(totalPix);
+                if (credEl)   credEl.textContent   = formatCurrencyArredondado(totalCredito);
+                if (parcText) parcText.textContent = `10x de ${formatCurrencyArredondado(parcela)}`;
             } else {
                 pagamentoWrap?.classList.add('hidden');
             }
@@ -5746,10 +5752,10 @@
                 examesWrap.classList.remove('hidden');
                 document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
                     .map(ex => `<div class="flex justify-between"><span>${ex.nome}</span><span class="font-bold">${formatCurrency(ex.preco)}</span></div>`).join('');
-                document.getElementById('agen-resumo-total').textContent = `Total estimado: ${formatCurrency(totalBruto)}`;
+                document.getElementById('agen-resumo-total').textContent = `Total estimado: ${formatCurrencyArredondado(orcTotais(totalBruto).total)}`;
 
                 const ehCredito = pagamento.toLowerCase().indexOf('crédito') >= 0;
-                const valorComDesconto = totalBruto * (ehCredito ? 0.65 : 0.60);
+                const valorComDesconto = ehCredito ? orcTotais(totalBruto).credito : orcTotais(totalBruto).pix;
                 const nomePagamento = ehCredito ? 'Cartão de crédito' : 'Pix, dinheiro ou débito';
                 const pagamentoEl = document.getElementById('agen-resumo-pagamento');
                 if (pagamentoEl) pagamentoEl.textContent = `Forma de pagamento: ${nomePagamento} — ${formatCurrencyArredondado(valorComDesconto)}`;
@@ -5823,7 +5829,7 @@
 
             const totalBruto = orcSelecionados.reduce((s,e) => s + (parseFloat(e.preco) || 0), 0);
             const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-            const descExames = `\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrency(totalBruto)}\nForma de pagamento: ${pagamento}`;
+            const descExames = `\n\nOrigem: agendamento feito no app\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrencyArredondado(orcTotais(totalBruto).total)}\nForma de pagamento: ${pagamento}`;
 
             btnSalvar.disabled = true;
             btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
