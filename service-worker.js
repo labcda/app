@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v12'; // v12: agenda no banco online (Supabase)
+const CACHE_NAME = 'pwa-cache-v13'; // v13: formulários públicos em /formularios/ ficam fora do cache
 const ASSETS = [
   './',
   './index.html',
@@ -53,6 +53,7 @@ self.addEventListener('activate', (e) => {
 // Estratégia Stale-While-Revalidate: Serve do cache e atualiza em background
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith('http')) return;
+  if (e.request.url.includes('/formularios/')) return;   // páginas públicas de auditoria/questionário: sempre da rede
   // APIs dinâmicas vão direto para a rede, sem cache
   if (ehRequisicaoDinamica(e.request.url)) return;
 
