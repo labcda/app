@@ -4658,7 +4658,7 @@
         }
 
         function formatCurrencyArredondado(value) {
-            return Math.round(Number(value || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            return Math.round(Number(value || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         // Totais do orçamento: sempre em reais inteiros, nunca com centavos (cartão = 10 parcelas inteiras)
