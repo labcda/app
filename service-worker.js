@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v11'; // v11: animação de execução nos botões
+const CACHE_NAME = 'pwa-cache-v12'; // v12: agenda no banco online (Supabase)
 const ASSETS = [
   './',
   './index.html',

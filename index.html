@@ -5605,6 +5605,42 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         const CDA_PAINEL_URL       = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
         const CDA_TOKEN            = 'CDA-50qZi8FlCWOndf4jEhLxMQn1';
 
+        // ---- AGENDA NO BANCO ONLINE (Supabase) ----
+        // A chave "publishable" é pública por desenho: com ela o app só consegue chamar 4 funções do banco
+        // (horários ocupados, dias de coleta em casa, agendar e cancelar com código). Nenhuma devolve telefone/nascimento;
+        // a tabela e as funções do painel ficam bloqueadas. Para voltar ao Apps Script: AGENDA_BACKEND = 'script'.
+        const AGENDA_BACKEND  = 'supabase';
+        const SUPABASE_URL    = 'https://ajwtskohneeqraytgmvh.supabase.co';
+        const SUPABASE_PUBKEY = 'sb_publishable_MDZcar8zW9SWX_1cmvTqYQ_tMv52pgL';
+        async function sbRpcApp(nome, args, limiteMs) {
+            const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), limiteMs || 20000);
+            try {
+                const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/' + nome, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SUPABASE_PUBKEY }, body: JSON.stringify(args || {}), signal: ctrl.signal });
+                const txt = await r.text();
+                if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + txt.slice(0, 120));
+                return txt ? JSON.parse(txt) : null;
+            } finally { clearTimeout(t); }
+        }
+        // Mesmos formatos de resposta que o Apps Script devolvia, para o resto do app não mudar
+        async function agendaOcupados(data) {
+            if (AGENDA_BACKEND !== 'supabase') return agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN));
+            const rows = await sbRpcApp('horarios_ocupados', { p_data: data }), oc = []; let dom = false;
+            (rows || []).forEach(x => { if (x.domiciliar) dom = true; else if (!oc.includes(x.hora)) oc.push(x.hora); });
+            return { ok: true, ocupados: oc, domiciliarDia: dom };
+        }
+        async function agendaDiasDomiciliar(mes) {
+            if (AGENDA_BACKEND !== 'supabase') return agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listarDiasDomiciliar&mes=' + mes + '&token=' + encodeURIComponent(CDA_TOKEN));
+            return { ok: true, dias: ((await sbRpcApp('dias_domiciliar', { p_mes: mes })) || []).map(x => x.dia) };
+        }
+        async function agendaCriar(payload) {
+            if (AGENDA_BACKEND !== 'supabase') { const r = await fetch(APPS_SCRIPT_AGENDA_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ action: 'criar', token: CDA_TOKEN }, payload)) }); return r.json(); }
+            return sbRpcApp('criar_agendamento', { p: payload }, 25000);
+        }
+        async function agendaCancelar(d) {
+            if (AGENDA_BACKEND !== 'supabase') { const r = await fetch(CDA_PAINEL_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'cancelarPorDados', token: CDA_TOKEN, data: d.data, horario: d.horario, nome: d.nome, codigo: d.codigo || '' }) }); return r.json(); }
+            return sbRpcApp('cancelar_por_codigo', { p_data: d.data, p_hora: d.horario, p_codigo: String(d.codigo || '').toUpperCase(), p_nome: String(d.nome || '').toUpperCase() });
+        }
+
         async function salvarAppOrcamento(acao) {
             try {
                 const nome   = localStorage.getItem('patient_name') || 'APP';
@@ -5744,7 +5780,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         async function agenCarregarDomiciliares() {
             const mes = agenCalRef.getFullYear() + '-' + String(agenCalRef.getMonth() + 1).padStart(2, '0');
             try {
-                const json = await agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listarDiasDomiciliar&mes=' + mes + '&token=' + encodeURIComponent(CDA_TOKEN));
+                const json = await agendaDiasDomiciliar(mes);
                 (json.dias || []).forEach(d => { agenDomDias[d] = true; });
                 agenCalRender();
             } catch (e) { console.warn('Dias de coleta em casa indisponíveis:', e); }
@@ -5865,8 +5901,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             let ocupados = [];
             let agendaOk = false;
             try {
-                const url = APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
-                const json = await agendaGetJSON(url);
+                const json = await agendaOcupados(data);
                 ocupados = Array.isArray(json.ocupados) ? json.ocupados.map(h => String(h).trim()) : [];
                 if (json.domiciliarDia) agenDomDias[data] = true;
                 agendaOk = true;
@@ -6077,7 +6112,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             try {
                 // Confere de novo bem antes de salvar — evita que dois pacientes
                 // reservem o mesmo horário quase ao mesmo tempo.
-                const checkJson = await agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN));
+                const checkJson = await agendaOcupados(data);
                 const ocupadosCheck = Array.isArray(checkJson.ocupados)
                     ? checkJson.ocupados.map(h => { const p = String(h).trim().split(':'); return p.length >= 2 ? String(parseInt(p[0])).padStart(2,'0') + ':' + p[1].padStart(2,'0') : String(h).trim(); })
                     : [];
@@ -6111,20 +6146,15 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                     : '\nTipo de atendimento: Laboratorio';
                 const levarInfo = '\nLevar: documento com foto e pedido medico (se tiver). Exame de urina/fezes: retirar coletores no laboratorio com antecedencia.';
 
-                const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({
-                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, nascimento: nascFormatado,
-                        pagamento, startTime: startDateTime, endTime: endDateTime,
-                        usuario: 'APP',
-                        tipo: agenState.tipo === 'domiciliar' ? 'domiciliar' : 'laboratorio',
-                        endereco: agenState.tipo === 'domiciliar' ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA\nCodigo de cancelamento: ${_agenUltimoCodigoCancel}${tipoInfo}\nConsentimento LGPD: sim (${new Date().toLocaleString('pt-BR')})${idadeInfo}${responsavelInfo}${levarInfo}${descExames}`,
-                        temOrcamento: '1'
-                    })
+                const json = await agendaCriar({
+                    data, horario, nome, telefone, nascimento: nascFormatado,
+                    pagamento, startTime: startDateTime, endTime: endDateTime, duracao_min: 40,
+                    usuario: 'APP',
+                    tipo: agenState.tipo === 'domiciliar' ? 'domiciliar' : 'laboratorio',
+                    endereco: agenState.tipo === 'domiciliar' ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
+                    descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA\nCodigo de cancelamento: ${_agenUltimoCodigoCancel}${tipoInfo}\nConsentimento LGPD: sim (${new Date().toLocaleString('pt-BR')})${idadeInfo}${responsavelInfo}${levarInfo}${descExames}`,
+                    temOrcamento: '1'
                 });
-                const json = await resp.json();
                 if (json.regra || json.domiciliar_ocupado) {
                     showToast(json.erro || 'Regra da coleta em casa não atendida.', 'error', 6000);
                     if (json.domiciliar_ocupado) agenDomDias[data] = true;
@@ -6144,8 +6174,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
                 if (_agenReagendandoApp) {   // reagendamento: só agora o horário antigo é liberado
                     const velho = _agenReagendandoApp; _agenReagendandoApp = null;
                     try {
-                        const rc = await fetch(CDA_PAINEL_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'cancelarPorDados', token: CDA_TOKEN, data: velho.data, horario: velho.horario, nome: velho.nome, codigo: velho.codigoCancel || '' }) });
-                        const jc = await rc.json();
+                        const jc = await agendaCancelar({ data: velho.data, horario: velho.horario, nome: velho.nome, codigo: velho.codigoCancel || '' });
                         if (jc.ok) { const lista = histLer(); if (lista[velho.idx]) { lista[velho.idx].status = 'CANCELADO'; histSalvar(lista); } }
                     } catch (eC) { console.warn('[CDA] Não foi possível liberar o horário antigo:', eC); }
                 }
@@ -6668,16 +6697,7 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
             let cancelou = false;
             try {
                 // Usa a URL do painel: é a implantação que tem a action cancelarPorDados
-                const resp = await fetch(CDA_PAINEL_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({
-                        action: 'cancelarPorDados', token: CDA_TOKEN,
-                        data: item.data, horario: item.horario,
-                        nome: item.nome, codigo: item.codigoCancel || ''
-                    })
-                });
-                const json = await resp.json();
+                const json = await agendaCancelar({ data: item.data, horario: item.horario, nome: item.nome, codigo: item.codigoCancel || '' });
                 cancelou = json.ok === true;
             } catch(e) { console.warn('[CDA] Falha ao cancelar via servidor:', e); }
 
