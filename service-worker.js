@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v10'; // v10: zoom por pinça bloqueado
+const CACHE_NAME = 'pwa-cache-v11'; // v11: animação de execução nos botões
 const ASSETS = [
   './',
   './index.html',

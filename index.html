@@ -7000,5 +7000,77 @@ Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:
         document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
         document.addEventListener('wheel', function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
     </script>
+    <style>
+        .cda-busy { pointer-events: none !important; cursor: progress !important; opacity: .88; }
+        .cda-busy .fa-spinner { animation: cdaGira .8s linear infinite; }
+        @keyframes cdaGira { to { transform: rotate(360deg); } }
+        .cda-busy::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.9), transparent); background-size: 40% 100%; background-repeat: no-repeat; animation: cdaBarra 1s linear infinite; border-radius: 0 0 8px 8px; }
+        @keyframes cdaBarra { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+    </style>
+    <script>
+    // Botões que SALVAM ou GERAM algo mostram uma animação de "em execução" (spinner + texto) até terminar,
+    // e ficam travados para evitar clique duplo. Funciona para todas as funções de ação chamadas por onclick.
+    (function () {
+        var VERBOS = /(pdf|exportar|consultar|salvar|salvo|gravar|gerar|criar|enviar|importar|registrar|concluir|baixar|compartilhar|imprimir|assinar|cadastrar|excluir|anexar|upload|darBaixa|fecharPeriodo|fecharMes|reagend|cancelarAg|cancelarAud|cancelarMan|cancelarLink|executarCancel|marcarCompar|toggleCompar|marcarContato|atualizarFinanceiro|atualizarRecebimento|atualizarVencimento|atualizarRecoleta|atualizarPermiss|salvarAssin|publicar|aprovar|sincronizar|copiarLink|lerComIA|agendarColeta)/i;
+        var EXCLUI = /^(carregar|listar|render|abrir|mostrar|get|set|formatar|validar|parse|buscar|filtrar|fechar(Modal|Historico|NPS|Overlay)|toggle(Tema|Menu|Sidebar)|navigate|aplicar|atualizarBadge|limpar|reset|selecionar|escolher)/i;
+        var ultimo = { el: null, t: 0 };
+        document.addEventListener('click', function (e) { var el = e.target && e.target.closest ? e.target.closest('button, a, [onclick]') : null; if (el) ultimo = { el: el, t: Date.now() }; }, true);
+
+        function textoOcupado(rotulo) {
+            if (/salv|gravar/i.test(rotulo)) return 'Salvando…'; if (/ger/i.test(rotulo)) return 'Gerando…'; if (/envi/i.test(rotulo)) return 'Enviando…';
+            if (/baix/i.test(rotulo)) return 'Baixando…'; if (/import/i.test(rotulo)) return 'Importando…'; if (/compartilh|imprim/i.test(rotulo)) return 'Preparando…';
+            if (/conclu/i.test(rotulo)) return 'Concluindo…'; if (/cancel|exclu/i.test(rotulo)) return 'Aguarde…'; return 'Processando…';
+        }
+        function ocupar(el, nome) {
+            var original = el.innerHTML, largura = el.offsetWidth, texto = (el.textContent || '').trim();
+            el.__cdaOriginal = original; el.__cdaDisabled = el.disabled;
+            if (largura) el.style.minWidth = largura + 'px';
+            var rotulo = texto ? textoOcupado(texto + ' ' + nome) : '';
+            el.innerHTML = '<i class="fa-solid fa-spinner" style="margin-right:' + (rotulo ? '8px' : '0') + '"></i>' + (rotulo ? '<span>' + rotulo + '</span>' : '');
+            el.__cdaBusyHtml = el.innerHTML;
+            el.classList.add('cda-busy'); if ('disabled' in el) el.disabled = true; el.setAttribute('aria-busy', 'true');
+            if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+        }
+        function liberar(el) {
+            el.classList.remove('cda-busy'); el.removeAttribute('aria-busy');
+            if ('disabled' in el) el.disabled = !!el.__cdaDisabled;
+            el.style.minWidth = '';
+            if (el.innerHTML === el.__cdaBusyHtml) el.innerHTML = el.__cdaOriginal;   // se a própria função já trocou o texto (ex.: "Agendado!"), não mexe
+            el.__cdaOriginal = el.__cdaBusyHtml = null; el.__cdaTomado = false;
+        }
+        function embrulhar(nome, orig) {
+            var w = function () {
+                var el = ultimo.el, args = arguments, self = this;
+                if (el && !el.__cdaTomado && Date.now() - ultimo.t < 400 && (el.getAttribute('onclick') || '').indexOf(nome + '(') >= 0) {
+                    el.__cdaTomado = true; ocupar(el, nome);
+                    return new Promise(function (resolve, reject) {
+                        setTimeout(function () {    // dá tempo do navegador desenhar a animação antes do trabalho pesado
+                            var r; try { r = orig.apply(self, args); } catch (err) { liberar(el); console.error(err); reject(err); return; }
+                            if (r && typeof r.then === 'function') r.then(function (v) { liberar(el); resolve(v); }, function (err) { liberar(el); reject(err); });
+                            else { setTimeout(function () { liberar(el); }, 250); resolve(r); }
+                        }, 40);
+                    });
+                }
+                return orig.apply(this, arguments);
+            };
+            w.__cdaEmbrulhada = true; return w;
+        }
+        function instrumentar() {
+            var n = 0;
+            Object.getOwnPropertyNames(window).forEach(function (nome) {
+                var f; try { f = window[nome]; } catch (e) { return; }
+                if (typeof f !== 'function' || f.__cdaEmbrulhada || !VERBOS.test(nome) || EXCLUI.test(nome)) return;
+                var src = Function.prototype.toString.call(f);
+                if (/\{\s*\[native code\]\s*\}/.test(src) || /\bevent\b/.test(src)) return;   // funções que leem "event" precisam rodar na hora do clique
+                var d = Object.getOwnPropertyDescriptor(window, nome); if (d && (d.writable === false || d.configurable === false && !d.writable)) return;
+                try { window[nome] = embrulhar(nome, f); n++; } catch (e) {}
+            });
+            return n;
+        }
+        window.addEventListener('load', function () { setTimeout(instrumentar, 300); setTimeout(instrumentar, 3000); });
+        window.__cdaInstrumentar = instrumentar;
+    })();
+    </script>
+
 </body>
 </html>
