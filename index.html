@@ -5512,12 +5512,13 @@
         // ---- Unidades (Matriz e Mata Fria): o paciente escolhe onde quer ser atendido ----
         const UNIDADES_APP = {
             MATRIZ: { nome: 'Matriz', endereco: 'Rua José Giestas, 46, Centro, Afonso Cláudio/ES', chegada: 'dirija-se a um atendente da recepção, no térreo', slotsManha: ['07:30','08:10','08:50','09:30','10:10','10:50'], slotsTarde: ['14:30','15:10','15:50'] },
-            MATA_FRIA: { nome: 'Mata Fria', endereco: '', chegada: 'dirija-se à recepção da unidade', slotsManha: ['07:30','08:10','08:50','09:30','10:10','10:50'], slotsTarde: ['14:30','15:10','15:50'] }
+            MATA_FRIA: { nome: 'Mata Fria', endereco: '', chegada: 'dirija-se à recepção da unidade', slotsManha: ['06:00','06:40','07:20','08:00','08:40'], slotsTarde: [] }
         };
         function unidadeApp() { try { return localStorage.getItem('cda_unidade_app') === 'MATA_FRIA' ? 'MATA_FRIA' : 'MATRIZ'; } catch (e) { return 'MATRIZ'; } }
         function appAplicarUnidade() {
             const u = unidadeApp(), cfg = UNIDADES_APP[u];
             SLOTS_MANHA.splice(0, SLOTS_MANHA.length, ...cfg.slotsManha); SLOTS_TARDE.splice(0, SLOTS_TARDE.length, ...cfg.slotsTarde);
+            const bt = document.getElementById('agen-btn-tarde'); if (bt) bt.style.display = cfg.slotsTarde.length ? '' : 'none';
             ['MATRIZ', 'MATA_FRIA'].forEach(k => { const b = document.getElementById('agen-un-' + k); if (b) b.classList.toggle('ativo', k === u); });
         }
         function appDefinirUnidade(u) {
