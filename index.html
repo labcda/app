@@ -4851,7 +4851,7 @@
         // =====================================================
         // GERAR PDF
         // =====================================================
-        async function orcCriarPDFBlob() {
+        async function orcCriarPDFBlob(ag) {
             await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
@@ -4860,7 +4860,7 @@
                 const cPrimary = [73,188,190], cDark = [15,76,92], cMid = [55,167,170];
                 const cText = [30,41,59], cMuted = [100,116,139], cLight = [240,246,247];
                 const cWhite = [255,255,255], cGreen = [5,150,105], cAmber = [160,100,0];
-                const nomePac = localStorage.getItem('patient_name') || '';
+                const nomePac = (ag && ag.nome) || localStorage.getItem('patient_name') || '';
                 const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
                 let y = 0;
 
@@ -4879,7 +4879,7 @@
                 doc.setFillColor(...cPrimary);
                 doc.roundedRect(W-margin-42,10,42,14,3,3,'F');
                 doc.setTextColor(...cWhite); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
-                doc.text('ORCAMENTO', W-margin-21,19,{align:'center'});
+                doc.text(ag ? 'AGENDAMENTO' : 'ORCAMENTO', W-margin-21,19,{align:'center'});
                 y = 56;
 
                 // ── PACIENTE ──
@@ -4887,11 +4887,29 @@
                 doc.roundedRect(margin,y,cw,20,4,4,'F');
                 doc.setTextColor(...cMuted); doc.setFontSize(7); doc.setFont('helvetica','normal');
                 doc.text('PACIENTE', margin+5, y+7);
-                doc.text('DATA', margin+cw/2, y+7);
+                doc.text(ag ? 'EMITIDO EM' : 'DATA', margin+cw/2, y+7);
                 doc.setTextColor(...cText); doc.setFontSize(10); doc.setFont('helvetica','bold');
                 doc.text(nomePac || 'Nao informado', margin+5, y+15);
                 doc.text(hoje, margin+cw/2, y+15);
                 y += 28;
+
+                // ── AGENDAMENTO: data, horário e orientações de chegada (só no PDF de agendamento) ──
+                if (ag) {
+                    doc.setFillColor(...cDark); doc.roundedRect(margin,y,cw,44,4,4,'F');
+                    doc.setFillColor(...cPrimary); doc.roundedRect(margin,y,3,44,1.5,1.5,'F');
+                    doc.setTextColor(200,240,241); doc.setFontSize(7); doc.setFont('helvetica','bold');
+                    doc.text('SEU AGENDAMENTO', margin+9, y+8);
+                    doc.setTextColor(...cWhite); doc.setFontSize(13); doc.setFont('helvetica','bold');
+                    doc.text(ag.dataExt, margin+9, y+17);
+                    doc.setFontSize(20);
+                    doc.text(ag.horario, W-margin-8, y+17, {align:'right'});
+                    doc.setDrawColor(...cPrimary); doc.setLineWidth(0.3); doc.line(margin+9, y+22, W-margin-8, y+22);
+                    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...cWhite);
+                    doc.text('Chegue 10 minutos antes do horário agendado.', margin+9, y+29.5);
+                    doc.setFont('helvetica','normal'); doc.setTextColor(215,243,244);
+                    doc.text('Ao chegar, dirija-se a um atendente da recepção, no térreo.', margin+9, y+36);
+                    y += 52;
+                }
 
                 // ── TABELA ──
                 doc.setFillColor(...cDark); doc.roundedRect(margin,y,cw,9,2,2,'F');
@@ -4911,6 +4929,7 @@
                     total += ex.preco; y += rowH;
                 });
                 doc.setDrawColor(...cPrimary); doc.setLineWidth(0.4); doc.line(margin,y+1,W-margin,y+1); y+=4;
+                if (y + 12 > H - 24) { doc.addPage(); y = 20; }
                 doc.setFillColor(...cDark); doc.roundedRect(margin,y,cw,12,3,3,'F');
                 doc.setTextColor(...cWhite); doc.setFontSize(9); doc.setFont('helvetica','bold');
                 doc.text('TOTAL ESTIMADO (tabela particular)', margin+5, y+8);
@@ -4919,6 +4938,7 @@
                 y += 18;
 
                 // ── DESCONTOS ──
+                if (y + 62 > H - 24) { doc.addPage(); y = 20; }
                 const totalPix = tt.pix, parcela = tt.parcela;
                 doc.setFillColor(...cLight); doc.roundedRect(margin,y,cw,56,4,4,'F');
                 doc.setFillColor(...cPrimary); doc.roundedRect(margin,y,3,56,1.5,1.5,'F');
@@ -4970,7 +4990,7 @@
                     doc.setFillColor(232,248,248); doc.roundedRect(margin,y,cw,28,4,4,'F');
                     doc.setFillColor(...cPrimary); doc.roundedRect(margin,y,3,28,1.5,1.5,'F');
                     doc.setTextColor(...cDark); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
-                    doc.text('Agende e ganhe mimos especiais!', margin+8, y+8);
+                    doc.text(ag ? 'Seus mimos especiais!' : 'Agende e ganhe mimos especiais!', margin+8, y+8);
                     doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(...cText);
                     doc.text('v Atendimento sem fila   v Sala VIP com TV e ar-condicionado', margin+8, y+15);
                     doc.text('v Cafe expresso   v Biscoitinho Club Social', margin+8, y+21.5);
@@ -4985,8 +5005,8 @@
                 doc.setFontSize(6.5); doc.setTextColor(180,220,221);
                 doc.text('* Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', W/2, H-6, {align:'center'});
 
-            const safe = (nomePac||'orcamento').replace(/[^a-z0-9]/gi,'_').toLowerCase();
-            const filename = 'orcamento_cda_' + safe + '.pdf';
+            const safe = (nomePac||(ag ? 'agendamento' : 'orcamento')).replace(/[^a-z0-9]/gi,'_').toLowerCase();
+            const filename = (ag ? 'agendamento_cda_' : 'orcamento_cda_') + safe + '.pdf';
             return { blob: doc.output('blob'), filename };
         }
 
@@ -6009,6 +6029,7 @@
         function agenResumoTexto(r) {
             let m = '🔬 *Laboratório CDA — Agendamento confirmado*\n\n';
             m += '👤 Paciente: *' + r.nome + '*\n📅 Data: *' + r.dataExt + '*\n🕗 Horário: *' + r.horario + '*\n📍 Laboratório CDA — Rua José Giestas, 46, Centro, Afonso Cláudio/ES\n';
+            m += '\n⏰ *Chegue 10 minutos antes do horário agendado.* Ao chegar, dirija-se a um atendente da recepção, no térreo.\n';
             if (r.exames.length) m += '\n*Exames:*\n' + r.exames.map(n => '• ' + n).join('\n') + '\n';
             if (r.total) m += '\n💰 *Total tabela particular:* ' + formatCurrencyArredondado(r.total) + '\n💳 Pagamento escolhido: *' + r.pagamento + '*' + (r.valorPago ? ' — *' + r.valorPago + '*' : '');
             if (r.preparo.length) {
@@ -6027,50 +6048,12 @@
         }
         async function agenResumoPDF() {
             const r = agenResumoDados(); if (!r) { showToast('Agendamento não encontrado.', 'error'); return; }
+            showToast('Gerando PDF...', 'info', 2500);
             try {
-                await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-                const { jsPDF } = window.jspdf, doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                const W = 210, mg = 16, AZUL = [0, 89, 84], TEAL = [51, 139, 133], TEXTO = [16, 22, 32], MUTED = [100, 116, 139];
-                doc.setFillColor(...AZUL); doc.roundedRect(mg, 10, W - mg * 2, 34, 6, 6, 'F');
-                doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(255, 255, 255); doc.text('Laboratório CDA', mg + 8, 24);
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(220, 245, 245); doc.text('Diagnóstico de confiança  ·  Afonso Cláudio, ES  ·  (27) 99898-0658', mg + 8, 31);
-                doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(255, 255, 255); doc.text('AGENDAMENTO CONFIRMADO', W - mg - 8, 24, { align: 'right' });
-                let y = 58;
-                const linha = (rot, val) => {
-                    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...MUTED); doc.text(rot, mg + 6, y);
-                    doc.setFontSize(11); doc.setTextColor(...TEXTO); const p = doc.splitTextToSize(val, W - mg * 2 - 12); doc.text(p, mg + 6, y + 6); y += 6 + p.length * 5 + 5;
-                };
-                doc.setFillColor(248, 250, 251); doc.roundedRect(mg, y - 7, W - mg * 2, 56, 4, 4, 'F');
-                linha('PACIENTE', String(r.nome).toUpperCase()); linha('DATA E HORÁRIO', r.dataExt + ' às ' + r.horario);
-                linha('LOCAL', 'Laboratório CDA — Rua José Giestas, 46, Centro, Afonso Cláudio/ES');
-                y += 6;
-                if (r.exames.length) {
-                    doc.setFillColor(...AZUL); doc.roundedRect(mg, y, W - mg * 2, 8, 2.5, 2.5, 'F');
-                    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(255, 255, 255); doc.text('EXAMES', mg + 6, y + 5.5); y += 8;
-                    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(55, 65, 81);
-                    const passo = r.exames.length > 20 ? 4.6 : 6;
-                    r.exames.slice(0, 40).forEach((n, i) => { if (y > 225) return; doc.text((i + 1) + '. ' + doc.splitTextToSize(n, 160)[0], mg + 6, y + 5); y += passo; });
-                    y += 4;
-                }
-                if (r.total) {
-                    doc.setFillColor(...TEAL); doc.roundedRect(mg, y, W - mg * 2, 11, 3, 3, 'F');
-                    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(255, 255, 255); doc.text('TOTAL ESTIMADO (tabela particular)', mg + 5, y + 7.2);
-                    doc.setFontSize(12); doc.text(formatCurrencyArredondado(r.total), W - mg - 4, y + 7.4, { align: 'right' }); y += 15;
-                    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(55, 65, 81);
-                    doc.text('Pagamento escolhido: ' + r.pagamento + (r.valorPago ? ' — ' + r.valorPago : ''), mg + 2, y); y += 9;
-                }
-                const bloco = (titulo, itens) => {
-                    if (y > 255) return;
-                    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...AZUL); doc.text(titulo, mg + 2, y); y += 5.5;
-                    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(55, 65, 81);
-                    itens.forEach(t => { if (y > 280) return; const p = doc.splitTextToSize('• ' + t, W - mg * 2 - 6); doc.text(p, mg + 4, y); y += p.length * 4.4; }); y += 3;
-                };
-                if (r.preparo.length) bloco('Preparo dos seus exames', r.preparo.map(p => p.nome + ' — ' + p.jejum + '. ' + p.preparo));
-                bloco('O que levar no dia da coleta', ['Documento oficial com foto', 'Pedido médico, se tiver, para conferência dos exames', 'Exame de urina ou fezes no pedido? Retire os coletores no laboratório com antecedência']);
-                bloco('Você ganha ao ser atendido', ['Atendimento sem fila · Sala VIP · Club Social · Achocolatado']);
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
-                doc.text('Dúvidas ou reagendamento: (27) 99898-0658  ·  Laboratório CDA – Diagnóstico de Confiança', W / 2, 289, { align: 'center' });
-                doc.save('agendamento_cda_' + String(r.nome).replace(/\s+/g, '_').toLowerCase() + '.pdf');
+                const { blob, filename } = await orcCriarPDFBlob(r);   // o mesmo PDF do orçamento, com o título AGENDAMENTO e a área da data/hora
+                const url = URL.createObjectURL(blob), link = document.createElement('a');
+                link.href = url; link.download = filename; link.click();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
             } catch (e) { console.warn(e); showToast('Não foi possível gerar o PDF agora.', 'error'); }
         }
 
