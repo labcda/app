@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v14'; // v14: sem leitura de pedido por IA; v13: formulários públicos em /formularios/ ficam fora do cache
+const CACHE_NAME = 'pwa-cache-v15'; // v15: resumo do agendamento (WhatsApp/PDF); v14: sem leitura de pedido por IA; v13: formulários públicos em /formularios/ ficam fora do cache
 const ASSETS = [
   './',
   './index.html',

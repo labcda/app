@@ -1390,6 +1390,14 @@
                 <div id="agendamento-sucesso-corpo" class="termos-texto" style="font-size:0.85rem;color:#475569;line-height:1.6;"></div>
             </div>
             <div style="padding:0 24px 24px;" class="space-y-2">
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="agenResumoWhatsApp()" class="py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 text-white" style="background:linear-gradient(135deg,#25D366,#128C7E)">
+                        <i class="fa-brands fa-whatsapp"></i> Resumo no WhatsApp
+                    </button>
+                    <button onclick="agenResumoPDF()" class="py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 border-2 border-slate-200 text-slate-700 bg-white">
+                        <i class="fa-solid fa-file-pdf"></i> Resumo em PDF
+                    </button>
+                </div>
                 <button onclick="baixarLembreteICS()" class="w-full bg-slate-100 text-slate-700 py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
                     <i class="fa-regular fa-calendar-plus"></i> Adicionar ao meu calendário
                 </button>
@@ -5976,11 +5984,94 @@
                 nascimento: nascimentoHist,
                 codigoCancel: _agenUltimoCodigoCancel,
                 atendimento: agenState.tipo, endereco: agenState.tipo === 'domiciliar' ? (document.getElementById('agen-endereco')?.value || '').trim() : '',
-                exames: (orcSelecionados || []).map(e => ({ id: e.id, nome: e.nome, preco: e.preco }))
+                exames: (orcSelecionados || []).map(e => ({ id: e.id, nome: e.nome, preco: e.preco })),
+                preparo: (function () { try { return preparoParaSelecionados(); } catch (e) { return []; } })()
             };
             pedirPermissaoNotificacao();
             verificarLembretes();
             _npsPendente = true;
+        }
+
+        // ---- Resumo do agendamento para o paciente: mensagem de WhatsApp ou PDF ----
+        function agenResumoDados() {
+            const ag = _agenUltimoAgendamento; if (!ag) return null;
+            const [y, m, d] = ag.data.split('-').map(Number);
+            const exames = (ag.exames || []).map(e => e.nome);
+            const bruto = (ag.exames || []).reduce((s, e) => s + (parseFloat(e.preco) || 0), 0);
+            const t = orcTotais(bruto), ehCred = String(ag.pagamento || '').toLowerCase().indexOf('crédito') >= 0;
+            return {
+                nome: ag.nome, horario: ag.horario, exames: exames, total: exames.length ? t.total : 0, pagamento: ag.pagamento,
+                dataExt: new Date(y, m - 1, d).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }),
+                valorPago: exames.length ? (ehCred ? '10x de ' + formatCurrencyArredondado(t.parcela) : formatCurrencyArredondado(t.pix)) : '',
+                preparo: ag.preparo || []
+            };
+        }
+        function agenResumoTexto(r) {
+            let m = '🔬 *Laboratório CDA — Agendamento confirmado*\n\n';
+            m += '👤 Paciente: *' + r.nome + '*\n📅 Data: *' + r.dataExt + '*\n🕗 Horário: *' + r.horario + '*\n📍 Laboratório CDA — Rua José Giestas, 46, Centro, Afonso Cláudio/ES\n';
+            if (r.exames.length) m += '\n*Exames:*\n' + r.exames.map(n => '• ' + n).join('\n') + '\n';
+            if (r.total) m += '\n💰 *Total tabela particular:* ' + formatCurrencyArredondado(r.total) + '\n💳 Pagamento escolhido: *' + r.pagamento + '*' + (r.valorPago ? ' — *' + r.valorPago + '*' : '');
+            if (r.preparo.length) {
+                m += '\n\n📋 *Preparo dos seus exames:*';
+                r.preparo.forEach(p => { m += '\n• *' + p.nome + '* — ' + p.jejum + '\n   ' + p.preparo; });
+                m += '\n_Orientações gerais — confirme com o laboratório se tiver dúvidas._';
+            }
+            m += '\n\n🎒 *O que levar no dia da coleta*\n• Documento oficial com foto\n• Pedido médico, se tiver, para conferência dos exames\n• Exame de urina ou fezes no pedido? Retire os coletores no laboratório com antecedência';
+            m += '\n\n🎁 *Você ganha:* atendimento sem fila, Sala VIP, Club Social e Achocolatado';
+            m += '\n\n📞 Dúvidas ou reagendamento: (27) 99898-0658\n\n_Laboratório CDA – Diagnóstico de Confiança_';
+            return m;
+        }
+        function agenResumoWhatsApp() {
+            const r = agenResumoDados(); if (!r) { showToast('Agendamento não encontrado.', 'error'); return; }
+            window.open('https://wa.me/?text=' + encodeURIComponent(agenResumoTexto(r)), '_blank');
+        }
+        async function agenResumoPDF() {
+            const r = agenResumoDados(); if (!r) { showToast('Agendamento não encontrado.', 'error'); return; }
+            try {
+                await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                const { jsPDF } = window.jspdf, doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const W = 210, mg = 16, AZUL = [0, 89, 84], TEAL = [51, 139, 133], TEXTO = [16, 22, 32], MUTED = [100, 116, 139];
+                doc.setFillColor(...AZUL); doc.roundedRect(mg, 10, W - mg * 2, 34, 6, 6, 'F');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(255, 255, 255); doc.text('Laboratório CDA', mg + 8, 24);
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(220, 245, 245); doc.text('Diagnóstico de confiança  ·  Afonso Cláudio, ES  ·  (27) 99898-0658', mg + 8, 31);
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(255, 255, 255); doc.text('AGENDAMENTO CONFIRMADO', W - mg - 8, 24, { align: 'right' });
+                let y = 58;
+                const linha = (rot, val) => {
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...MUTED); doc.text(rot, mg + 6, y);
+                    doc.setFontSize(11); doc.setTextColor(...TEXTO); const p = doc.splitTextToSize(val, W - mg * 2 - 12); doc.text(p, mg + 6, y + 6); y += 6 + p.length * 5 + 5;
+                };
+                doc.setFillColor(248, 250, 251); doc.roundedRect(mg, y - 7, W - mg * 2, 56, 4, 4, 'F');
+                linha('PACIENTE', String(r.nome).toUpperCase()); linha('DATA E HORÁRIO', r.dataExt + ' às ' + r.horario);
+                linha('LOCAL', 'Laboratório CDA — Rua José Giestas, 46, Centro, Afonso Cláudio/ES');
+                y += 6;
+                if (r.exames.length) {
+                    doc.setFillColor(...AZUL); doc.roundedRect(mg, y, W - mg * 2, 8, 2.5, 2.5, 'F');
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(255, 255, 255); doc.text('EXAMES', mg + 6, y + 5.5); y += 8;
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(55, 65, 81);
+                    const passo = r.exames.length > 20 ? 4.6 : 6;
+                    r.exames.slice(0, 40).forEach((n, i) => { if (y > 225) return; doc.text((i + 1) + '. ' + doc.splitTextToSize(n, 160)[0], mg + 6, y + 5); y += passo; });
+                    y += 4;
+                }
+                if (r.total) {
+                    doc.setFillColor(...TEAL); doc.roundedRect(mg, y, W - mg * 2, 11, 3, 3, 'F');
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(255, 255, 255); doc.text('TOTAL ESTIMADO (tabela particular)', mg + 5, y + 7.2);
+                    doc.setFontSize(12); doc.text(formatCurrencyArredondado(r.total), W - mg - 4, y + 7.4, { align: 'right' }); y += 15;
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(55, 65, 81);
+                    doc.text('Pagamento escolhido: ' + r.pagamento + (r.valorPago ? ' — ' + r.valorPago : ''), mg + 2, y); y += 9;
+                }
+                const bloco = (titulo, itens) => {
+                    if (y > 255) return;
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...AZUL); doc.text(titulo, mg + 2, y); y += 5.5;
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(55, 65, 81);
+                    itens.forEach(t => { if (y > 280) return; const p = doc.splitTextToSize('• ' + t, W - mg * 2 - 6); doc.text(p, mg + 4, y); y += p.length * 4.4; }); y += 3;
+                };
+                if (r.preparo.length) bloco('Preparo dos seus exames', r.preparo.map(p => p.nome + ' — ' + p.jejum + '. ' + p.preparo));
+                bloco('O que levar no dia da coleta', ['Documento oficial com foto', 'Pedido médico, se tiver, para conferência dos exames', 'Exame de urina ou fezes no pedido? Retire os coletores no laboratório com antecedência']);
+                bloco('Você ganha ao ser atendido', ['Atendimento sem fila · Sala VIP · Club Social · Achocolatado']);
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+                doc.text('Dúvidas ou reagendamento: (27) 99898-0658  ·  Laboratório CDA – Diagnóstico de Confiança', W / 2, 289, { align: 'center' });
+                doc.save('agendamento_cda_' + String(r.nome).replace(/\s+/g, '_').toLowerCase() + '.pdf');
+            } catch (e) { console.warn(e); showToast('Não foi possível gerar o PDF agora.', 'error'); }
         }
 
         function fecharModalSucessoAgendamento() {
