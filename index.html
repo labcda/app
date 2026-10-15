@@ -2227,6 +2227,19 @@
                     </label>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                            <i class="fa-solid fa-hospital text-cda-primary mr-1"></i> Em qual unidade?
+                        </label>
+                        <div class="grid grid-cols-2 gap-3" id="agen-unidades">
+                            <button type="button" id="agen-un-MATRIZ" onclick="appDefinirUnidade('MATRIZ')" class="agen-periodo-btn ativo flex flex-col items-center gap-1 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
+                                <i class="fa-solid fa-building text-xl"></i><span>Matriz</span><span class="text-[10px] font-medium opacity-70">Centro</span>
+                            </button>
+                            <button type="button" id="agen-un-MATA_FRIA" onclick="appDefinirUnidade('MATA_FRIA')" class="agen-periodo-btn flex flex-col items-center gap-1 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
+                                <i class="fa-solid fa-house-chimney-medical text-xl"></i><span>Mata Fria</span><span class="text-[10px] font-medium opacity-70">Filial</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                             <i class="fa-solid fa-location-dot text-cda-primary mr-1"></i> Onde será a coleta?
                         </label>
                         <div class="grid grid-cols-2 gap-3">
@@ -4898,7 +4911,7 @@
                     doc.setFillColor(...cDark); doc.roundedRect(margin,y,cw,44,4,4,'F');
                     doc.setFillColor(...cPrimary); doc.roundedRect(margin,y,3,44,1.5,1.5,'F');
                     doc.setTextColor(200,240,241); doc.setFontSize(7); doc.setFont('helvetica','bold');
-                    doc.text('SEU AGENDAMENTO', margin+9, y+8);
+                    doc.text('SEU AGENDAMENTO' + (ag.unidadeNome ? '  ·  UNIDADE ' + String(ag.unidadeNome).toUpperCase() : ''), margin+9, y+8);
                     doc.setTextColor(...cWhite); doc.setFontSize(13); doc.setFont('helvetica','bold');
                     doc.text(ag.dataExt, margin+9, y+17);
                     doc.setFontSize(20);
@@ -4907,7 +4920,7 @@
                     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...cWhite);
                     doc.text('Chegue 10 minutos antes do horário agendado.', margin+9, y+29.5);
                     doc.setFont('helvetica','normal'); doc.setTextColor(215,243,244);
-                    doc.text('Ao chegar, dirija-se a um atendente da recepção, no térreo.', margin+9, y+36);
+                    doc.text('Ao chegar, ' + (ag.chegada || 'dirija-se à recepção') + '.', margin+9, y+36);
                     y += 52;
                 }
 
@@ -5375,15 +5388,16 @@
         // Mesmos formatos de resposta que o Apps Script devolvia, para o resto do app não mudar
         async function agendaOcupados(data) {
             if (AGENDA_BACKEND !== 'supabase') return agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN));
-            const rows = await sbRpcApp('horarios_ocupados', { p_data: data }), oc = []; let dom = false;
+            const rows = await sbRpcApp('horarios_ocupados', { p_data: data, p_unidade: unidadeApp() }), oc = []; let dom = false;
             (rows || []).forEach(x => { if (x.domiciliar) dom = true; else if (!oc.includes(x.hora)) oc.push(x.hora); });
             return { ok: true, ocupados: oc, domiciliarDia: dom };
         }
         async function agendaDiasDomiciliar(mes) {
             if (AGENDA_BACKEND !== 'supabase') return agendaGetJSON(APPS_SCRIPT_AGENDA_URL + '?action=listarDiasDomiciliar&mes=' + mes + '&token=' + encodeURIComponent(CDA_TOKEN));
-            return { ok: true, dias: ((await sbRpcApp('dias_domiciliar', { p_mes: mes })) || []).map(x => x.dia) };
+            return { ok: true, dias: ((await sbRpcApp('dias_domiciliar', { p_mes: mes, p_unidade: unidadeApp() })) || []).map(x => x.dia) };
         }
         async function agendaCriar(payload) {
+            payload.unidade = unidadeApp();
             if (AGENDA_BACKEND !== 'supabase') { const r = await fetch(APPS_SCRIPT_AGENDA_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ action: 'criar', token: CDA_TOKEN }, payload)) }); return r.json(); }
             return sbRpcApp('criar_agendamento', { p: payload }, 25000);
         }
@@ -5404,6 +5418,7 @@
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         action:           'salvarAppOrcamento',
+                        unidade:          unidadeApp(),
                         token:            CDA_TOKEN,
                         data:             agora.toLocaleDateString('pt-BR'),
                         hora:             agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0'),
@@ -5470,6 +5485,7 @@
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         action:     'salvarAppRegistroAgen',
+                        unidade:    unidadeApp(),
                         token:      CDA_TOKEN,
                         data:       d + '/' + m + '/' + y,
                         hora:       horario,
@@ -5493,6 +5509,24 @@
         const SLOTS_TARDE = ['14:30','15:10','15:50'];
 
         const SLOTS_DOM_MANHA = ['09:30','10:10','10:50'];   // coleta em casa: somente a partir das 9h
+        // ---- Unidades (Matriz e Mata Fria): o paciente escolhe onde quer ser atendido ----
+        const UNIDADES_APP = {
+            MATRIZ: { nome: 'Matriz', endereco: 'Rua José Giestas, 46, Centro, Afonso Cláudio/ES', chegada: 'dirija-se a um atendente da recepção, no térreo', slotsManha: ['07:30','08:10','08:50','09:30','10:10','10:50'], slotsTarde: ['14:30','15:10','15:50'] },
+            MATA_FRIA: { nome: 'Mata Fria', endereco: '', chegada: 'dirija-se à recepção da unidade', slotsManha: ['07:30','08:10','08:50','09:30','10:10','10:50'], slotsTarde: ['14:30','15:10','15:50'] }
+        };
+        function unidadeApp() { try { return localStorage.getItem('cda_unidade_app') === 'MATA_FRIA' ? 'MATA_FRIA' : 'MATRIZ'; } catch (e) { return 'MATRIZ'; } }
+        function appAplicarUnidade() {
+            const u = unidadeApp(), cfg = UNIDADES_APP[u];
+            SLOTS_MANHA.splice(0, SLOTS_MANHA.length, ...cfg.slotsManha); SLOTS_TARDE.splice(0, SLOTS_TARDE.length, ...cfg.slotsTarde);
+            ['MATRIZ', 'MATA_FRIA'].forEach(k => { const b = document.getElementById('agen-un-' + k); if (b) b.classList.toggle('ativo', k === u); });
+        }
+        function appDefinirUnidade(u) {
+            try { localStorage.setItem('cda_unidade_app', u === 'MATA_FRIA' ? 'MATA_FRIA' : 'MATRIZ'); } catch (e) {}
+            appAplicarUnidade();
+            try { agenSelecionarTipo('laboratorio'); } catch (e) {}   // troca de unidade: limpa data e horário escolhidos
+            showToast('Unidade: ' + UNIDADES_APP[unidadeApp()].nome, 'info', 1800);
+        }
+        document.addEventListener('DOMContentLoaded', () => { try { appAplicarUnidade(); } catch (e) {} });
         const DOM_HORA_MINIMA = '09:00';
         let agenState = { data: null, periodo: null, horario: null, tipo: 'laboratorio' };
         let agenCalRef = new Date();
@@ -5802,7 +5836,7 @@
                 const [y,m,d] = data.split('-').map(Number);
                 const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
                 document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
-                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario}` + (agenState.tipo === 'domiciliar' ? ' · coleta em casa' : '');
+                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario} · Unidade ${UNIDADES_APP[unidadeApp()].nome}` + (agenState.tipo === 'domiciliar' ? ' · coleta em casa' : '');
                 document.getElementById('agen-resumo-nome').textContent = nome;
 
                 const examesWrap = document.getElementById('agen-resumo-exames-wrap');
@@ -5886,7 +5920,7 @@
 
             const totalBruto = orcSelecionados.reduce((s,e) => s + (parseFloat(e.preco) || 0), 0);
             const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-            const descExames = `\n\nOrigem: agendamento feito no app\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrencyArredondado(orcTotais(totalBruto).total)}\nForma de pagamento: ${pagamento}`;
+            const descExames = `\n\nOrigem: agendamento feito no app\nUnidade: ${UNIDADES_APP[unidadeApp()].nome}\n\nLista de Exames:\n${linhas}\nTotal estimado: ${formatCurrencyArredondado(orcTotais(totalBruto).total)}\nForma de pagamento: ${pagamento}`;
 
             btnSalvar.disabled = true;
             btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
@@ -5994,6 +6028,7 @@
                 const ehDom = agenState.tipo === 'domiciliar';
                 histAdd('agendamento', {
                     nome, data, horario, pagamento,
+                    unidade: unidadeApp(),
                     telefone: document.getElementById('agen-telefone')?.value?.trim() || '',
                     nascimento: document.getElementById('agen-nascimento')?.value || '',
                     codigoCancel: _agenUltimoCodigoCancel,
@@ -6029,6 +6064,7 @@
             const nascimentoHist = document.getElementById('agen-nascimento')?.value || '';
             _agenUltimoAgendamento = {
                 nome, data, horario, pagamento,
+                unidade: unidadeApp(),
                 telefone: telefoneHist,
                 nascimento: nascimentoHist,
                 codigoCancel: _agenUltimoCodigoCancel,
@@ -6049,7 +6085,7 @@
             const bruto = (ag.exames || []).reduce((s, e) => s + (parseFloat(e.preco) || 0), 0);
             const t = orcTotais(bruto), ehCred = String(ag.pagamento || '').toLowerCase().indexOf('crédito') >= 0;
             return {
-                nome: ag.nome, horario: ag.horario, exames: exames, total: exames.length ? t.total : 0, pagamento: ag.pagamento,
+                nome: ag.nome, horario: ag.horario, unidade: UNIDADES_APP[ag.unidade || 'MATRIZ'] ? (ag.unidade || 'MATRIZ') : 'MATRIZ', endereco: UNIDADES_APP[ag.unidade || 'MATRIZ'].endereco, chegada: UNIDADES_APP[ag.unidade || 'MATRIZ'].chegada, unidadeNome: UNIDADES_APP[ag.unidade || 'MATRIZ'].nome, exames: exames, total: exames.length ? t.total : 0, pagamento: ag.pagamento,
                 dataExt: new Date(y, m - 1, d).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }),
                 valorPago: exames.length ? (ehCred ? '10x de ' + formatCurrencyArredondado(t.parcela) : formatCurrencyArredondado(t.pix)) : '',
                 preparo: ag.preparo || []
@@ -6057,8 +6093,8 @@
         }
         function agenResumoTexto(r) {
             let m = '🔬 *Laboratório CDA — Agendamento confirmado*\n\n';
-            m += '👤 Paciente: *' + r.nome + '*\n📅 Data: *' + r.dataExt + '*\n🕗 Horário: *' + r.horario + '*\n📍 Laboratório CDA — Rua José Giestas, 46, Centro, Afonso Cláudio/ES\n';
-            m += '\n⏰ *Chegue 10 minutos antes do horário agendado.* Ao chegar, dirija-se a um atendente da recepção, no térreo.\n';
+            m += '👤 Paciente: *' + r.nome + '*\n📅 Data: *' + r.dataExt + '*\n🕗 Horário: *' + r.horario + '*\n📍 Laboratório CDA — ' + r.unidadeNome + (r.endereco ? ' · ' + r.endereco : '') + '\n';
+            m += '\n⏰ *Chegue 10 minutos antes do horário agendado.* Ao chegar, ' + r.chegada + '.\n';
             if (r.exames.length) m += '\n*Exames:*\n' + r.exames.map(n => '• ' + n).join('\n') + '\n';
             if (r.total) m += '\n💰 *Total tabela particular:* ' + formatCurrencyArredondado(r.total) + '\n💳 Pagamento escolhido: *' + r.pagamento + '*' + (r.valorPago ? ' — *' + r.valorPago + '*' : '');
             if (r.preparo.length) {

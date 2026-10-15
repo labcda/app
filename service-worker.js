@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-cache-v16'; // v16: aviso de ciclo circadiano (apos 9h30); v15: resumo do agendamento (WhatsApp/PDF); v14: sem leitura de pedido por IA; v13: formulários públicos em /formularios/ ficam fora do cache
+const CACHE_NAME = 'pwa-cache-v17'; // v17: escolha da unidade (Matriz ou Mata Fria); v16: aviso de ciclo circadiano (apos 9h30); v15: resumo do agendamento (WhatsApp/PDF); v14: sem leitura de pedido por IA; v13: formulários públicos em /formularios/ ficam fora do cache
 const ASSETS = [
   './',
   './index.html',
