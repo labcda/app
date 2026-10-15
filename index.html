@@ -5707,13 +5707,41 @@
             grid.classList.remove('hidden');
         }
 
+        // ---- Exames sujeitos ao ciclo circadiano: não indicamos coletar depois das 9h30 ----
+        const CIRC_HORA_LIMITE = '09:30';
+        const CIRC_REGRAS = [/CORTISOL/, /\bACTH\b|CORTICOTROF/, /\bGH\b|\bHGH\b|HORMONIO DO CRESCIMENTO|SOMATOTROF/, /MELATONINA/, /TESTOSTERONA/, /PROLACTINA/, /\bTSH\b/, /\bFERRO\b/, /SATURACAO DA TRANSFERRINA|\bIST\b/, /FOSFORO/, /\bPTH\b|PARATORM/, /\bRENINA\b/, /ALDOSTERONA/, /EOSINOFILOS?/, /GLICOSE|GLICEMIA/, /FERRITINA/, /TRANSFERRINA/, /CAPACIDADE TOTAL DE LIGACAO|TIBC|CTLF/, /ACIDO URICO/, /MAGNESIO/, /ACIDOS BILIARES/];
+        const CIRC_EXCLUI = /URIN|24\s*(H|HS|HORAS)|FEZES|ANTICORPO|ANTI[ -]|AUTO|POS.?PRANDIAL|TOLERANCIA|SALIVAR|LIVRE URI|DEHIDRO|DESIDROGEN|ERITROCIT|RECEPTOR|\b16 ?HORAS|SUPRESSAO|DEXAMETASONA/;
+        function circExamesAfetados() {
+            if (typeof orcSelecionados === 'undefined') return [];
+            const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+            return orcSelecionados.filter(e => { const n = norm(e.nome); return !CIRC_EXCLUI.test(n) && CIRC_REGRAS.some(r => r.test(n)); }).map(e => e.nome);
+        }
+        function circHorarioTarde(h) { return /^\d{1,2}:\d{2}$/.test(h || '') && ('0' + h).slice(-5) > CIRC_HORA_LIMITE; }
+        // mostra (ou esconde) o aviso acima do botão de salvar; devolve a lista de exames afetados quando o aviso está ativo
+        function agenAvisoCircadiano() {
+            let box = document.getElementById('agen-aviso-circ');
+            const afetados = circHorarioTarde(agenState.horario) ? circExamesAfetados() : [];
+            if (!afetados.length) { if (box) box.style.display = 'none'; return []; }
+            if (!box) {
+                const btn = document.getElementById('agen-btn-salvar'); if (!btn || !btn.parentNode) return afetados;
+                box = document.createElement('div'); box.id = 'agen-aviso-circ';
+                box.style.cssText = 'margin:0 0 12px;padding:12px 14px;border-radius:14px;background:#FFF4D6;border:1px solid #F5C451;color:#6B4A00;font-size:.82rem;line-height:1.45';
+                btn.parentNode.insertBefore(box, btn);
+            }
+            box.style.display = 'block';
+            box.innerHTML = '<b><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px"></i>Atenção ao horário escolhido</b><br>Não indicamos fazer ' + (afetados.length > 1 ? 'estes exames' : 'este exame') + ' depois das 9h30, pois pode haver interferência no resultado devido ao ciclo circadiano: <b>' +
+                afetados.slice(0, 6).map(n => String(n).replace(/[<>&]/g, '')).join(', ') + (afetados.length > 6 ? ' e mais ' + (afetados.length - 6) : '') + '</b>.<br>Para um resultado mais confiável, escolha um horário até 9h30.';
+            return afetados;
+        }
+
         function agenSelecionarHorario(hora) {
             agenState.horario = hora;
             document.querySelectorAll('.agen-horario-btn').forEach(btn => {
                 btn.classList.toggle('ativo', btn.dataset.hora === hora);
             });
             agenAtualizarResumo();
-            showToast(`Horário ${hora} selecionado`, 'success', 1500);
+            if (agenAvisoCircadiano().length) showToast('Não indicamos esses exames depois das 9h30 (ciclo circadiano). Veja o aviso abaixo.', 'info', 7000);
+            else showToast(`Horário ${hora} selecionado`, 'success', 1500);
         }
 
         function agenPagamentoSelecionado() {
@@ -5731,6 +5759,7 @@
         }
 
         function agenAtualizarResumo() {
+  try { agenAvisoCircadiano(); } catch (eC) {}
             const { data, periodo, horario } = agenState;
             const nome = document.getElementById('agen-nome')?.value?.trim() || '';
             const telefoneResumo = document.getElementById('agen-telefone')?.value?.trim() || '';
