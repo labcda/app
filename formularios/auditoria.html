@@ -50,7 +50,7 @@ canvas{width:100%;height:170px;border:2px dashed var(--tq);border-radius:14px;ba
 <div id="progresso" class="prog" style="display:none"><span id="pt">0 de 0</span><div class="bar"><i id="pb"></i></div><span id="ps"></span></div>
 <div class="wrap"><div id="app"><div class="card cen"><div class="spin"></div><p>Carregando… pode levar alguns segundos.</p></div></div></div>
 <script>
-var API = 'https://script.google.com/macros/s/AKfycbxS3cBgs1SLOaFdJrgT--7oX23n8u-x92dUEEYxhBMiK6UUzAY-bnIXndjKRm-rqL0Zcg/exec';
+var API = 'https://ajwtskohneeqraytgmvh.supabase.co/functions/v1/qualidade';
 var TOKEN = new URLSearchParams(location.search).get('t') || '';
 var app = document.getElementById('app'), M = null, R = {}, pad = null, sujo = false, LS = 'aud_' + TOKEN.slice(0, 12);
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
