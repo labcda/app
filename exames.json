@@ -921,19 +921,11 @@
   },
   {
     "id": 120,
-    "codigo": "HBCG",
-    "nome": "ANTI HBC IgG",
+    "codigo": "HBCT",
+    "nome": "ANTI-HBC TOTAL (ANTICORPOS IGG+IGM)",
     "categoria": "PARTICULAR",
-    "preco": 41.68,
-    "busca": "HBCG ANTI HBC IGG PARTICULAR"
-  },
-  {
-    "id": 121,
-    "codigo": "HBCM",
-    "nome": "ANTI HBC IgM",
-    "categoria": "PARTICULAR",
-    "preco": 50.01,
-    "busca": "HBCM ANTI HBC IGM PARTICULAR"
+    "preco": 83.35,
+    "busca": "HBCT ANTI HBC TOTAL ANTICORPOS IGG IGM PARTICULAR"
   },
   {
     "id": 122,
