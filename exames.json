@@ -2624,14 +2624,6 @@
     "busca": "NAB ANTICORPOS NEUTRALIZANTES ANTI SARS COV 2 PARTICULAR"
   },
   {
-    "id": 335,
-    "codigo": "CEPA",
-    "nome": "ANTIBIOGRAMA",
-    "categoria": "PARTICULAR",
-    "preco": 133.36,
-    "busca": "CEPA ANTIBIOGRAMA PARTICULAR"
-  },
-  {
     "id": 336,
     "codigo": "LEPTO",
     "nome": "LEPTOSPIROSE IGG/IGM",
